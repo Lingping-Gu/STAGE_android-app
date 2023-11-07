@@ -11,39 +11,37 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Enter your email..."
+        android:hint="johndoe@stage.com"
         android:inputType="textEmailAddress"
-        app:layout_constraintStart_toEndOf="@id/emailIV"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/emailAddressIV"
         app:layout_constraintBottom_toTopOf="@id/passwordET"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintVertical_chainStyle="packed"
-        />
+        app:layout_constraintVertical_chainStyle="packed"/>
 
     <ImageView
-        android:id="@+id/emailIV"
+        android:id="@+id/emailAddressIV"
         android:layout_width="30dp"
         android:layout_height="30dp"
         app:srcCompat="@drawable/user"
         app:layout_constraintEnd_toStartOf="@id/emailAddressET"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/emailAddressET"
         app:layout_constraintTop_toTopOf="@id/emailAddressET"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        />
+        app:layout_constraintBottom_toBottomOf="@id/emailAddressET"
+        app:layout_constraintHorizontal_chainStyle="packed" />
 
     <EditText
         android:id="@+id/passwordET"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Enter your password..."
+        android:hint="password"
         android:inputType="textPassword"
-        app:layout_constraintStart_toEndOf="@id/passwordIV"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/passwordIV"
         app:layout_constraintTop_toBottomOf="@id/emailAddressET"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/pwConfirmET"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintVertical_chainStyle="packed"/>
 
@@ -54,9 +52,33 @@
         app:srcCompat="@drawable/key"
         app:layout_constraintEnd_toStartOf="@id/passwordET"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/passwordET"
         app:layout_constraintTop_toTopOf="@id/passwordET"
-        app:layout_constraintHorizontal_chainStyle="packed"/>
+        app:layout_constraintBottom_toBottomOf="@id/passwordET"
+        app:layout_constraintHorizontal_chainStyle="packed" />
+
+    <EditText
+        android:id="@+id/pwConfirmET"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="confirm password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/pwConfirmIV"
+        app:layout_constraintTop_toBottomOf="@id/passwordET"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <ImageView
+        android:id="@+id/pwConfirmIV"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:srcCompat="@drawable/x"
+        app:layout_constraintEnd_toStartOf="@id/pwConfirmET"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/pwConfirmET"
+        app:layout_constraintBottom_toBottomOf="@id/pwConfirmET"
+        app:layout_constraintHorizontal_chainStyle="packed" />
 
     <Button
         android:id="@+id/registerBT"
@@ -65,9 +87,6 @@
         android:text="Register"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/resetPasswordTV"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        android:layout_marginTop="15dp"
-        android:layout_marginStart="15dp"/>
+        app:layout_constraintTop_toBottomOf="@id/pwConfirmET"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

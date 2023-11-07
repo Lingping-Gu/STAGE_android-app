@@ -21,8 +21,8 @@ import com.google.firebase.auth.SignInMethodQueryResult;
 
 public class Login extends AppCompatActivity {
 
-    private static final String TAG = "Login";
-    private FirebaseAuth mAuth;
+        private static final String TAG = "Login";
+        private FirebaseAuth mAuth;
     Button registerBT;
     Button loginBT;
     EditText emailET;
@@ -114,47 +114,5 @@ public class Login extends AppCompatActivity {
         //  change this intent
         Intent intent = new Intent(Login.this,MainActivity.class);
         startActivity(intent);
-    }
-
-    // TODO: password criteria
-    // TODO: hint for when invalid password is entered
-    // TODO: confirm password field
-    // TODO: hint for when invalid email is entered/already existing email is entered
-    private void createUserAccount(String email, String password) {
-        mAuth.fetchSignInMethodsForEmail(email)
-                .addOnCompleteListener(this, new OnCompleteListener<SignInMethodQueryResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
-                        if (task.isSuccessful()) {
-                            SignInMethodQueryResult result = task.getResult();
-                            if (result != null && result.getSignInMethods() != null && result.getSignInMethods().isEmpty()) {
-                                // this means that email is not registered so we can create an account
-                                Task<AuthResult> authResultTask = mAuth.createUserWithEmailAndPassword(email, password)
-                                        .addOnCompleteListener(Login.this, new OnCompleteListener<AuthResult>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<AuthResult> createTask) {
-                                                if (createTask.isSuccessful()) {
-                                                    // sign up successful
-                                                    Log.d(TAG, "createUserWithEmailAndPassword:success");
-                                                    FirebaseUser currentUser = mAuth.getCurrentUser();
-                                                    // update UI(currentUser)
-                                                } else {
-                                                    // sign up unsuccessful
-                                                    Log.w(TAG, "createUserWithEmailAndPassword:failure", createTask.getException());
-                                                    // make toast to notify user
-                                                    // update UI null user
-                                                }
-                                            }
-                                        });
-                            } else {
-                                // email is already registered
-                                // create toast
-                            }
-                        } else {
-                            // error checking email availability
-                            Log.e(TAG, "Error checking email availability", task.getException());
-                        }
-                    }
-                });
     }
 }
