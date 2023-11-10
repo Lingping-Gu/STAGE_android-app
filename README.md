@@ -1,1 +1,2 @@
-# emptyandroidstarter
+# STAGE
+CS5520 Fall 2023 Project
