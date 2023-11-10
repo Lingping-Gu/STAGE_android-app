@@ -82,7 +82,6 @@ public class Register extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                // register success
                                 Log.d(TAG, "createUserWithEmail:success");
                                 // change intent
                                 Intent intent = new Intent(Register.this,MainActivity.class);
