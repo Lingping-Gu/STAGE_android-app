@@ -4,8 +4,11 @@ import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -38,6 +41,19 @@ public class MainActivity extends AppCompatActivity {
         // obtain the NavController from the NavHostFragment
         // the NavController is responsible for switching fragments using res.navigation.mobile_navigation.xml
         NavController navController = navHostFragment.getNavController();
+
+        // Set up a NavController listener to handle menu item selection
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.navigation_music_review) {
+                // Only set the selected item if it's not already selected
+                if (binding.navView.getSelectedItemId() != R.id.navigation_explore) {
+                    binding.navView.getMenu().findItem(R.id.navigation_explore).setChecked(true);
+                }
+            } else {
+                // Handle other destinations if needed
+            }
+        });
+
 
         // Binds the BottomNavigationView to the NavController.
         // Sets up listeners on the bottom navigation items such that when the user tap an item,
