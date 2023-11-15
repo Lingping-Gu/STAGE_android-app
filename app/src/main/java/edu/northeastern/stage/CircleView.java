@@ -39,13 +39,14 @@ public class CircleView extends View {
         super.onDraw(canvas);
 
         @SuppressLint("DrawAllocation") Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
+        paint.setColor(Color.rgb(67,83,52));
         paint.setStyle(Paint.Style.STROKE);
 
         // Calculate center x and y
         int centerX = getWidth() / 2;
         int centerY = getHeight() / 2;
 
+        int circleCount = 0;
         if(circles != null){
             // Draw each circle on the canvas
             for(Circle c : circles) {
@@ -57,7 +58,7 @@ public class CircleView extends View {
                 adjustCirclePosition(c);
 
                 // Set random text size based on circle radius
-                float textSize = c.getRadius() / 2;
+                float textSize = c.getRadius() / 3;
                 paint.setTextSize(textSize);
 
                 // Generate random text
@@ -82,7 +83,37 @@ public class CircleView extends View {
     }
 
     // Function to adjust circle position to avoid collisions
+    // adjust boundary for the circles
     private void adjustCirclePosition(Circle currentCircle) {
+//        Random rand = new Random();
+        for (Circle otherCircle : circles) {
+            if (otherCircle != currentCircle) {
+                float distance = calculateDistance(currentCircle, otherCircle);
+                float minDistance = currentCircle.getRadius() + otherCircle.getRadius();
+
+                // If circles are too close, adjust the position of the current circle
+                if (distance < minDistance) {
+                    float angle = calculateAngle(currentCircle, otherCircle);
+
+                    float newX = otherCircle.getX() + minDistance * (float) Math.cos(angle) + 100;
+                    float newY = otherCircle.getY() + minDistance * (float) Math.sin(angle) + 100;
+
+//                    int randX = rand.nextInt(1)==1?100:-100;
+//                    int randY = rand.nextInt(1)==1?100:-100;
+//                    float newX = otherCircle.getX() + minDistance * (float) Math.cos(angle) + randX;
+//                    float newY = otherCircle.getY() + minDistance * (float) Math.sin(angle) + randY;
+
+                    currentCircle.setX(newX);
+                    currentCircle.setY(newY);
+
+                    distance = calculateDistance(currentCircle, otherCircle);
+                    minDistance = currentCircle.getRadius() + otherCircle.getRadius();
+                }
+            }
+        }
+    }
+
+    private void adjustCirclePosition2(Circle currentCircle) {
         for (Circle otherCircle : circles) {
             if (otherCircle != currentCircle) {
                 float distance = calculateDistance(currentCircle, otherCircle);
@@ -148,5 +179,11 @@ public class CircleView extends View {
         float dy = circle2.getY() - circle1.getY();
         return (float) Math.atan2(dy, dx);
     }
+
+    public void setCircles(List<Circle> circles) {
+        this.circles = circles.toArray(new Circle[0]);
+        invalidate(); // Request a redraw
+    }
+
 
 }

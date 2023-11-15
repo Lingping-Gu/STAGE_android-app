@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,6 +46,8 @@ public class Explore extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private AutoCompleteTextView actv;
     Button reviewButton;
+    CircleView circleView;
+    SeekBar geoSlider;
 
     //    String[] recs = {"Option1", "Option2", "Option3", "Option4", "Option5"};
     // a method to toast a message given
@@ -99,6 +102,12 @@ public class Explore extends AppCompatActivity {
         Log.d(TAG, "in oncreate");
 
         reviewButton = findViewById(R.id.reviewButton);
+        circleView = findViewById(R.id.circleView);
+        geoSlider = findViewById(R.id.slider);
+
+//        geoSlider.onseek(SeekBar.OnSeekBarChangeListener l){
+
+//        }
 
         //Creating the instance of ArrayAdapter containing list of song names
         //Getting the instance of AutoCompleteTextView
@@ -116,7 +125,7 @@ public class Explore extends AppCompatActivity {
 
         actv.setTextColor(Color.BLUE);
 
-        //createCircles();
+        createCircles();
 
     }
 
@@ -239,18 +248,25 @@ public class Explore extends AppCompatActivity {
 
         Random rand = new Random();
 
-        for(int i=0; i<50; i++) {
+        circles.add(new Circle(circleView.getHeight()/2, circleView.getWidth()/2, 55));
+
+        for(int i=1; i<50; i++) {
 
             float x = rand.nextFloat()*100;
             float y = rand.nextFloat()*100;
             float radius = rand.nextFloat()*100 + 5;
 
             circles.add(new Circle(x, y, radius));
-
         }
 
-        CircleView cv = new CircleView(this, circles);
-        setContentView(cv);
+        // Set the circles to the existing CircleView
+        if (circleView != null) {
+            circleView.setCircles(circles);
+            circleView.invalidate(); // Request a redraw
+        }
+
+//        circleView = new CircleView(this, circles);
+//        setContentView(circleView);
     }
 
 }
