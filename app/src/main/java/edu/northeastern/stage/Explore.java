@@ -1,6 +1,8 @@
 package edu.northeastern.stage;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -41,6 +44,7 @@ public class Explore extends AppCompatActivity {
     ArrayList<String> recs = new ArrayList<>();
     private ArrayAdapter<String> adapter;
     private AutoCompleteTextView actv;
+    Button reviewButton;
 
     //    String[] recs = {"Option1", "Option2", "Option3", "Option4", "Option5"};
     // a method to toast a message given
@@ -53,6 +57,7 @@ public class Explore extends AppCompatActivity {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             Log.d(TAG, "in beforeTextChanged");
+            reviewButton.setEnabled(false);
             if(s.length() == 0){
 //                resultText.setText("");
             }
@@ -84,6 +89,7 @@ public class Explore extends AppCompatActivity {
     };
 
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +97,8 @@ public class Explore extends AppCompatActivity {
 
 //        suggestions = findViewById(R.id.suggestions_list);
         Log.d(TAG, "in oncreate");
+
+        reviewButton = findViewById(R.id.reviewButton);
 
         //Creating the instance of ArrayAdapter containing list of song names
         //Getting the instance of AutoCompleteTextView
@@ -101,17 +109,21 @@ public class Explore extends AppCompatActivity {
         // Set a listener to handle item selection
         actv.setOnItemClickListener((parent, view, position, id) -> {
             String selectedSong = (String) parent.getItemAtPosition(position);
-            // Do something with the selected song (e.g., show a message or perform an action)
 //            makeDeezerReq();
             Log.d(TAG, "IN ACTV.setOnItemClickListener");
+            reviewButton.setEnabled(true);
         });
 
         actv.setTextColor(Color.RED);
 
-//        searchBox.addTextChangedListener(textWatcher);
-
 //        createCircles();
 
+    }
+
+    public void reviewButtonPressed(View v){
+        // Opens a new activity (AboutMeActivity) that displays my name and email
+        Intent intent = new Intent(this, Review.class);
+        startActivity(intent);
     }
 
     public void makeDeezerReq(String inputArtistName) {
