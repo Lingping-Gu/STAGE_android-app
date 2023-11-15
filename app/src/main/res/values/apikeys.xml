@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="DEEZER_API">ffe291ce76mshf7702ba5576f58cp178987jsnc3c9a30b44e7</string>
+    <string name="DEEZER_BASE_URL">https://deezerdevs-deezer.p.rapidapi.com/search?q=</string>
+    <!--    <string name="GENIUS_BASE_URL">https://api.genius.com</string>-->
+    <!--    <string name="GENIUS_API">2HDkDjx7ZuG8I6AqvSWBbKsXopkoVsfVCre3HbFps3pD6R6AhXOSHf4oVb7qDu4a</string>-->
+</resources>
