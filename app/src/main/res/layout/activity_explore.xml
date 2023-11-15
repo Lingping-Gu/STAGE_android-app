@@ -13,12 +13,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:dropDownSelector="@color/white"
         android:ems="10"
         android:hint="Search suggestions"
+        android:popupBackground="@color/beige"
+        android:shadowColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@id/reviewButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/reviewButton"
         app:layout_constraintVertical_chainStyle="packed" />
 
 

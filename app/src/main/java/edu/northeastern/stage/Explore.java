@@ -114,7 +114,7 @@ public class Explore extends AppCompatActivity {
             reviewButton.setEnabled(true);
         });
 
-        actv.setTextColor(Color.RED);
+        actv.setTextColor(Color.BLUE);
 
 //        createCircles();
 
