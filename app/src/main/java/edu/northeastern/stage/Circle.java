@@ -2,13 +2,13 @@ package edu.northeastern.stage;
 
 public class Circle {
 
-    private int x;
-    private int y;
-    private int radius;
+    private float x;
+    private float y;
+    private float radius;
 
     // Constructor
 
-    public Circle(int x, int y, int radius) {
+    public Circle(float x, float y, float radius) {
         this.x = x;
         this.y = y;
         this.radius = radius;
@@ -16,29 +16,29 @@ public class Circle {
 
     // Getters
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    public int getRadius() {
+    public float getRadius() {
         return radius;
     }
 
     // Setters
 
-    public void setX(int x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public void setY(int y) {
+    public void setY(float y) {
         this.y = y;
     }
 
-    public void setRadius(int radius) {
+    public void setRadius(float radius) {
         this.radius = radius;
     }
 

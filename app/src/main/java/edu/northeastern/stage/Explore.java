@@ -116,7 +116,7 @@ public class Explore extends AppCompatActivity {
 
         actv.setTextColor(Color.BLUE);
 
-//        createCircles();
+        //createCircles();
 
     }
 
@@ -239,11 +239,11 @@ public class Explore extends AppCompatActivity {
 
         Random rand = new Random();
 
-        for(int i=0; i<20; i++) {
+        for(int i=0; i<50; i++) {
 
-            int x = rand.nextInt(100);
-            int y = rand.nextInt(100);
-            int radius = rand.nextInt(20) + 5; // radii 5-25
+            float x = rand.nextFloat()*100;
+            float y = rand.nextFloat()*100;
+            float radius = rand.nextFloat()*100 + 5;
 
             circles.add(new Circle(x, y, radius));
 
