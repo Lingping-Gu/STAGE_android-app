@@ -93,30 +93,31 @@ public class Explore extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_explore);
+        setContentView(R.layout.activity_explore); // Inflate the layout
 
-//        suggestions = findViewById(R.id.suggestions_list);
-        Log.d(TAG, "in oncreate");
+        Log.e("Explore", "Circles to be created.");
+        createCircles();
 
-        reviewButton = findViewById(R.id.reviewButton);
-
-        //Creating the instance of ArrayAdapter containing list of song names
-        //Getting the instance of AutoCompleteTextView
-        actv = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
-        actv.setThreshold(1);//will start working from first character
-
-        actv.addTextChangedListener(textWatcher);
-        // Set a listener to handle item selection
-        actv.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedSong = (String) parent.getItemAtPosition(position);
-//            makeDeezerReq();
-            Log.d(TAG, "IN ACTV.setOnItemClickListener");
-            reviewButton.setEnabled(true);
-        });
-
-        actv.setTextColor(Color.BLUE);
-
-//        createCircles();
+////        suggestions = findViewById(R.id.suggestions_list);
+//        Log.d(TAG, "in oncreate");
+//
+//        reviewButton = findViewById(R.id.reviewButton);
+//
+//        //Creating the instance of ArrayAdapter containing list of song names
+//        //Getting the instance of AutoCompleteTextView
+//        actv = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
+//        actv.setThreshold(1);//will start working from first character
+//
+//        actv.addTextChangedListener(textWatcher);
+//        // Set a listener to handle item selection
+//        actv.setOnItemClickListener((parent, view, position, id) -> {
+//            String selectedSong = (String) parent.getItemAtPosition(position);
+////            makeDeezerReq();
+//            Log.d(TAG, "IN ACTV.setOnItemClickListener");
+//            reviewButton.setEnabled(true);
+//        });
+//
+//        actv.setTextColor(Color.BLUE);
 
     }
 
@@ -234,23 +235,46 @@ public class Explore extends AppCompatActivity {
         }
     }
 
-    public void createCircles(){
-        List<Circle> circles = new ArrayList<>();
+    public void createCircles() {
+        List<Circle> circles = createNonOverlappingCircles();
+        Log.e("Explore", "Circles are created.");
 
+        CircleView cv = findViewById(R.id.circleView);
+        cv.setCircles(circles);
+    }
+
+    private List<Circle> createNonOverlappingCircles() {
+        List<Circle> circles = new ArrayList<>();
         Random rand = new Random();
 
-        for(int i=0; i<20; i++) {
+        while (circles.size() < 20) {
+            float x = rand.nextFloat() * 100;
+            float y = rand.nextFloat() * 100;
+            float radius = rand.nextFloat() * 100 + 5;
 
-            int x = rand.nextInt(100);
-            int y = rand.nextInt(100);
-            int radius = rand.nextInt(20) + 5; // radii 5-25
+            // Ensure the newly created circle doesn't overlap with existing circles
+            boolean isOverlapping = false;
+            for (Circle existingCircle : circles) {
+                float distance = calculateDistance(x, y, existingCircle.getX(), existingCircle.getY());
+                float minDistance = radius + existingCircle.getRadius();
+                if (distance < minDistance) {
+                    isOverlapping = true;
+                    break; // This circle overlaps, generate a new one
+                }
+            }
 
-            circles.add(new Circle(x, y, radius));
-
+            if (!isOverlapping) {
+                circles.add(new Circle(x, y, 10, 10, radius, radius * radius));
+            }
         }
 
-        CircleView cv = new CircleView(this, circles);
-        setContentView(cv);
+        return circles;
+    }
+
+    private float calculateDistance(float x1, float y1, float x2, float y2) {
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
 }

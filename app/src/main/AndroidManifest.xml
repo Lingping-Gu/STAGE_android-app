@@ -41,7 +41,18 @@
             android:name=".RecentListenedAdapter"
             android:exported="false">
         </activity>
-
+        <activity
+            android:name=".Explore"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".Circle"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".CircleView"
+            android:exported="false">
+        </activity>
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
