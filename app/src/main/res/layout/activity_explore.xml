@@ -12,23 +12,41 @@
         android:id="@+id/autoCompleteTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="Search suggestions"
-        app:layout_constraintBottom_toTopOf="@+id/circleView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/reviewButton"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+
+
+    <Button
+        android:id="@+id/reviewButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:enabled="false"
+        android:onClick="reviewButtonPressed"
+        android:text="Button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/autoCompleteTextView"
+        app:layout_constraintVertical_chainStyle="packed" />
+
 
     <!-- Add the CircleView here -->
 
     <edu.northeastern.stage.CircleView
         android:id="@+id/circleView"
-        android:layout_width="380dp"
-        android:layout_height="395dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/slider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.483"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <SeekBar
@@ -44,18 +62,6 @@
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintVertical_bias="0.959" />
-
-    <Button
-        android:id="@+id/reviewButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:enabled="false"
-        android:onClick="reviewButtonPressed"
-        android:text="Button"
-        app:layout_constraintBottom_toTopOf="@+id/circleView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/autoCompleteTextView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
