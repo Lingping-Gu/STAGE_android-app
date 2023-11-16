@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import edu.northeastern.stage.model.Circle;
+
 public class Explore extends AppCompatActivity {
 
     private static final String TAG = Explore.class.getSimpleName();

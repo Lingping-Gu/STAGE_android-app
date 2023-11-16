@@ -1,10 +1,13 @@
 package edu.northeastern.stage.ui.explore;
 
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,10 +21,12 @@ import android.widget.Button;
 import android.widget.SeekBar;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
-import edu.northeastern.stage.Circle;
+import edu.northeastern.stage.model.Circle;
 import edu.northeastern.stage.CircleView;
 import edu.northeastern.stage.Explore;
 import edu.northeastern.stage.R;
@@ -31,17 +36,19 @@ public class ExploreFragment extends Fragment {
 
     private ArrayAdapter<String> adapter;
     private AutoCompleteTextView actv;
-    private Button reviewButton;
+    private Button buttonToMusicReview;
     private CircleView circleView;
     private SeekBar geoSlider;
     private ExploreViewModel viewModel;
+    private static final Random rand = new Random();
+
     private static final String TAG = Explore.class.getSimpleName();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_explore, container, false);
 
-        reviewButton = fragmentView.findViewById(R.id.reviewButton);
+        buttonToMusicReview = fragmentView.findViewById(R.id.reviewButton);
         circleView = fragmentView.findViewById(R.id.circleView);
         geoSlider = fragmentView.findViewById(R.id.slider);
         actv = fragmentView.findViewById(R.id.autoCompleteTextView);
@@ -55,15 +62,24 @@ public class ExploreFragment extends Fragment {
         actv.setOnItemClickListener((parent, view, position, id) -> {
             String selectedSong = (String) parent.getItemAtPosition(position);
             viewModel.songSelected(selectedSong);
-            reviewButton.setEnabled(true);
+            buttonToMusicReview.setEnabled(true);
         });
 
-        reviewButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), Review.class);
-            startActivity(intent);
-        });
+//        buttonToMusicReview.setOnClickListener(v -> {
+//            Intent intent = new Intent(getContext(), Review.class);
+//            startActivity(intent);
+//        });
 
         viewModel.setCircles(createCircles());
+
+        buttonToMusicReview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Use the NavController to navigate to the MusicReviewFragment
+                NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
+                navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
+            }
+        });
 
         return fragmentView;
     }
@@ -73,7 +89,7 @@ public class ExploreFragment extends Fragment {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             Log.d(TAG, "in beforeTextChanged");
-            reviewButton.setEnabled(false);
+            buttonToMusicReview.setEnabled(false);
             if(s.length() == 0){
 //                resultText.setText("");
             }
@@ -106,20 +122,32 @@ public class ExploreFragment extends Fragment {
         });
     }
 
-    public List<Circle> createCircles(){
+    public List<Circle> createCircles() {
         List<Circle> circles = new ArrayList<>();
+        int attempts = 0;
+        int maxAttempts = 100; // Limit the number of attempts to avoid infinite loop
 
-        Random rand = new Random();
+        while (circles.size() < 100 && attempts < maxAttempts) {
+            float x = rand.nextFloat() * 100;
+            float y = rand.nextFloat() * 100;
+            float radius = rand.nextFloat() * 100 + 5;
 
-        circles.add(new Circle(circleView.getHeight()/2, circleView.getWidth()/2, 55));
+            // Ensure the newly created circle doesn't overlap with existing circles
+            boolean isOverlapping = false;
+            for (Circle existingCircle : circles) {
+                float distance = calculateDistance(x, y, existingCircle.getX(), existingCircle.getY());
+                float minDistance = radius + existingCircle.getRadius();
+                if (distance < minDistance) {
+                    isOverlapping = true;
+                    break; // This circle overlaps, generate a new one
+                }
+            }
 
-        for(int i=1; i<50; i++) {
+            if (!isOverlapping) {
+                circles.add(new Circle(x, y, radius));
+            }
 
-            float x = rand.nextFloat()*100;
-            float y = rand.nextFloat()*100;
-            float radius = rand.nextFloat()*100 + 5;
-
-            circles.add(new Circle(x, y, radius));
+            attempts++;
         }
 
         // Set the circles to the existing CircleView
@@ -127,7 +155,16 @@ public class ExploreFragment extends Fragment {
             circleView.setCircles(circles);
             circleView.invalidate(); // Request a redraw
         }
+
         return circles;
     }
+
+    private float calculateDistance(float x1, float y1, float x2, float y2) {
+        //euclidean distance
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        return (float) Math.sqrt(dx * dx + dy * dy);
+    }
+
 
 }

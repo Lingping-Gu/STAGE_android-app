@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/beige"
     tools:context=".Explore">
 
     <AutoCompleteTextView
@@ -15,7 +14,7 @@
         android:layout_marginTop="10dp"
         android:dropDownSelector="@color/white"
         android:ems="10"
-        android:hint="Search suggestions"
+        android:hint="@string/explore_search"
         android:popupBackground="@color/beige"
         android:shadowColor="@color/black"
         app:layout_constraintBottom_toTopOf="@id/reviewButton"
@@ -24,8 +23,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
 
-
-
     <Button
         android:id="@+id/reviewButton"
         android:layout_width="wrap_content"
@@ -33,14 +30,10 @@
         android:layout_marginEnd="24dp"
         android:enabled="false"
         android:onClick="reviewButtonPressed"
-        android:text="Button"
+        android:text="@string/explore_review_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/autoCompleteTextView"
         app:layout_constraintVertical_chainStyle="packed" />
-
-
-    <!-- Add the CircleView here -->
-
 
     <edu.northeastern.stage.CircleView
         android:id="@+id/circleView"
@@ -53,8 +46,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.732"
         app:layout_constraintVertical_chainStyle="packed" />
-
-
 
     <SeekBar
         android:id="@+id/slider"
@@ -69,7 +60,5 @@
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintVertical_bias="0.959" />
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

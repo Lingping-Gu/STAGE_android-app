@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import java.util.List;
 import java.util.Random;
 
+import edu.northeastern.stage.model.Circle;
+
 public class CircleView extends View {
 
     // Constructor and circle list initialization
@@ -54,8 +56,8 @@ public class CircleView extends View {
                 c.setX(centerX + c.getX());
                 c.setY(centerY + c.getY());
 
-                // Adjust circle position to avoid collisions
-                adjustCirclePosition(c);
+                // Adjust circle position to avoid overlapping
+//                adjustCirclePosition(c);
 
                 // Set random text size based on circle radius
                 float textSize = c.getRadius() / 3;
@@ -81,90 +83,6 @@ public class CircleView extends View {
         int randomIndex = new Random().nextInt(texts.length);
         return texts[randomIndex];
     }
-
-    // Function to adjust circle position to avoid collisions
-    // adjust boundary for the circles
-    private void adjustCirclePosition(Circle currentCircle) {
-//        Random rand = new Random();
-        for (Circle otherCircle : circles) {
-            if (otherCircle != currentCircle) {
-                float distance = calculateDistance(currentCircle, otherCircle);
-                float minDistance = currentCircle.getRadius() + otherCircle.getRadius();
-
-                // If circles are too close, adjust the position of the current circle
-                if (distance < minDistance) {
-                    float angle = calculateAngle(currentCircle, otherCircle);
-
-                    float newX = otherCircle.getX() + minDistance * (float) Math.cos(angle) + 100;
-                    float newY = otherCircle.getY() + minDistance * (float) Math.sin(angle) + 100;
-
-//                    int randX = rand.nextInt(1)==1?100:-100;
-//                    int randY = rand.nextInt(1)==1?100:-100;
-//                    float newX = otherCircle.getX() + minDistance * (float) Math.cos(angle) + randX;
-//                    float newY = otherCircle.getY() + minDistance * (float) Math.sin(angle) + randY;
-
-                    currentCircle.setX(newX);
-                    currentCircle.setY(newY);
-
-                    distance = calculateDistance(currentCircle, otherCircle);
-                    minDistance = currentCircle.getRadius() + otherCircle.getRadius();
-                }
-            }
-        }
-    }
-
-    private void adjustCirclePosition2(Circle currentCircle) {
-        for (Circle otherCircle : circles) {
-            if (otherCircle != currentCircle) {
-                float distance = calculateDistance(currentCircle, otherCircle);
-                float minDistance = currentCircle.getRadius() + otherCircle.getRadius();
-
-                // If circles are too close, adjust the position of the current circle
-                if (distance < minDistance) {
-                    float angle = calculateAngle(currentCircle, otherCircle);
-                    float newX = otherCircle.getX() + minDistance * (float) Math.cos(angle);
-                    float newY = otherCircle.getY() + minDistance * (float) Math.sin(angle);
-
-                    currentCircle.setX(newX);
-                    currentCircle.setY(newY);
-                }
-            }
-        }
-    }
-
-//    private void adjustCirclePosition(Circle circle) {
-//
-//        // Minimum distance between circles
-//        int minDistance = circle.getRadius() * 2;
-//
-//        for (Circle other : circles) {
-//
-//            if (circle != other) {
-//
-//                // Calculate distance between circle centers
-//                int dx = Math.abs(circle.getX() - other.getX());
-//                int dy = Math.abs(circle.getY() - other.getY());
-//                double distance = Math.sqrt(dx * dx + dy * dy);
-//
-//                // If circles too close, adjust current circle position
-//                if (distance < minDistance) {
-//                    int xDiff = circle.getX() - other.getX();
-//                    int yDiff = circle.getY() - other.getY();
-//                    if (xDiff > 0) {
-//                        circle.setX(circle.getX() + minDistance);
-//                    } else {
-//                        circle.setX(circle.getX() - minDistance);
-//                    }
-//                    if (yDiff > 0) {
-//                        circle.setY(circle.getY() + minDistance);
-//                    } else {
-//                        circle.setY(circle.getY() - minDistance);
-//                    }
-//                }
-//
-//            }
-//        }
-//    }
 
     // Function to calculate distance between two circles
     private float calculateDistance(Circle circle1, Circle circle2) {

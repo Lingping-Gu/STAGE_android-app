@@ -1,4 +1,4 @@
-package edu.northeastern.stage;
+package edu.northeastern.stage.model;
 
 public class Circle {
 
