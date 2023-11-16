@@ -120,9 +120,9 @@ public class ExploreFragment extends Fragment {
         int MIN_DISTANCE_THRESHOLD = 10;
 
         while (circles.size() < 100 && attempts < maxAttempts) {
-            float x = rand.nextInt(1000);
-            float y = rand.nextInt(1000);
-            float radius = rand.nextInt(200) + 5;
+            float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
+            float y = rand.nextFloat() * 2000 - 1000;
+            float radius = rand.nextFloat() * 200 + 5;
 
             // Ensure the newly created circle doesn't overlap with existing circles
             boolean isOverlapping = false;

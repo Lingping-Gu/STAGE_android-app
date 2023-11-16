@@ -48,6 +48,19 @@ public class CircleView extends View {
         int centerX = getWidth() / 2;
         int centerY = getHeight() / 2;
 
+        // Get the dimensions of the View
+        int viewWidth = getWidth();
+        int viewHeight = getHeight();
+
+        // Set the boundary for drawing
+        int left = 50;
+        int top = 50;
+        int right = viewWidth - 50;
+        int bottom = viewHeight - 50;
+
+        // Draw a rectangle within the boundary
+        canvas.drawRect(left, top, right, bottom, paint);
+
         int circleCount = 0;
         if(circles != null){
             // Draw each circle on the canvas
