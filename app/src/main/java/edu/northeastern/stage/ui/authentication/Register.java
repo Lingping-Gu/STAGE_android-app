@@ -65,6 +65,7 @@ public class Register extends AppCompatActivity {
         if (user != null) {
             // change intent
             Intent intent = new Intent(Register.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
 
@@ -137,7 +138,7 @@ public class Register extends AppCompatActivity {
     }
 
     private void createUserAccount(String email, String password, String confirmPassword) {
-        if (email == null || password == null || confirmPassword == null || email == "" || password == "" || confirmPassword == "" || profilePicSelected == null) {
+        if (email == null || password == null || confirmPassword == null || email.equals("") || password.equals("") || confirmPassword.equals("") || profilePicSelected == null) {
             Toast.makeText(Register.this, "Register failed. Please make sure to enter an email and password.", Toast.LENGTH_SHORT).show();
         } else {
             mAuth.createUserWithEmailAndPassword(email, password)
@@ -153,21 +154,21 @@ public class Register extends AppCompatActivity {
 
                                 Map<String, Object> updates = new HashMap<>();
                                 updates.put("profilePicResource",profilePicSelected);
-                                updates.put("email",user.getEmail());
 
                                 reference.child(user.getUid()).updateChildren(updates, new DatabaseReference.CompletionListener() {
                                     @Override
                                     public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
                                         if (error == null) {
-                                            Log.d(TAG, "User profile updated on database");
+                                            Log.d(TAG, "Profile picture resource updated successfully");
                                         } else {
-                                            Log.e(TAG, "Failed to update profile on database: " + error.getMessage());
+                                            Log.e(TAG, "Failed to update profile picture resource: " + error.getMessage());
                                         }
                                     }
                                 });
 
                                 // change intent
                                 Intent intent = new Intent(Register.this, MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                             } else {
                                 // register fail, check which exception

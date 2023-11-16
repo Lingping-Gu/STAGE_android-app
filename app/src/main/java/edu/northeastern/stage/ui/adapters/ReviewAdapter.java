@@ -7,6 +7,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import edu.northeastern.stage.R;
@@ -32,6 +37,11 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         holder.userIdTextView.setText(review.getUserID());
         holder.contentTextView.setText(review.getContent());
         holder.ratingTextView.setText(String.valueOf(review.getRating()));
+        Instant instant = Instant.ofEpochMilli(review.getTimestamp());
+        ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = dateTime.format(formatter);
+        holder.timestampTextView.setText(formattedDateTime);
         // If to use Glide or Picasso, load image here
         // Glide.with(holder.avatarImageView.getContext()).load(review.getAvatarUri()).into(holder.avatarImageView);
     }
@@ -45,6 +55,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         TextView userIdTextView;
         TextView contentTextView;
         TextView ratingTextView;
+        TextView timestampTextView;
         ImageView avatarImageView;
 
         public ReviewViewHolder(@NonNull View itemView) {
@@ -52,6 +63,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             userIdTextView = itemView.findViewById(R.id.tvUserId);
             contentTextView = itemView.findViewById(R.id.tvPostContent);
             ratingTextView = itemView.findViewById(R.id.tvIndividualRating);
+            timestampTextView = itemView.findViewById(R.id.tvTimestamp);
             avatarImageView = itemView.findViewById(R.id.ivUserAvatar);
         }
     }

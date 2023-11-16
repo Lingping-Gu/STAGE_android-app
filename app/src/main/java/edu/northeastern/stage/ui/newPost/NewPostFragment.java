@@ -8,12 +8,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -21,9 +25,10 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
+import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
-import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
+import edu.northeastern.stage.ui.musicReview.SubmitReviewFragment;
 import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
@@ -34,7 +39,6 @@ public class NewPostFragment extends Fragment {
     private NewPostViewModel viewModel;
     private SharedDataViewModel sharedDataViewModel;
     private JsonObject selectedTrack;
-    private String visibilityState;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNewPostBinding.inflate(inflater, container, false);
@@ -51,31 +55,26 @@ public class NewPostFragment extends Fragment {
             }
         });
 
-        // get track if it exists
-        sharedDataViewModel.getTrackPost().observe(getViewLifecycleOwner(), track -> {
-            if (track != null) {
-                viewModel.setTrack(track);
-            }
-        });
-
-        // get visibility state
-        int selectedId = binding.rgPostVisibility.getCheckedRadioButtonId();
-        if (selectedId != -1) {
-            RadioButton selectedRadioButton = getView().findViewById(selectedId);
-            visibilityState = selectedRadioButton.getText().toString();
-            if(visibilityState.equals("Private")) {
-                visibilityState = "private";
-            } else if (visibilityState.equals("Only Friends")) {
-                visibilityState = "friends";
-            } else if (visibilityState.equals("Everyone")) {
-                visibilityState = "public";
-            }
-        }
-
         // Set up the interactions for the new post elements
         binding.btnSubmitPost.setOnClickListener(v -> {
             String postContent = binding.etPostContent.getText().toString();
-            viewModel.createPost(postContent, visibilityState);
+
+            if (postContent.equalsIgnoreCase("")) {
+                Toast.makeText(getActivity(), "Please enter post content.", Toast.LENGTH_SHORT).show();
+            } else if (selectedTrack == null) {
+                Toast.makeText(getActivity(), "Please search for a song to post.", Toast.LENGTH_SHORT).show();
+            } else {
+                viewModel.createPost(selectedTrack, postContent);
+                Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
+
+                NavOptions navOptions = new NavOptions.Builder()
+                        .setPopUpTo(R.id.navigation_new_post, true)
+                        .build();
+
+                // Navigate using the configured NavOptions
+                NavController navController = NavHostFragment.findNavController(NewPostFragment.this);
+                navController.navigate(R.id.action_navigation_new_post_to_navigation_home, null, navOptions);
+            }
         });
 
         // Setup AutoCompleteTextView for song search
@@ -129,8 +128,6 @@ public class NewPostFragment extends Fragment {
                         }
                     }
                     artists = artists.trim();
-                    Track trackToStore = viewModel.createTrack(selectedTrack);
-                    sharedDataViewModel.setTrackPost(trackToStore);
                     binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
                 }
             });
