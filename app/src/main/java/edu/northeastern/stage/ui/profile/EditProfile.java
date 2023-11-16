@@ -1,4 +1,4 @@
-package edu.northeastern.stage;
+package edu.northeastern.stage.ui.profile;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import edu.northeastern.stage.R;
 
 public class EditProfile extends AppCompatActivity {
     private EditText editUsername;
