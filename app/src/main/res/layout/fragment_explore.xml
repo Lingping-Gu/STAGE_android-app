@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".Explore">
+    android:layout_height="match_parent">
 
     <AutoCompleteTextView
         android:id="@+id/autoCompleteTextView"
@@ -38,7 +37,7 @@
     <edu.northeastern.stage.CircleView
         android:id="@+id/circleView"
         android:layout_width="match_parent"
-        android:layout_height="530dp"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="@+id/slider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.483"

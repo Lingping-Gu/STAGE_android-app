@@ -1,7 +1,5 @@
 package edu.northeastern.stage.ui.explore;
 
-import android.content.Intent;
-import android.graphics.Point;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,7 +9,6 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,16 +18,12 @@ import android.widget.Button;
 import android.widget.SeekBar;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import edu.northeastern.stage.model.Circle;
 import edu.northeastern.stage.CircleView;
-import edu.northeastern.stage.Explore;
 import edu.northeastern.stage.R;
-import edu.northeastern.stage.Review;
 
 public class ExploreFragment extends Fragment {
 
@@ -41,8 +34,6 @@ public class ExploreFragment extends Fragment {
     private SeekBar geoSlider;
     private ExploreViewModel viewModel;
     private static final Random rand = new Random();
-
-    private static final String TAG = Explore.class.getSimpleName();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,7 +79,7 @@ public class ExploreFragment extends Fragment {
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            Log.d(TAG, "in beforeTextChanged");
+//            Log.d(TAG, "in beforeTextChanged");
             buttonToMusicReview.setEnabled(false);
             if(s.length() == 0){
 //                resultText.setText("");
@@ -98,7 +89,7 @@ public class ExploreFragment extends Fragment {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            Log.d(TAG, "in onTextChanged");
+//            Log.d(TAG, "in onTextChanged");
             // This function is called when text is edited
 //            toastMsg("Text is edited, and onTextChangedListener is called.");
             if(s.length() == 0){
@@ -108,7 +99,7 @@ public class ExploreFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable s) {
-            Log.d(TAG, "in afterTextChanged");
+//            Log.d(TAG, "in afterTextChanged");
 
             viewModel.searchTextChanged(s.toString());
 
@@ -125,18 +116,20 @@ public class ExploreFragment extends Fragment {
     public List<Circle> createCircles() {
         List<Circle> circles = new ArrayList<>();
         int attempts = 0;
-        int maxAttempts = 100; // Limit the number of attempts to avoid infinite loop
+        int maxAttempts = 100000; // Limit the number of attempts to avoid infinite loop
+        int MIN_DISTANCE_THRESHOLD = 10;
 
         while (circles.size() < 100 && attempts < maxAttempts) {
-            float x = rand.nextFloat() * 100;
-            float y = rand.nextFloat() * 100;
-            float radius = rand.nextFloat() * 100 + 5;
+            float x = rand.nextInt(1000);
+            float y = rand.nextInt(1000);
+            float radius = rand.nextInt(200) + 5;
 
             // Ensure the newly created circle doesn't overlap with existing circles
             boolean isOverlapping = false;
             for (Circle existingCircle : circles) {
                 float distance = calculateDistance(x, y, existingCircle.getX(), existingCircle.getY());
-                float minDistance = radius + existingCircle.getRadius();
+                // add min_distance_threshold so they are bit further away from each other
+                float minDistance = radius + existingCircle.getRadius() + MIN_DISTANCE_THRESHOLD;
                 if (distance < minDistance) {
                     isOverlapping = true;
                     break; // This circle overlaps, generate a new one
