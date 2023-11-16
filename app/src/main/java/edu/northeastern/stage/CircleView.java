@@ -41,7 +41,9 @@ public class CircleView extends View {
         super.onDraw(canvas);
 
         @SuppressLint("DrawAllocation") Paint paint = new Paint();
-        paint.setColor(Color.rgb(67,83,52));
+//        paint.setColor(Color.rgb(67,83,52));
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(2);
         paint.setStyle(Paint.Style.STROKE);
 
         // Calculate center x and y
@@ -57,6 +59,10 @@ public class CircleView extends View {
         int top = 50;
         int right = viewWidth - 50;
         int bottom = viewHeight - 50;
+
+        // Calculate rectangle width and height
+        int rectWidth = right - left;
+        int rectHeight = bottom - top;
 
         // Draw a rectangle within the boundary
         canvas.drawRect(left, top, right, bottom, paint);
@@ -78,12 +84,19 @@ public class CircleView extends View {
 
                 // Generate random text
                 String randomText = generateRandomText();
+                // Calculate text width and height
+                float textWidth = paint.measureText(randomText);
+                Paint.FontMetrics metrics = paint.getFontMetrics();
+                float textHeight = metrics.descent - metrics.ascent;
+                // Calculate centered coordinates for the text
+                float textX = c.getX() - (textWidth / 2);
+                float textY = c.getY() - (textHeight / 2);
 
                 // Draw circle with black border
                 canvas.drawCircle(c.getX(), c.getY(), c.getRadius(), paint);
 
                 // Draw text inside the circle
-                canvas.drawText(randomText, c.getX(), c.getY(), paint);
+                canvas.drawText(randomText, textX, textY, paint);
             }
         }
 
