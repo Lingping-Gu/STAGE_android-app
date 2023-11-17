@@ -4,14 +4,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.google.gson.JsonElement;
 
-public class MainActivity extends AppCompatActivity implements Spotify.SearchCallBack {
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+
+public class MainActivity extends AppCompatActivity {
 
     Button loginBT;
     Button registerBT;
@@ -48,21 +52,16 @@ public class MainActivity extends AppCompatActivity implements Spotify.SearchCal
         tokenBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                spotify.trackSearch("hello",MainActivity.this);
+                CompletableFuture<ArrayList<JsonElement>> trackSearchFuture = spotify.trackSearch("hello");
+                trackSearchFuture.thenAccept(searchResult -> {
+                    for(JsonElement track : searchResult) {
+                        Log.d("TrackSearch", track.toString());
+                    }
+                }).exceptionally(e -> {
+                    Log.e("TrackSearchError",e.getMessage());
+                    return null;
+                });
             }
         });
-    }
-
-    @Override
-    public void onSearchResults(String[] searchResults) {
-        tracks = searchResults;
-        for(String track : tracks) {
-            Toast.makeText(MainActivity.this, track, Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public void onSearchError(String errorMessage) {
-
     }
 }

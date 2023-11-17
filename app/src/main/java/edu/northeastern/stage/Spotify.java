@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 import okhttp3.Credentials;
 import okhttp3.FormBody;
@@ -31,11 +33,6 @@ public class Spotify {
     private String accessToken = "";
     private long tokenExpirationTime = 0;
     private Context context;
-
-    public interface SearchCallBack {
-        void onSearchResults(String[] searchResults);
-        void onSearchError(String errorMessage);
-    }
 
     public Spotify(Context context) {
         this.context = context;
@@ -133,8 +130,10 @@ public class Spotify {
         }).start();
     }
 
-    public void trackSearch(final String track, final SearchCallBack callback) {
+    public CompletableFuture<ArrayList<JsonElement>> trackSearch(final String track) {
         checkAccessToken();
+        CompletableFuture<ArrayList<JsonElement>> future = new CompletableFuture<>();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -150,44 +149,35 @@ public class Spotify {
                     Response response = client.newCall(request).execute();
                     if (response.isSuccessful()) {
                         final String responseBody = response.body().string();
-                        final String[] tracks = handleTrackSearchResults(responseBody);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onSearchResults(tracks);
-                            }
-                        });
+                        final ArrayList<JsonElement> tracks = handleTrackSearchResults(responseBody);
+                        future.complete(tracks);
                     } else {
                         // unsuccessful response
                         Log.e("SearchError", "Unsuccessful search response: " + response.code());
                         final String errorMessage = "Unsuccessful search response: " + response.code();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onSearchError(errorMessage);
-                            }
-                        });
+                        future.completeExceptionally(new RuntimeException(errorMessage));
                     }
                 } catch (IOException e) {
                     // handle IO exception
                     e.printStackTrace();
+                    future.completeExceptionally(e);
                 }
             }
         }).start();
+        return future;
     }
 
-    private String[] handleTrackSearchResults(String responseBody) {
+    private ArrayList<JsonElement> handleTrackSearchResults(String responseBody) {
 
-        String[] tracks = new String[0];
+        ArrayList<JsonElement> tracks = new ArrayList<JsonElement>();
 
         try {
             JsonObject json = new Gson().fromJson(responseBody, JsonObject.class);
             if (json.has("tracks") && json.getAsJsonObject("tracks").has("items")) {
                 JsonArray items = json.getAsJsonObject("tracks").getAsJsonArray("items");
                 if (items.size() > 0) {
-                    tracks = new String[items.size()];
                     for(int i = 0; i< items.size();i++) {
-                        tracks[i] = items.get(i).toString();
+                        tracks.add(items.get(i));
                     }
                 } else {
                     // No tracks found
