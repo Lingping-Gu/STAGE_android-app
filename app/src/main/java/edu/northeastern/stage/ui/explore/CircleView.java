@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -71,6 +72,7 @@ public class CircleView extends View {
         viewWidth = getWidth();
         viewHeight = getHeight();
 
+
         matrix = new Matrix();
         paint = new Paint();
         paint.setColor(Color.WHITE);
@@ -82,6 +84,9 @@ public class CircleView extends View {
     protected void onDraw(@NonNull Canvas canvas) {
 
         super.onDraw(canvas);
+
+        canvas.save();
+        canvas.concat(matrix);
 
         // Calculate center x and y
         int centerX = getWidth() / 2;
@@ -101,17 +106,22 @@ public class CircleView extends View {
         int rectWidth = right - left;
         int rectHeight = bottom - top;
 
+
+
         // Draw a rectangle within the boundary
         canvas.drawRect(left, top, right, bottom, paint);
 
+        canvas.save();
+        canvas.concat(matrix);
 
         if (circles != null) {
             // Draw each circle on the canvas
             for (Circle c : circles) {
 
+
                 // Offset circle x and y to center
-                c.setX(centerX + c.getX());
-                c.setY(centerY + c.getY());
+//                c.setX(centerX + c.getX());
+//                c.setY(centerY + c.getY());
 
                 // Set random text size based on circle radius
                 float textSize = c.getRadius() / 3;
@@ -127,15 +137,14 @@ public class CircleView extends View {
                 float textX = c.getX() - (textWidth / 2);
                 float textY = c.getY() - (textHeight / 2);
 
+                canvas.save();
                 // Draw circle with black border
                 canvas.drawCircle(c.getX(), c.getY(), c.getRadius(), paint);
                 // Draw text inside the circle
                 canvas.drawText(randomText, textX, textY, paint);
-                canvas.save();
-                canvas.concat(matrix);
             }
         }
-//        drawZoomControls(canvas);
+        drawZoomControls(canvas);
     }
 
         // Function to generate random text
@@ -152,6 +161,7 @@ public class CircleView extends View {
     }
 
     private void drawZoomControls(Canvas canvas) {
+        toastmsg("In drawZoomControls");
         Paint controlsPaint = new Paint();
         controlsPaint.setColor(Color.BLUE);
         controlsPaint.setTextSize(50);
@@ -165,50 +175,51 @@ public class CircleView extends View {
 //        canvas.drawText("-", controlXMinus, controlYMinus, controlsPaint);
 
         canvas.drawText("+", getWidth() - 80, getHeight() - 80, controlsPaint);
-        canvas.drawText("-", getWidth() - 80, getHeight() - 20, controlsPaint);
+        canvas.drawText("-", getWidth() - 70, getHeight() - 20, controlsPaint);
     }
 
 
     //include the + & - back again after fixing the canvas touch that makes the circles disappear (rectangle border remains)
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        objScaleGestureDetector.onTouchEvent(event);
         float touchX = event.getX();
         float touchY = event.getY();
 
-//        Log.d("CIRCLEVIEW", "Touch event: " + event.getAction());
+        Log.d("CIRCLEVIEW", "Touch event: " + event.getAction());
 
-//        switch (event.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                Log.d("CIRCLEVIEW", "ACTION_DOWN");
-//                lastTouchX = touchX;
-//                lastTouchY = touchY;
-//                isDragging = true;
-//                break;
-//
-//            case MotionEvent.ACTION_MOVE:
-//                Log.d("CIRCLEVIEW", "ACTION_MOVE");
-//
-//                if (isDragging) {
-//                    Log.d("CIRCLEVIEW", "isDragging  in ACTION_MOVE");
-//
-//                    float dx = touchX - lastTouchX;
-//                    float dy = touchY - lastTouchY;
-//                    matrix.postTranslate(dx, dy);
-//                    invalidate();
-//                    lastTouchX = touchX;
-//                    lastTouchY = touchY;
-//                }
-//                break;
-//
-//            case MotionEvent.ACTION_UP:
-//                Log.d("CIRCLEVIEW", "ACTION_UP");
-//
-//            case MotionEvent.ACTION_CANCEL:
-//                Log.d("CIRCLEVIEW", "ACTION_CANCEL");
-//                isDragging = false;
-//                break;
-//        }
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Log.d("CIRCLEVIEW", "ACTION_DOWN");
+                lastTouchX = touchX;
+                lastTouchY = touchY;
+                isDragging = true;
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                toastmsg("In action move");
+
+                if (isDragging) {
+                    Log.d("CIRCLEVIEW", "isDragging  in ACTION_MOVE");
+
+                    float dx = touchX - lastTouchX;
+                    float dy = touchY - lastTouchY;
+                    matrix.postTranslate(dx, dy);
+                    invalidate();
+                    lastTouchX = touchX;
+                    lastTouchY = touchY;
+                }
+                break;
+
+            case MotionEvent.ACTION_UP:
+                Log.d("CIRCLEVIEW", "ACTION_UP");
+
+            case MotionEvent.ACTION_CANCEL:
+                Log.d("CIRCLEVIEW", "ACTION_CANCEL");
+                isDragging = false;
+                break;
+        }
+
+        objScaleGestureDetector.onTouchEvent(event);
 
         return true;
     }
@@ -257,6 +268,10 @@ public class CircleView extends View {
             return true;
         }
 
+    }
+
+    private void toastmsg(String msg){
+        Toast.makeText(this.getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
 

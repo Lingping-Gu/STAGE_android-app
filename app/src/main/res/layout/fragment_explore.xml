@@ -83,19 +83,4 @@
         app:layout_constraintVertical_chainStyle="packed" />
 
 
-    <!--    <edu.northeastern.stage.ui.explore.ExploreLocationSeekBar-->
-<!--        android:id="@+id/vertical_seekbar"-->
-<!--        android:layout_width="34dp"-->
-<!--        android:layout_height="384dp"-->
-<!--        android:layout_marginStart="4dp"-->
-<!--        android:max="100"-->
-<!--        android:min="10"-->
-<!--        android:progress="30"-->
-<!--        android:progressDrawable="@drawable/vertical_progress_selector"-->
-<!--        android:thumb="@drawable/thumb"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintVertical_bias="0.412" />-->
-
 </androidx.constraintlayout.widget.ConstraintLayout>
