@@ -8,10 +8,13 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.io.IOException;
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import okhttp3.Credentials;
@@ -23,13 +26,16 @@ import okhttp3.Response;
 
 public class Spotify {
 
-    // need a way to keep checking if token exists
-
     private static final String CLIENT_ID = "cdbc9d16da944c8dad47d543ed0741b2"; // store this somewhere else
     private static final String CLIENT_SECRET = "d418779f7c994c6683bf27b1a35f141b"; // store this somewhere else
     private String accessToken = "";
     private long tokenExpirationTime = 0;
     private Context context;
+
+    public interface SearchCallBack {
+        void onSearchResults(String[] searchResults);
+        void onSearchError(String errorMessage);
+    }
 
     public Spotify(Context context) {
         this.context = context;
@@ -46,9 +52,7 @@ public class Spotify {
 
     // need to run this method at the start of each method
     private void checkAccessToken() {
-
         if (isTokenExpired()) {
-
             new Thread(new Runnable() {
 
                 @Override
@@ -95,6 +99,7 @@ public class Spotify {
     }
 
     public void artistSearch(final String artist) {
+        checkAccessToken();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -127,6 +132,79 @@ public class Spotify {
             }
         }).start();
     }
+
+    public void trackSearch(final String track, final SearchCallBack callback) {
+        checkAccessToken();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpClient client = new OkHttpClient();
+
+                String url = "https://api.spotify.com/v1/search?q=" + track + "&type=track&limit=1";
+                Request request = new Request.Builder()
+                        .url(url)
+                        .addHeader("Authorization", "Bearer " + accessToken)
+                        .build();
+
+                try {
+                    Response response = client.newCall(request).execute();
+                    if (response.isSuccessful()) {
+                        final String responseBody = response.body().string();
+                        final String[] tracks = handleTrackSearchResults(responseBody);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.onSearchResults(tracks);
+                            }
+                        });
+                    } else {
+                        // unsuccessful response
+                        Log.e("SearchError", "Unsuccessful search response: " + response.code());
+                        final String errorMessage = "Unsuccessful search response: " + response.code();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.onSearchError(errorMessage);
+                            }
+                        });
+                    }
+                } catch (IOException e) {
+                    // handle IO exception
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private String[] handleTrackSearchResults(String responseBody) {
+
+        String[] tracks = new String[0];
+
+        try {
+            JsonObject json = new Gson().fromJson(responseBody, JsonObject.class);
+            if (json.has("tracks") && json.getAsJsonObject("tracks").has("items")) {
+                JsonArray items = json.getAsJsonObject("tracks").getAsJsonArray("items");
+                if (items.size() > 0) {
+                    tracks = new String[items.size()];
+                    for(int i = 0; i< items.size();i++) {
+                        tracks[i] = items.get(i).toString();
+                    }
+                } else {
+                    // No tracks found
+                    Toast.makeText(context, "No tracks found", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                // Unexpected response format
+                Log.e("SearchError", "Unexpected search response format");
+            }
+        } catch (JsonParseException e) {
+            // JSON parsing exception
+            Log.e("SearchError", "JSON parsing exception");
+        }
+
+        return tracks;
+    }
+
 
     private void handleArtistSearchResults(String responseBody) {
         try {
@@ -185,7 +263,7 @@ public class Spotify {
     }
 
     private boolean isTokenExpired() {
-        return this.tokenExpirationTime == 0 || this.tokenExpirationTime < Calendar.getInstance().getTimeInMillis();
+        return tokenExpirationTime == 0 || tokenExpirationTime < Calendar.getInstance().getTimeInMillis();
     }
 
     private void runOnUiThread(Runnable runnable) {

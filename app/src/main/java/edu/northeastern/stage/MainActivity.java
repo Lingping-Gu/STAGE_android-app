@@ -9,13 +9,16 @@ import android.widget.Button;
 
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements Spotify.SearchCallBack {
 
     Button loginBT;
     Button registerBT;
     Button tokenBT;
 
     Spotify spotify = new Spotify(MainActivity.this);
+    String[] tracks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +48,21 @@ public class MainActivity extends AppCompatActivity {
         tokenBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this,"Access token: " + spotify.getAccessToken(), Toast.LENGTH_SHORT).show();
-                spotify.artistSearch("Adele");
+                spotify.trackSearch("hello",MainActivity.this);
             }
         });
+    }
+
+    @Override
+    public void onSearchResults(String[] searchResults) {
+        tracks = searchResults;
+        for(String track : tracks) {
+            Toast.makeText(MainActivity.this, track, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onSearchError(String errorMessage) {
+
     }
 }
