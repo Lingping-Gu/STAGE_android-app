@@ -1,5 +1,6 @@
 package edu.northeastern.stage.ui.explore;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -15,8 +16,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +40,7 @@ public class ExploreFragment extends Fragment {
     private ExploreViewModel viewModel;
     ExploreLocationSeekBar seekBar;
     SeekBar locationSeekBar;
+    TextView progressTextView;
     private static final Random rand = new Random();
 
 
@@ -77,10 +83,7 @@ public class ExploreFragment extends Fragment {
         circleView = fragmentView.findViewById(R.id.circleView);
         actv = fragmentView.findViewById(R.id.autoCompleteTextView);
         geoSlider = fragmentView.findViewById(R.id.locationSeekBar);
-
-        actv.setThreshold(1);
-
-        int seekBarValue= geoSlider.getProgress(); // get progress value from the Seek bar
+        progressTextView = fragmentView.findViewById(R.id.textView);
 
         // perform seek bar change listener event used for getting the progress value
         geoSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -88,6 +91,20 @@ public class ExploreFragment extends Fragment {
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 progressChangedValue = progress;
+                progressTextView.setText(String.valueOf(progressChangedValue));
+
+                int width = geoSlider.getWidth() - geoSlider.getPaddingLeft() - geoSlider.getPaddingRight();
+                int thumbPos = geoSlider.getPaddingLeft() + width * geoSlider.getProgress() / geoSlider.getMax();
+
+                progressTextView.measure(0, 0);
+                int txtW = progressTextView.getMeasuredWidth();
+                int delta = txtW / 2;
+                progressTextView.setX(geoSlider.getX() + thumbPos - delta);
+
+                // Update ImageView properties based on seekbar progress
+//                float scale = 0.5f + (float) progress / 100.0f; // Adjust scale based on progress
+//                circleImageView.setScaleX(scale);
+//                circleImageView.setScaleY(scale);
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -102,6 +119,8 @@ public class ExploreFragment extends Fragment {
 
         viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
         observeViewModel();
+
+        actv.setThreshold(1);
 
         actv.addTextChangedListener(textWatcher);
 

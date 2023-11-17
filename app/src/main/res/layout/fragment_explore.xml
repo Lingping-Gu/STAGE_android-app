@@ -70,7 +70,20 @@
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent" />
 
-<!--    <edu.northeastern.stage.ui.explore.ExploreLocationSeekBar-->
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        app:layout_constraintBottom_toTopOf="@id/locationSeekBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.063"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/circleView"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+
+    <!--    <edu.northeastern.stage.ui.explore.ExploreLocationSeekBar-->
 <!--        android:id="@+id/vertical_seekbar"-->
 <!--        android:layout_width="34dp"-->
 <!--        android:layout_height="384dp"-->
