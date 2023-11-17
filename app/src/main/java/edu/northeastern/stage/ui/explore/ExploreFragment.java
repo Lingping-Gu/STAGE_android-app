@@ -16,13 +16,13 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import edu.northeastern.stage.model.Circle;
-import edu.northeastern.stage.CircleView;
 import edu.northeastern.stage.R;
 
 public class ExploreFragment extends Fragment {
@@ -33,6 +33,8 @@ public class ExploreFragment extends Fragment {
     private CircleView circleView;
     private SeekBar geoSlider;
     private ExploreViewModel viewModel;
+    ExploreLocationSeekBar seekBar;
+    SeekBar locationSeekBar;
     private static final Random rand = new Random();
 
 
@@ -73,9 +75,30 @@ public class ExploreFragment extends Fragment {
 
         buttonToMusicReview = fragmentView.findViewById(R.id.reviewButton);
         circleView = fragmentView.findViewById(R.id.circleView);
-        geoSlider = fragmentView.findViewById(R.id.slider);
         actv = fragmentView.findViewById(R.id.autoCompleteTextView);
+        geoSlider = fragmentView.findViewById(R.id.locationSeekBar);
+
         actv.setThreshold(1);
+
+        int seekBarValue= geoSlider.getProgress(); // get progress value from the Seek bar
+
+        // perform seek bar change listener event used for getting the progress value
+        geoSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int progressChangedValue = 0;
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progressChangedValue = progress;
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                Toast.makeText(requireContext(), "Seek bar progress is :" + progressChangedValue,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
 
         viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
         observeViewModel();

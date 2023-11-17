@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -32,12 +33,12 @@
         app:layout_constraintTop_toBottomOf="@+id/autoCompleteTextView"
         app:layout_constraintVertical_chainStyle="packed" />
 
-    <edu.northeastern.stage.CircleView
+    <edu.northeastern.stage.ui.explore.CircleView
         android:id="@+id/circleView"
         android:layout_width="329dp"
         android:layout_height="395dp"
         android:background="#000000"
-        app:layout_constraintBottom_toTopOf="@+id/slider"
+        app:layout_constraintBottom_toTopOf="@+id/locationSeekBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.483"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,18 +46,43 @@
         app:layout_constraintVertical_bias="0.732"
         app:layout_constraintVertical_chainStyle="packed" />
 
+<!--    <ImageView-->
+<!--        android:id="+id/circleImageView"-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="100dp"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        android:src="@drawable/thumb"-->
+<!--        tools:ignore="MissingConstraints" />-->
+
     <SeekBar
-        android:id="@+id/slider"
+        android:id="@+id/locationSeekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="132dp"
         android:max="100"
-        android:thumb="@drawable/map_marker"
         android:thumbOffset="0dp"
+        android:thumb="@drawable/map_marker"
+        android:progressDrawable="@drawable/progress_selector"
+        android:focusableInTouchMode="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent" />
+
+<!--    <edu.northeastern.stage.ui.explore.ExploreLocationSeekBar-->
+<!--        android:id="@+id/vertical_seekbar"-->
+<!--        android:layout_width="34dp"-->
+<!--        android:layout_height="384dp"-->
+<!--        android:layout_marginStart="4dp"-->
+<!--        android:max="100"-->
+<!--        android:min="10"-->
+<!--        android:progress="30"-->
+<!--        android:progressDrawable="@drawable/vertical_progress_selector"-->
+<!--        android:thumb="@drawable/thumb"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.412" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

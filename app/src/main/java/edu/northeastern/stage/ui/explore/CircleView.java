@@ -1,4 +1,4 @@
-package edu.northeastern.stage;
+package edu.northeastern.stage.ui.explore;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -168,6 +168,8 @@ public class CircleView extends View {
         canvas.drawText("-", getWidth() - 80, getHeight() - 20, controlsPaint);
     }
 
+
+    //include the + & - back again after fixing the canvas touch that makes the circles disappear (rectangle border remains)
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         objScaleGestureDetector.onTouchEvent(event);
