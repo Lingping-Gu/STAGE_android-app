@@ -15,15 +15,8 @@ import android.view.ViewGroup;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.ReviewAdapter;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +27,7 @@ public class MusicReviewFragment extends Fragment {
     private RecyclerView reviewsRecyclerView;
     private ReviewAdapter reviewAdapter;
     private TextView overallScoreTextView;
+    private TextView noReviewsTextView;
 
     public static MusicReviewFragment newInstance() {
         return new MusicReviewFragment();
@@ -47,12 +41,22 @@ public class MusicReviewFragment extends Fragment {
         reviewsRecyclerView = view.findViewById(R.id.reviewsRecyclerView);
         overallScoreTextView = view.findViewById(R.id.overallScoreTextView);
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        noReviewsTextView = view.findViewById(R.id.noReviewsTextView);
 
         mViewModel = new ViewModelProvider(this).get(MusicReviewViewModel.class);
         mViewModel.getReviews().observe(getViewLifecycleOwner(), reviews -> {
-            reviewAdapter = new ReviewAdapter(reviews);
-            reviewsRecyclerView.setAdapter(reviewAdapter);
-            updateOverallScore();
+            if (reviews == null || reviews.isEmpty()) {
+                // Show "No reviews yet." text and hide RecyclerView
+                noReviewsTextView.setVisibility(View.VISIBLE);
+                reviewsRecyclerView.setVisibility(View.GONE);
+            } else {
+                // Show RecyclerView and hide "No reviews yet." text
+                reviewAdapter = new ReviewAdapter(reviews);
+                reviewsRecyclerView.setAdapter(reviewAdapter);
+                noReviewsTextView.setVisibility(View.GONE);
+                reviewsRecyclerView.setVisibility(View.VISIBLE);
+                updateOverallScore();
+            }
         });
 
         mViewModel.fetchReviews(); // Simulate fetching data

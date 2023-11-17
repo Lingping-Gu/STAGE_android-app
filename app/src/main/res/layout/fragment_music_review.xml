@@ -47,6 +47,16 @@
                 android:padding="16dp"
                 android:text="Overall Score" />
 
+            <TextView
+                android:id="@+id/noReviewsTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="No reviews yet."
+                android:textSize="20sp"
+                android:visibility="gone" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reviewsRecyclerView"
                 android:layout_width="match_parent"
