@@ -32,6 +32,12 @@ public class MusicReviewViewModel extends ViewModel {
         reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
         reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
         reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
+        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
+        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
+        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
+        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
+        reviewList.add(new Review("user123", "uri_to_avatar", "last", 4.5f));
+        reviewList.add(new Review("user123", "uri_to_avatar", "last+1", 4.5f));
         // ... add more reviews
         reviews.setValue(reviewList);
     }
