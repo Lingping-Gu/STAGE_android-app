@@ -35,45 +35,6 @@ public class ExploreFragment extends Fragment {
     private ExploreViewModel viewModel;
     private static final Random rand = new Random();
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.fragment_explore, container, false);
-
-        buttonToMusicReview = fragmentView.findViewById(R.id.reviewButton);
-        circleView = fragmentView.findViewById(R.id.circleView);
-        geoSlider = fragmentView.findViewById(R.id.slider);
-        actv = fragmentView.findViewById(R.id.autoCompleteTextView);
-        actv.setThreshold(1);
-
-        viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
-        observeViewModel();
-
-        actv.addTextChangedListener(textWatcher);
-
-        actv.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedSong = (String) parent.getItemAtPosition(position);
-            viewModel.songSelected(selectedSong);
-            buttonToMusicReview.setEnabled(true);
-        });
-
-//        buttonToMusicReview.setOnClickListener(v -> {
-//            Intent intent = new Intent(getContext(), Review.class);
-//            startActivity(intent);
-//        });
-
-        viewModel.setCircles(createCircles());
-
-        buttonToMusicReview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Use the NavController to navigate to the MusicReviewFragment
-                NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
-                navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
-            }
-        });
-
-        return fragmentView;
-    }
 
     TextWatcher textWatcher = new TextWatcher() {
 
@@ -105,6 +66,38 @@ public class ExploreFragment extends Fragment {
 
         }
     };
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View fragmentView = inflater.inflate(R.layout.fragment_explore, container, false);
+
+        buttonToMusicReview = fragmentView.findViewById(R.id.reviewButton);
+        circleView = fragmentView.findViewById(R.id.circleView);
+        geoSlider = fragmentView.findViewById(R.id.slider);
+        actv = fragmentView.findViewById(R.id.autoCompleteTextView);
+        actv.setThreshold(1);
+
+        viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
+        observeViewModel();
+
+        actv.addTextChangedListener(textWatcher);
+
+        actv.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedSong = (String) parent.getItemAtPosition(position);
+            viewModel.songSelected(selectedSong);
+            buttonToMusicReview.setEnabled(true);
+        });
+
+        viewModel.setCircles(createCircles());
+
+        buttonToMusicReview.setOnClickListener(v -> {
+            // Use the NavController to navigate to the MusicReviewFragment
+            NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
+            navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
+        });
+
+        return fragmentView;
+    }
 
     private void observeViewModel() {
         viewModel.getRecommendations().observe(getViewLifecycleOwner(), recommendations -> {

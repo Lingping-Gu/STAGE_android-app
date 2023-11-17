@@ -7,7 +7,10 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -27,8 +30,14 @@ public class CircleView extends View {
     private float lastTouchX;
     private float lastTouchY;
     private boolean isDragging = false;
-    int viewWidth;
-    int viewHeight;
+    private float viewWidth;
+    private float viewHeight;
+    private float controlXPlus;
+    private float controlYPlus;
+    private float controlXMinus;
+    private float controlYMinus;
+
+    ScaleGestureDetector objScaleGestureDetector;
 
 
     // Constructors for XML inflation
@@ -56,6 +65,8 @@ public class CircleView extends View {
     }
 
     private void init() {
+
+        objScaleGestureDetector = new ScaleGestureDetector(this.getContext(), new PinchZoomListener());
         // Get the dimensions of the View
         viewWidth = getWidth();
         viewHeight = getHeight();
@@ -71,12 +82,6 @@ public class CircleView extends View {
     protected void onDraw(@NonNull Canvas canvas) {
 
         super.onDraw(canvas);
-
-//        Paint paint = new Paint();
-//        paint.setColor(Color.rgb(67,83,52));
-        paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(2);
-        paint.setStyle(Paint.Style.STROKE);
 
         // Calculate center x and y
         int centerX = getWidth() / 2;
@@ -97,9 +102,8 @@ public class CircleView extends View {
         int rectHeight = bottom - top;
 
         // Draw a rectangle within the boundary
-//        canvas.drawRect(left, top, right, bottom, paint);
-//        canvas.save();
-//        canvas.concat(matrix);
+        canvas.drawRect(left, top, right, bottom, paint);
+
 
         if (circles != null) {
             // Draw each circle on the canvas
@@ -108,9 +112,6 @@ public class CircleView extends View {
                 // Offset circle x and y to center
                 c.setX(centerX + c.getX());
                 c.setY(centerY + c.getY());
-
-                // Adjust circle position to avoid overlapping
-//                adjustCirclePosition(c);
 
                 // Set random text size based on circle radius
                 float textSize = c.getRadius() / 3;
@@ -134,7 +135,7 @@ public class CircleView extends View {
                 canvas.concat(matrix);
             }
         }
-        drawZoomControls(canvas);
+//        drawZoomControls(canvas);
     }
 
         // Function to generate random text
@@ -145,28 +146,9 @@ public class CircleView extends View {
         return texts[randomIndex];
     }
 
-    // Function to calculate distance between two circles
-    private float calculateDistance(Circle circle1, Circle circle2) {
-        float dx = circle2.getX() - circle1.getX();
-        float dy = circle2.getY() - circle1.getY();
-        return (float) Math.sqrt(dx * dx + dy * dy);
-    }
-
-    // Function to calculate angle between two circles
-    private float calculateAngle(Circle circle1, Circle circle2) {
-        float dx = circle2.getX() - circle1.getX();
-        float dy = circle2.getY() - circle1.getY();
-        return (float) Math.atan2(dy, dx);
-    }
-
     public void setCircles(List<Circle> circles) {
         this.circles = circles.toArray(new Circle[0]);
         invalidate(); // Request a redraw
-    }
-
-    private void drawContent(Canvas canvas) {
-        // Add your custom drawing code here
-        canvas.drawCircle(200, 200, 100, paint);
     }
 
     private void drawZoomControls(Canvas canvas) {
@@ -174,38 +156,57 @@ public class CircleView extends View {
         controlsPaint.setColor(Color.BLUE);
         controlsPaint.setTextSize(50);
 
+//        controlXPlus = viewWidth - 80;
+//        controlYPlus = viewHeight - 80;
+//        controlXMinus = viewWidth - 70;
+//        controlYMinus = viewHeight - 20;
+
+//        canvas.drawText("+", controlXPlus, controlYPlus, controlsPaint);
+//        canvas.drawText("-", controlXMinus, controlYMinus, controlsPaint);
+
         canvas.drawText("+", getWidth() - 80, getHeight() - 80, controlsPaint);
-        canvas.drawText("-", getWidth() - 70, getHeight() - 20, controlsPaint);
+        canvas.drawText("-", getWidth() - 80, getHeight() - 20, controlsPaint);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        objScaleGestureDetector.onTouchEvent(event);
         float touchX = event.getX();
         float touchY = event.getY();
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                lastTouchX = touchX;
-                lastTouchY = touchY;
-                isDragging = true;
-                break;
+//        Log.d("CIRCLEVIEW", "Touch event: " + event.getAction());
 
-            case MotionEvent.ACTION_MOVE:
-                if (isDragging) {
-                    float dx = touchX - lastTouchX;
-                    float dy = touchY - lastTouchY;
-                    matrix.postTranslate(dx, dy);
-                    invalidate();
-                    lastTouchX = touchX;
-                    lastTouchY = touchY;
-                }
-                break;
-
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                isDragging = false;
-                break;
-        }
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                Log.d("CIRCLEVIEW", "ACTION_DOWN");
+//                lastTouchX = touchX;
+//                lastTouchY = touchY;
+//                isDragging = true;
+//                break;
+//
+//            case MotionEvent.ACTION_MOVE:
+//                Log.d("CIRCLEVIEW", "ACTION_MOVE");
+//
+//                if (isDragging) {
+//                    Log.d("CIRCLEVIEW", "isDragging  in ACTION_MOVE");
+//
+//                    float dx = touchX - lastTouchX;
+//                    float dy = touchY - lastTouchY;
+//                    matrix.postTranslate(dx, dy);
+//                    invalidate();
+//                    lastTouchX = touchX;
+//                    lastTouchY = touchY;
+//                }
+//                break;
+//
+//            case MotionEvent.ACTION_UP:
+//                Log.d("CIRCLEVIEW", "ACTION_UP");
+//
+//            case MotionEvent.ACTION_CANCEL:
+//                Log.d("CIRCLEVIEW", "ACTION_CANCEL");
+//                isDragging = false;
+//                break;
+//        }
 
         return true;
     }
@@ -215,29 +216,45 @@ public class CircleView extends View {
         return super.performClick();
     }
 
-//    @Override
-//    public boolean onSingleTapConfirmed(MotionEvent event) {
-//        float touchX = event.getX();
-//        float touchY = event.getY();
-//
-//        if (isZoomInButtonTapped(touchX, touchY)) {
-//            scaleFactor *= 1.2f;
-//        } else if (isZoomOutButtonTapped(touchX, touchY)) {
-//            scaleFactor /= 1.2f;
-//        }
-//
-//        matrix.reset();
-//        matrix.postScale(scaleFactor, scaleFactor, getWidth() / 2f, getHeight() / 2f);
-//        invalidate();
-//        return super.onSingleTapConfirmed(event);
-//    }
-
     private boolean isZoomInButtonTapped(float x, float y) {
         return x > getWidth() - 100 && y > getHeight() - 100 && x < getWidth() && y < getHeight();
     }
 
     private boolean isZoomOutButtonTapped(float x, float y) {
         return x > getWidth() - 100 && y > getHeight() - 30 && x < getWidth() && y < getHeight() - 10;
+    }
+
+
+    public class PinchZoomListener extends SimpleOnScaleGestureListener{
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector){
+            Log.d("CIRCLEVIEW", "Touch PinchZoomListener");
+
+            float gestureFactor = detector.getScaleFactor();
+            // zoom out
+            if(gestureFactor > 1){
+                Log.d("CIRCLEVIEW", "Touch PinchZoomListener zoom out");
+
+                scaleFactor /= 1.2f;
+            } else { //zoom in
+                Log.d("CIRCLEVIEW", "Touch PinchZoomListener zoom in");
+
+                scaleFactor *= 1.2f;
+            }
+
+            matrix.reset();
+            matrix.postScale(scaleFactor, scaleFactor, getWidth() / 2f, getHeight() / 2f);
+            invalidate();
+            return true;
+
+        }
+
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector){
+            return true;
+        }
+
     }
 
 
