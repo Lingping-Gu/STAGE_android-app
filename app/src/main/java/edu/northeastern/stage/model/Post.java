@@ -5,12 +5,14 @@ public class Post {
     private String musicLink;
     private String postContent;
     private boolean isLiked;
+    private String visibilityState;
 
-    public Post(String userAvatarUrl, String musicLink, String postContent, boolean isLiked) {
+    public Post(String userAvatarUrl, String musicLink, String postContent, boolean isLiked, String visibilityState) {
         this.userAvatarUrl = userAvatarUrl;
         this.musicLink = musicLink;
         this.postContent = postContent;
         this.isLiked = isLiked;
+        this.visibilityState = visibilityState;
     }
 
     // Getters and Setters
@@ -44,5 +46,13 @@ public class Post {
 
     public void setLiked(boolean liked) {
         isLiked = liked;
+    }
+
+    public String getVisibilityState() {
+        return visibilityState;
+    }
+
+    public void setVisibilityState(String visibilityState) {
+        this.visibilityState = visibilityState;
     }
 }
