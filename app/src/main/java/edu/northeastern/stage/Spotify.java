@@ -13,10 +13,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.io.IOException;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 import okhttp3.Credentials;
@@ -95,14 +93,16 @@ public class Spotify {
         }
     }
 
-    public void artistSearch(final String artist) {
+    public CompletableFuture<ArrayList<JsonElement>> artistSearch(final String artist, Integer numResults) {
         checkAccessToken();
+        CompletableFuture<ArrayList<JsonElement>> future = new CompletableFuture<>();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
                 OkHttpClient client = new OkHttpClient();
 
-                String url = "https://api.spotify.com/v1/search?q=" + artist + "&type=artist";
+                String url = "https://api.spotify.com/v1/search?q=" + artist + "&type=artist&limit=" + numResults.toString();
                 Request request = new Request.Builder()
                         .url(url)
                         .addHeader("Authorization", "Bearer " + accessToken)
@@ -112,25 +112,52 @@ public class Spotify {
                     Response response = client.newCall(request).execute();
                     if (response.isSuccessful()) {
                         final String responseBody = response.body().string();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                handleArtistSearchResults(responseBody);
-                            }
-                        });
+                        final ArrayList<JsonElement> artists = handleArtistSearchResults(responseBody);
+                        future.complete(artists);
                     } else {
                         // unsuccessful response
                         Log.e("SearchError", "Unsuccessful search response: " + response.code());
+                        final String errorMessage = "Unsuccessful search response: " + response.code();
+                        future.completeExceptionally(new RuntimeException(errorMessage));
                     }
                 } catch (IOException e) {
                     // handle IO exception
                     e.printStackTrace();
+                    future.completeExceptionally(e);
                 }
             }
         }).start();
+        return future;
     }
 
-    public CompletableFuture<ArrayList<JsonElement>> trackSearch(final String track) {
+    private ArrayList<JsonElement> handleArtistSearchResults(String responseBody) {
+
+        ArrayList<JsonElement> artists = new ArrayList<JsonElement>();
+
+        try {
+            JsonObject json = new Gson().fromJson(responseBody, JsonObject.class);
+            if (json.has("artists") && json.getAsJsonObject("artists").has("items")) {
+                JsonArray items = json.getAsJsonObject("artists").getAsJsonArray("items");
+                if (items.size() > 0) {
+                    for(int i = 0; i< items.size();i++) {
+                        artists.add(items.get(i));
+                    }
+                } else {
+                    // No tracks found
+                    Toast.makeText(context, "No artists found", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                // Unexpected response format
+                Log.e("SearchError", "Unexpected search response format");
+            }
+        } catch (JsonParseException e) {
+            // JSON parsing exception
+            Log.e("SearchError", "JSON parsing exception");
+        }
+        return artists;
+    }
+
+    public CompletableFuture<ArrayList<JsonElement>> trackSearch(final String track, Integer numResults) {
         checkAccessToken();
         CompletableFuture<ArrayList<JsonElement>> future = new CompletableFuture<>();
 
@@ -139,7 +166,7 @@ public class Spotify {
             public void run() {
                 OkHttpClient client = new OkHttpClient();
 
-                String url = "https://api.spotify.com/v1/search?q=" + track + "&type=track&limit=1";
+                String url = "https://api.spotify.com/v1/search?q=" + track + "&type=track&limit=" + numResults.toString();
                 Request request = new Request.Builder()
                         .url(url)
                         .addHeader("Authorization", "Bearer " + accessToken)
@@ -191,35 +218,7 @@ public class Spotify {
             // JSON parsing exception
             Log.e("SearchError", "JSON parsing exception");
         }
-
         return tracks;
-    }
-
-
-    private void handleArtistSearchResults(String responseBody) {
-        try {
-            JsonObject json = new Gson().fromJson(responseBody, JsonObject.class);
-            if (json.has("artists") && json.getAsJsonObject("artists").has("items")) {
-                JsonArray items = json.getAsJsonObject("artists").getAsJsonArray("items");
-                if (items.size() > 0) {
-                    // Retrieve information about the first artist in the search results
-                    String artistName = items.get(0).getAsJsonObject().get("name").getAsString();
-                    String artistId = items.get(0).getAsJsonObject().get("id").getAsString();
-
-                    // Do something with the artist information (e.g., display it)
-                    Toast.makeText(context, "Artist: " + artistName + ", ID: " + artistId, Toast.LENGTH_SHORT).show();
-                } else {
-                    // No artists found
-                    Toast.makeText(context, "No artists found", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                // Unexpected response format
-                Log.e("SearchError", "Unexpected search response format");
-            }
-        } catch (JsonParseException e) {
-            // JSON parsing exception
-            Log.e("SearchError", "JSON parsing exception");
-        }
     }
 
     private static String parseAccessToken(String responseBody) {

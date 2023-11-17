@@ -8,8 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import android.widget.Toast;
-
 import com.google.gson.JsonElement;
 
 import java.util.ArrayList;
@@ -20,9 +18,7 @@ public class MainActivity extends AppCompatActivity {
     Button loginBT;
     Button registerBT;
     Button tokenBT;
-
     Spotify spotify = new Spotify(MainActivity.this);
-    String[] tracks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         tokenBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CompletableFuture<ArrayList<JsonElement>> trackSearchFuture = spotify.trackSearch("hello");
+                CompletableFuture<ArrayList<JsonElement>> trackSearchFuture = spotify.trackSearch("hello",10);
                 trackSearchFuture.thenAccept(searchResult -> {
                     for(JsonElement track : searchResult) {
                         Log.d("TrackSearch", track.toString());
