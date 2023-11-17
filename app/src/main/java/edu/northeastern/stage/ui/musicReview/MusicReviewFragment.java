@@ -49,6 +49,7 @@ public class MusicReviewFragment extends Fragment {
                 // Show "No reviews yet." text and hide RecyclerView
                 noReviewsTextView.setVisibility(View.VISIBLE);
                 reviewsRecyclerView.setVisibility(View.GONE);
+                updateOverallScore();
             } else {
                 // Show RecyclerView and hide "No reviews yet." text
                 reviewAdapter = new ReviewAdapter(reviews);
@@ -58,7 +59,6 @@ public class MusicReviewFragment extends Fragment {
                 updateOverallScore();
             }
         });
-
         mViewModel.fetchReviews(); // Simulate fetching data
 
         return view;
