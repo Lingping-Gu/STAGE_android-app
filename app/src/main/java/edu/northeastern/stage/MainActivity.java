@@ -48,13 +48,13 @@ public class MainActivity extends AppCompatActivity {
         tokenBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CompletableFuture<ArrayList<JsonElement>> trackSearchFuture = spotify.trackSearch("hello",10);
+                CompletableFuture<ArrayList<JsonElement>> trackSearchFuture = spotify.artistSearch("hello",10);
                 trackSearchFuture.thenAccept(searchResult -> {
                     for(JsonElement track : searchResult) {
-                        Log.d("TrackSearch", track.toString());
+                        Log.d("ArtistSearch", track.toString());
                     }
                 }).exceptionally(e -> {
-                    Log.e("TrackSearchError",e.getMessage());
+                    Log.e("ArtistSearchError",e.getMessage());
                     return null;
                 });
             }
