@@ -18,7 +18,7 @@ public class Artist {
         this.uri = uri;
         this.spotifyUrl = spotifyUrl;
     }
-    
+
     public String getHref() {
         return href;
     }
