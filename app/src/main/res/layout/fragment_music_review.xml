@@ -40,6 +40,13 @@
                 android:padding="16dp"
                 android:text="Album: Desire\nReleased: November 1975\nGenre: Classic Rock, Folk Rock, Protest Song\nLanguage: English\nSongwriters: Bob Dylan, Jacques Levy\nStudio: Columbia Studios, New York" />
 
+            <Button
+                android:id="@+id/addReviewButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Review"
+                android:layout_gravity="center_horizontal" />
+
             <TextView
                 android:id="@+id/overallScoreTextView"
                 android:layout_width="match_parent"

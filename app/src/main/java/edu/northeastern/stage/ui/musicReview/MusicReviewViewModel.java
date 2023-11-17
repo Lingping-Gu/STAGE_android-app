@@ -1,5 +1,7 @@
 package edu.northeastern.stage.ui.musicReview;
 
+import android.util.Log;
+
 import androidx.lifecycle.ViewModel;
 
 import androidx.lifecycle.LiveData;
@@ -53,5 +55,14 @@ public class MusicReviewViewModel extends ViewModel {
             totalRating += review.getRating();
         }
         return totalRating / reviewList.size();
+    }
+
+    public void addReview(Review review) {
+        List<Review> currentReviews = reviews.getValue();
+        if (currentReviews == null) {
+            currentReviews = new ArrayList<>();
+        }
+        currentReviews.add(review);
+        reviews.setValue(currentReviews);
     }
 }
