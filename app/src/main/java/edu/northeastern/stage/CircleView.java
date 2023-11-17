@@ -96,20 +96,15 @@ public class CircleView extends View {
         int rectWidth = right - left;
         int rectHeight = bottom - top;
 
-        canvas.save();
-        canvas.concat(matrix);
         // Draw a rectangle within the boundary
-        canvas.drawRect(left, top, right, bottom, paint);
+//        canvas.drawRect(left, top, right, bottom, paint);
+//        canvas.save();
+//        canvas.concat(matrix);
 
-        canvas.restore();
-        drawZoomControls(canvas);
-
-        int circleCount = 0;
         if (circles != null) {
             // Draw each circle on the canvas
             for (Circle c : circles) {
-                canvas.save();
-                canvas.concat(matrix);
+
                 // Offset circle x and y to center
                 c.setX(centerX + c.getX());
                 c.setY(centerY + c.getY());
@@ -133,14 +128,13 @@ public class CircleView extends View {
 
                 // Draw circle with black border
                 canvas.drawCircle(c.getX(), c.getY(), c.getRadius(), paint);
-
                 // Draw text inside the circle
                 canvas.drawText(randomText, textX, textY, paint);
-
-                canvas.restore();
-                drawZoomControls(canvas);
+                canvas.save();
+                canvas.concat(matrix);
             }
         }
+        drawZoomControls(canvas);
     }
 
         // Function to generate random text
@@ -177,11 +171,11 @@ public class CircleView extends View {
 
     private void drawZoomControls(Canvas canvas) {
         Paint controlsPaint = new Paint();
-        controlsPaint.setColor(Color.BLACK);
+        controlsPaint.setColor(Color.BLUE);
         controlsPaint.setTextSize(50);
 
         canvas.drawText("+", getWidth() - 80, getHeight() - 80, controlsPaint);
-        canvas.drawText("-", getWidth() - 80, getHeight() - 20, controlsPaint);
+        canvas.drawText("-", getWidth() - 70, getHeight() - 20, controlsPaint);
     }
 
     @Override
