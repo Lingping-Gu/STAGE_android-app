@@ -24,7 +24,9 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import edu.northeastern.stage.model.Circle;
@@ -41,7 +43,6 @@ public class ExploreFragment extends Fragment {
     ExploreLocationSeekBar seekBar;
     SeekBar locationSeekBar;
     TextView progressTextView;
-    private static final Random rand = new Random();
 
 
     TextWatcher textWatcher = new TextWatcher() {
@@ -130,7 +131,7 @@ public class ExploreFragment extends Fragment {
             buttonToMusicReview.setEnabled(true);
         });
 
-        viewModel.setCircles(createCircles());
+        viewModel.setCircles(circleView);
 
         buttonToMusicReview.setOnClickListener(v -> {
             // Use the NavController to navigate to the MusicReviewFragment
@@ -146,52 +147,6 @@ public class ExploreFragment extends Fragment {
             adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, recommendations);
             actv.setAdapter(adapter);
         });
-    }
-
-    public List<Circle> createCircles() {
-        List<Circle> circles = new ArrayList<>();
-        int attempts = 0;
-        int maxAttempts = 100000; // Limit the number of attempts to avoid infinite loop
-        int MIN_DISTANCE_THRESHOLD = 10;
-
-        while (circles.size() < 100 && attempts < maxAttempts) {
-            float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
-            float y = rand.nextFloat() * 2000 - 1000;
-            float radius = rand.nextFloat() * 200 + 5;
-
-            // Ensure the newly created circle doesn't overlap with existing circles
-            boolean isOverlapping = false;
-            for (Circle existingCircle : circles) {
-                float distance = calculateDistance(x, y, existingCircle.getX(), existingCircle.getY());
-                // add min_distance_threshold so they are bit further away from each other
-                float minDistance = radius + existingCircle.getRadius() + MIN_DISTANCE_THRESHOLD;
-                if (distance < minDistance) {
-                    isOverlapping = true;
-                    break; // This circle overlaps, generate a new one
-                }
-            }
-
-            if (!isOverlapping) {
-                circles.add(new Circle(x, y, radius));
-            }
-
-            attempts++;
-        }
-
-        // Set the circles to the existing CircleView
-        if (circleView != null) {
-            circleView.setCircles(circles);
-            circleView.invalidate(); // Request a redraw
-        }
-
-        return circles;
-    }
-
-    private float calculateDistance(float x1, float y1, float x2, float y2) {
-        //euclidean distance
-        float dx = x2 - x1;
-        float dy = y2 - y1;
-        return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
 

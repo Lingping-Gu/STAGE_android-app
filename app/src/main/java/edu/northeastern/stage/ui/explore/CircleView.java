@@ -16,7 +16,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import edu.northeastern.stage.model.Circle;
@@ -37,6 +39,9 @@ public class CircleView extends View {
     private float controlYPlus;
     private float controlXMinus;
     private float controlYMinus;
+    private boolean hasDrawn = false;
+    Map<Circle, String> circleTextMap = new HashMap<>();
+
 
     ScaleGestureDetector objScaleGestureDetector;
 
@@ -85,78 +90,81 @@ public class CircleView extends View {
 
         super.onDraw(canvas);
 
-        canvas.save();
-        canvas.concat(matrix);
+        if(!hasDrawn) {
 
-        // Calculate center x and y
-        int centerX = getWidth() / 2;
-        int centerY = getHeight() / 2;
+            canvas.save();
+            canvas.concat(matrix);
 
-        // Get the dimensions of the View
-        int viewWidth = getWidth();
-        int viewHeight = getHeight();
+            // Calculate center x and y
+            int centerX = getWidth() / 2;
+            int centerY = getHeight() / 2;
 
-        // Set the boundary for drawing
-        int left = 50;
-        int top = 50;
-        int right = viewWidth - 50;
-        int bottom = viewHeight - 50;
+            // Get the dimensions of the View
+            int viewWidth = getWidth();
+            int viewHeight = getHeight();
 
-        // Calculate rectangle width and height
-        int rectWidth = right - left;
-        int rectHeight = bottom - top;
+            // Set the boundary for drawing
+            int left = 50;
+            int top = 50;
+            int right = viewWidth - 50;
+            int bottom = viewHeight - 50;
 
-
-
-        // Draw a rectangle within the boundary
-        canvas.drawRect(left, top, right, bottom, paint);
-
-        canvas.save();
-        canvas.concat(matrix);
-
-        if (circles != null) {
-            // Draw each circle on the canvas
-            for (Circle c : circles) {
+            // Calculate rectangle width and height
+            int rectWidth = right - left;
+            int rectHeight = bottom - top;
 
 
-                // Offset circle x and y to center
+
+            // Draw a rectangle within the boundary
+//        canvas.drawRect(left, top, right, bottom, paint);
+
+
+            if (circles != null) {
+                // Draw each circle on the canvas
+                for (Circle c : circles) {
+
+
+                    // Offset circle x and y to center
 //                c.setX(centerX + c.getX());
 //                c.setY(centerY + c.getY());
 
-                // Set random text size based on circle radius
-                float textSize = c.getRadius() / 3;
-                paint.setTextSize(textSize);
+                    // Set random text size based on circle radius
+                    float textSize = c.getRadius() / 3;
+                    paint.setTextSize(textSize);
 
-                // Generate random text
-                String randomText = generateRandomText();
-                // Calculate text width and height
-                float textWidth = paint.measureText(randomText);
-                Paint.FontMetrics metrics = paint.getFontMetrics();
-                float textHeight = metrics.descent - metrics.ascent;
-                // Calculate centered coordinates for the text
-                float textX = c.getX() - (textWidth / 2);
-                float textY = c.getY() - (textHeight / 2);
+                    // Generate random text
+                    String randomText = circleTextMap.get(c);
+                    // Calculate text width and height
+                    float textWidth = paint.measureText(randomText);
+                    Paint.FontMetrics metrics = paint.getFontMetrics();
+                    float textHeight = metrics.descent - metrics.ascent;
+                    // Calculate centered coordinates for the text
+                    float textX = c.getX() - (textWidth / 2);
+                    float textY = c.getY() - (textHeight / 2);
 
-                canvas.save();
-                // Draw circle with black border
-                canvas.drawCircle(c.getX(), c.getY(), c.getRadius(), paint);
-                // Draw text inside the circle
-                canvas.drawText(randomText, textX, textY, paint);
+                    canvas.save();
+                    // Draw circle with black border
+                    canvas.drawCircle(c.getX(), c.getY(), c.getRadius(), paint);
+                    // Draw text inside the circle
+                    canvas.drawText(randomText, textX, textY, paint);
+                }
             }
+
+            canvas.save();
+            canvas.concat(matrix);
+            canvas.restore();
+            drawZoomControls(canvas);
+
+
+//            hasDrawn = true;
+
         }
-        drawZoomControls(canvas);
+
     }
 
-        // Function to generate random text
-    private String generateRandomText() {
-        // Replace this with your own logic to generate random text
-        String[] texts = {"Text1", "Text2", "Text3", "Text4", "Text5"};
-        int randomIndex = new Random().nextInt(texts.length);
-        return texts[randomIndex];
-    }
-
-    public void setCircles(List<Circle> circles) {
+    public void setCircles(List<Circle> circles, HashMap<Circle, String> circleTextMap) {
         this.circles = circles.toArray(new Circle[0]);
+        this.circleTextMap = circleTextMap;
         invalidate(); // Request a redraw
     }
 
