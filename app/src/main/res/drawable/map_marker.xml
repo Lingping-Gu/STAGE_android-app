@@ -1,20 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- res/drawable/map_marker.xml -->
-    <item>
-        <shape
-            android:shape="oval">
-            <size
-                android:width="24dp"
-                android:height="24dp"/>
-            <solid
-                android:color="#000000"/>
-        </shape>
-    </item>
-    <item
-        android:drawable="@android:drawable/star_on"
-        android:width="18dp"
-        android:height="18dp"
-        android:gravity="center"/>
-
-</layer-list>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="38dp"
+    android:height="38dp"
+    android:viewportWidth="42"
+    android:viewportHeight="42">
+    <path
+        android:pathData="M21,21m0,20a20,20 0,1 1,0 -40a20,20 0,1 1,0 40"
+        android:strokeWidth="2"
+        android:fillColor="#00FFFFFF"
+        android:strokeColor="#46B2D3"/>
+</vector>
