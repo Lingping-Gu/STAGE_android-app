@@ -1,6 +1,5 @@
 package edu.northeastern.stage.ui.explore;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -19,7 +18,6 @@ import androidx.annotation.NonNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import edu.northeastern.stage.model.Circle;
 
@@ -93,9 +91,10 @@ public class CircleView extends View {
         int right = viewWidth - 50;
         int bottom = viewHeight - 50;
 
-        // Draw a rectangle within the boundary
-//        canvas.drawRect(left, top, right, bottom, paint);
+//      canvas.clipOutRect(left, top, right, bottom);
 
+        // Draw a rectangle within the boundary
+//      canvas.drawRect(left, top, right, bottom, paint);
 
         if (circles != null) {
             // Draw each circle on the canvas
@@ -179,7 +178,7 @@ public class CircleView extends View {
 
             case MotionEvent.ACTION_UP:
                 Log.d("CIRCLEVIEW", "ACTION_UP");
-                checkCircleClick(touchX, touchY);
+//                checkCircleClick(touchX, touchY);
                 break;
 
             case MotionEvent.ACTION_CANCEL:
