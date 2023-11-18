@@ -18,7 +18,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginRight="16dp"
-            android:src="@drawable/ic_avatar_placeholder" />
+            app:srcCompat="@drawable/default_pfp"  />
 
         <!-- Vertical container for texts and like image -->
         <LinearLayout
@@ -42,16 +42,23 @@
                 android:layout_height="wrap_content"
                 android:text="Post content placeholder"
                 android:layout_marginTop="8dp" />
-
         </LinearLayout>
 
-        <!-- Like button image on the bottom right -->
         <ImageView
             android:id="@+id/ivLike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:src="@drawable/ic_favorite_black_24dp"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/ic_favorite_black_24dp" />
+
+        <ImageView
+            android:id="@+id/visibleState"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/profile_public"
             android:layout_marginLeft="16dp" />
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>
+

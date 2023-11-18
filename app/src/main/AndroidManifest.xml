@@ -26,6 +26,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.profile.EditProfile"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".ui.profile.TagsAdapter"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".ui.profile.ProfileFragment"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".ui.profile.RecentListenedAdapter"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".ui.profile.ProfileViewModel"
+            android:exported="false">
+        </activity>
     </application>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 </manifest>
