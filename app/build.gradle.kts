@@ -38,6 +38,12 @@ dependencies {
     // firebase authentication library
     implementation("com.google.firebase:firebase-auth")
 
+    // firebase DB
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
+    implementation ("com.google.firebase:firebase-messaging")
+
     // pre-existing dependencies
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")

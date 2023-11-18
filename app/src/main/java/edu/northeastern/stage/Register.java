@@ -20,7 +20,6 @@ import com.google.firebase.auth.FirebaseAuthEmailException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.SignInMethodQueryResult;
 
 public class Register extends AppCompatActivity {
 
@@ -41,7 +40,7 @@ public class Register extends AppCompatActivity {
 
         if (user != null) {
             // change intent
-           Intent intent = new Intent(Register.this,MainActivity.class);
+           Intent intent = new Intent(Register.this, LoginRegisterExample.class);
            startActivity(intent);
         }
 
@@ -84,7 +83,7 @@ public class Register extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "createUserWithEmail:success");
                                 // change intent
-                                Intent intent = new Intent(Register.this,MainActivity.class);
+                                Intent intent = new Intent(Register.this, LoginRegisterExample.class);
                                 startActivity(intent);
                             } else {
                                 // register fail, check which exception
