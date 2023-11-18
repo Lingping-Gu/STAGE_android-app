@@ -35,7 +35,7 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         mAuth = FirebaseAuth.getInstance();
 
-        // mAuth.signOut(); // use this for testing purposes
+        // mAuth.signOut(); // use this to sign out
 
         // TODO: change intent to other activity
         FirebaseUser currentUser = mAuth.getCurrentUser();
