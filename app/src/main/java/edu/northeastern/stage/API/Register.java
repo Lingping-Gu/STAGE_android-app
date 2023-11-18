@@ -1,4 +1,4 @@
-package edu.northeastern.stage;
+package edu.northeastern.stage.API;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +20,8 @@ import com.google.firebase.auth.FirebaseAuthEmailException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+
+import edu.northeastern.stage.R;
 
 public class Register extends AppCompatActivity {
 

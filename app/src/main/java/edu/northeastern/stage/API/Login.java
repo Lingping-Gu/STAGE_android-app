@@ -1,4 +1,4 @@
-package edu.northeastern.stage;
+package edu.northeastern.stage.API;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +18,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import edu.northeastern.stage.R;
 
 public class Login extends AppCompatActivity {
 

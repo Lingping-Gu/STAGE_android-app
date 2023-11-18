@@ -1,4 +1,4 @@
-package edu.northeastern.stage;
+package edu.northeastern.stage.API;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,6 +11,8 @@ import com.google.gson.JsonElement;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
+
+import edu.northeastern.stage.R;
 
 public class SpotifyAPIExample extends AppCompatActivity {
 
@@ -29,7 +31,7 @@ public class SpotifyAPIExample extends AppCompatActivity {
         searchArtistBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CompletableFuture<ArrayList<JsonElement>> artistSearchFuture = spotify.artistSearch("ADele",10);
+                CompletableFuture<ArrayList<JsonElement>> artistSearchFuture = spotify.artistSearch("Adele",10);
                 artistSearchFuture.thenAccept(searchResult -> {
                     for(JsonElement track : searchResult) {
                         Log.d("ArtistSearch", track.toString());

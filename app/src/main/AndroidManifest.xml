@@ -15,29 +15,28 @@
         android:theme="@style/Theme.STAGE"
         tools:targetApi="31">
         <activity
-            android:name=".FirebaseExample"
+            android:name=".API.FirebaseExample"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".SpotifyAPIExample"
-            android:exported="false">
+            android:name=".API.SpotifyAPIExample"
+            android:exported="true">
         </activity>
         <activity
-            android:name=".ResetPWDialogFragment"
+            android:name=".API.ResetPWDialogFragment"
             android:exported="false" />
         <activity
-            android:name=".Register"
+            android:name=".API.Register"
             android:exported="false" />
         <activity
-            android:name=".Login"
+            android:name=".API.Login"
             android:exported="false" />
         <activity
-            android:name=".LoginRegisterExample"
+            android:name=".API.LoginRegisterExample"
             android:exported="false" />
     </application>
 
