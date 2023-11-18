@@ -78,6 +78,7 @@ public class CircleView extends View {
     protected void onDraw(@NonNull Canvas canvas) {
 
         super.onDraw(canvas);
+        Log.d("ONDRAW", "ondraw");
 
         canvas.save();
         canvas.concat(matrix);
@@ -178,6 +179,8 @@ public class CircleView extends View {
 
             case MotionEvent.ACTION_UP:
                 Log.d("CIRCLEVIEW", "ACTION_UP");
+                checkCircleClick(touchX, touchY);
+                break;
 
             case MotionEvent.ACTION_CANCEL:
                 Log.d("CIRCLEVIEW", "ACTION_CANCEL");
@@ -237,6 +240,30 @@ public class CircleView extends View {
 
     private void toastmsg(String msg){
         Toast.makeText(this.getContext(), msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private void checkCircleClick(float touchX, float touchY) {
+        if (circles != null) {
+            for (Circle c : circles) {
+                // Check if the touch point is within the bounds of the circle
+                if (isPointInsideCircle(touchX, touchY, c)) {
+                    // Handle the circle click, for example, display a message or perform an action
+                    toastmsg("" + c + " text value is " + circleTextMap.get(c));
+                    break; // Exit the loop once a circle is clicked
+                }
+            }
+        }
+    }
+
+    private boolean isPointInsideCircle(float x, float y, Circle circle) {
+        //Create a float array to represent the touch coordinates as a point.
+        float[] point = {x, y};
+        matrix.invert(matrix); // Invert the matrix to get the original coordinates
+        matrix.mapPoints(point); // Map the touch coordinates to the original coordinates
+
+        //Calculate the distance between the mapped touch coordinates and the circle's center using the Pythagorean theorem.
+        float distance = (float) Math.sqrt(Math.pow(point[0] - circle.getX(), 2) + Math.pow(point[1] - circle.getY(), 2));
+        return distance <= circle.getRadius();
     }
 
 
