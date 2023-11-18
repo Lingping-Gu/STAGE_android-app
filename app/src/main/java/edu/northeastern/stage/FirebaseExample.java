@@ -17,11 +17,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FirebaseExample extends AppCompatActivity {
 
     Button createPostBT;
     Button createReviewBT;
+    Button updateUserBT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,7 @@ public class FirebaseExample extends AppCompatActivity {
 
         createPostBT = findViewById(R.id.createPostBT);
         createReviewBT = findViewById(R.id.createReviewBT);
+        updateUserBT = findViewById(R.id.updateUserBT);
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -46,11 +50,21 @@ public class FirebaseExample extends AppCompatActivity {
         String content = "Hello there!";
         String user = UID;
         Long timeStamp = System.currentTimeMillis();
-        ArrayList<String> likes = new ArrayList<>();
         Integer rating = 5;
+        ArrayList<String> likes = new ArrayList<>();
 
         Post newPost = new Post(trackID,content,user,timeStamp,likes);
         Review newReview = new Review(trackID, content, user, timeStamp, rating);
+
+        Long lastLoggedInTimeStamp = System.currentTimeMillis();
+        Location lastLocation = new Location(100.0,100.0);
+        String firstName = "Test";
+        String lastName = "User";
+        Name name = new Name(firstName,lastName);
+
+        User updateUser = new User(lastLoggedInTimeStamp,name,lastLocation);
+
+        String friend = "friendID";
 
         String finalUID = UID;
         createPostBT.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +81,12 @@ public class FirebaseExample extends AppCompatActivity {
             }
         });
 
+        updateUserBT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateUser(updateUser,finalUID);
+            }
+        });
     }
 
     public void createPost(Post post, String UID) {
@@ -78,22 +98,17 @@ public class FirebaseExample extends AppCompatActivity {
                 .child("posts");
 
         DatabaseReference newPostRef = reference.push();
-        final boolean[] successFlag = {true};
 
         newPostRef.setValue(post, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
                 if(error != null) {
-                    successFlag[0] = false;
+                    Log.d("NewPost","New post created!");
+                } else {
+                    Log.d("NewPost","New post created!");
                 }
             }
         });
-        if(successFlag[0]) {
-            // success
-            Log.d("NewPost","New post created!");
-        } else {
-            Log.e("NewPost","New post not created!");
-        }
     }
 
     public void createReview(Review review, String UID) {
@@ -105,21 +120,94 @@ public class FirebaseExample extends AppCompatActivity {
                 .child("reviews");
 
         DatabaseReference newReviewRef = reference.push();
-        final boolean[] successFlag = {true};
 
         newReviewRef.setValue(review, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
                 if(error != null) {
-                    successFlag[0] = false;
+                    Log.d("NewReview","New review created!");
+                } else {
+                    Log.e("NewReview","New review not created!");
                 }
             }
         });
-        if(successFlag[0]) {
-            // success
-            Log.d("NewReview","New review created!");
-        } else {
-            Log.e("NewReview","New review not created!");
+    }
+
+    public void updateUser(User user, String UID) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(UID);
+
+        Map<String, Object> updates = new HashMap<>();
+
+        if(user.getLastLocation() != null) {
+            updates.put("lastLocation",user.getLastLocation());
         }
+
+        if(user.getName() != null) {
+            updates.put("name",user.getName());
+        }
+
+        if(user.getLastLoggedInTimeStamp() != null) {
+            updates.put("lastLoggedInTimeStamp",user.getLastLoggedInTimeStamp());
+        }
+
+        reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if(error != null) {
+                    Log.d("UpdateUser","User update success!");
+                } else {
+                    Log.e("UpdateUser","User update fail!");
+                }
+            }
+        });
+    }
+
+    // update my own list of likes
+    // update post's like as well
+    public void likePost(Review review, String UID) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(UID)
+                .child("reviews");
+
+        DatabaseReference newReviewRef = reference.push();
+
+        newReviewRef.setValue(review, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if(error != null) {
+                    Log.d("NewReview","New review created!");
+                } else {
+                    Log.e("NewReview","New review not created!");
+                }
+            }
+        });
+    }
+    public void follow(Review review, String UID) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(UID)
+                .child("reviews");
+
+        DatabaseReference newReviewRef = reference.push();
+
+        newReviewRef.setValue(review, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if(error != null) {
+                    Log.d("NewReview","New review created!");
+                } else {
+                    Log.e("NewReview","New review not created!");
+                }
+            }
+        });
     }
 }
