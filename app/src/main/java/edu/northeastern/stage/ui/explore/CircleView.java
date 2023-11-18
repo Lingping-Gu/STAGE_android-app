@@ -125,7 +125,7 @@ public class CircleView extends View {
         canvas.save();
         canvas.concat(matrix);
         canvas.restore();
-        drawZoomControls(canvas);
+//        drawZoomControls(canvas);
 
     }
 
@@ -136,7 +136,6 @@ public class CircleView extends View {
     }
 
     private void drawZoomControls(Canvas canvas) {
-        toastmsg("In drawZoomControls");
         Paint controlsPaint = new Paint();
         controlsPaint.setColor(Color.BLUE);
         controlsPaint.setTextSize(50);
@@ -153,6 +152,7 @@ public class CircleView extends View {
         float touchY = event.getY();
 
         Log.d("CIRCLEVIEW", "Touch event: " + event.getAction());
+//        toastmsg("In onTouchEvent ->" + Thread.activeCount());
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -163,7 +163,6 @@ public class CircleView extends View {
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                toastmsg("In action move");
 
                 if (isDragging) {
                     Log.d("CIRCLEVIEW", "isDragging  in ACTION_MOVE");
@@ -205,6 +204,7 @@ public class CircleView extends View {
     }
 
 
+    //check if we still want to leave the pinch in and out seeing that texts don't get zoomed in
     public class PinchZoomListener extends SimpleOnScaleGestureListener{
 
         @Override
@@ -214,13 +214,11 @@ public class CircleView extends View {
             float gestureFactor = detector.getScaleFactor();
             // zoom out
             if(gestureFactor > 1){
-                Log.d("CIRCLEVIEW", "Touch PinchZoomListener zoom out");
-
-                scaleFactor /= 1.2f;
-            } else { //zoom in
                 Log.d("CIRCLEVIEW", "Touch PinchZoomListener zoom in");
-
-                scaleFactor *= 1.2f;
+                scaleFactor *= 1.05f;
+            } else { //zoom in
+                Log.d("CIRCLEVIEW", "Touch PinchZoomListener zoom out");
+                scaleFactor /= 1.05f;
             }
 
             matrix.reset();
