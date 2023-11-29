@@ -12,9 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import edu.northeastern.stage.ui.adapters.PostAdapter;
+import edu.northeastern.stage.ui.PostAdapter;
 import edu.northeastern.stage.R;
-import edu.northeastern.stage.ui.viewmodels.HomeViewModel;
 
 public class HomeFragment extends Fragment {
 

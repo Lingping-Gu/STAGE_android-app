@@ -14,8 +14,7 @@ import android.view.ViewGroup;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.databinding.FragmentProfileBinding;
-import edu.northeastern.stage.ui.adapters.TagsAdapter;
-import edu.northeastern.stage.ui.viewmodels.ProfileViewModel;
+import edu.northeastern.stage.ui.TagsAdapter;
 
 import android.content.Intent;
 import android.widget.ImageView;

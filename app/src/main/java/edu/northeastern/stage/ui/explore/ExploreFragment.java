@@ -3,7 +3,6 @@ package edu.northeastern.stage.ui.explore;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -20,7 +19,6 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import edu.northeastern.stage.R;
-import edu.northeastern.stage.model.Song;
 
 public class ExploreFragment extends Fragment {
 
@@ -29,7 +27,7 @@ public class ExploreFragment extends Fragment {
     private Button buttonToMusicReview;
     private CircleView circleView;
     private SeekBar geoSlider;
-    private edu.northeastern.stage.ui.viewmodels.ExploreViewModel viewModel;
+    private ExploreViewModel viewModel;
     private edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel sharedViewModel;
     TextView progressTextView;
 
@@ -65,7 +63,7 @@ public class ExploreFragment extends Fragment {
         geoSlider = fragmentView.findViewById(R.id.locationSeekBar);
         progressTextView = fragmentView.findViewById(R.id.textView);
 
-        viewModel = new ViewModelProvider(this).get(edu.northeastern.stage.ui.viewmodels.ExploreViewModel.class);
+        viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
         observeViewModel();
         viewModel.setCircles(circleView);
 

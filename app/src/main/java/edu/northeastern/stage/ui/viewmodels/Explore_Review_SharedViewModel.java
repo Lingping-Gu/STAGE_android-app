@@ -7,10 +7,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import edu.northeastern.stage.model.Review;
 import edu.northeastern.stage.model.Song;
 
 public class Explore_Review_SharedViewModel extends ViewModel {

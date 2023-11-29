@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.viewmodels;
+package edu.northeastern.stage.ui.profile;
 
 import androidx.lifecycle.ViewModel;
 

@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
-import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
 
 public class NewPostFragment extends Fragment {
     private FragmentNewPostBinding binding;

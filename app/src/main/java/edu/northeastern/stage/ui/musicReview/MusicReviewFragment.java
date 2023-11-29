@@ -1,6 +1,5 @@
 package edu.northeastern.stage.ui.musicReview;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -16,14 +15,13 @@ import android.view.ViewGroup;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Song;
-import edu.northeastern.stage.ui.adapters.ReviewAdapter;
+import edu.northeastern.stage.ui.ReviewAdapter;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import edu.northeastern.stage.ui.viewmodels.MusicReviewViewModel;
 
 public class MusicReviewFragment extends Fragment {
-    private edu.northeastern.stage.ui.viewmodels.MusicReviewViewModel mViewModel;
+    private MusicReviewViewModel mViewModel;
     private edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel sharedViewModel;
     private RecyclerView reviewsRecyclerView;
     private ReviewAdapter reviewAdapter;
@@ -63,7 +61,7 @@ public class MusicReviewFragment extends Fragment {
             }
         });
 
-        mViewModel = new ViewModelProvider(this).get(edu.northeastern.stage.ui.viewmodels.MusicReviewViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(MusicReviewViewModel.class);
         mViewModel.getReviews().observe(getViewLifecycleOwner(), reviews -> {
             reviewAdapter = new ReviewAdapter(reviews);
             reviewsRecyclerView.setAdapter(reviewAdapter);

@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.viewmodels;
+package edu.northeastern.stage.ui.musicReview;
 
 import androidx.lifecycle.ViewModel;
 
