@@ -1,7 +1,10 @@
-package edu.northeastern.stage.model.music;
+package edu.northeastern.stage.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.northeastern.stage.model.music.Album;
+import edu.northeastern.stage.model.music.Artist;
 
 public class Song {
     private String name;
