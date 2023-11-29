@@ -14,14 +14,14 @@
         android:src="@drawable/ic_album_placeholder"
         android:contentDescription="album_cover" />
 
-    <!-- Search bar for song -->
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/svSongSearch"
+    <!-- AutoCompleteTextView for song -->
+    <AutoCompleteTextView
+        android:id="@+id/actvSongSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:iconifiedByDefault="false"
-        android:queryHint="search song" />
+        android:hint="search song"
+        android:inputType="text" />
 
     <!-- Text input bar for post content -->
     <EditText
