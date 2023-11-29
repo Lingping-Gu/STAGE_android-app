@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import edu.northeastern.stage.PostAdapter;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.databinding.FragmentProfileBinding;
@@ -44,7 +45,7 @@ public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
     private ProfileViewModel viewModel;
     private TagsAdapter tagsAdapter;
-    private PostsAdapter postsAdapter;
+    private PostAdapter postsAdapter;
     private RecentListenedAdapter recentListenedAdapter;
     private static final int REQUEST_EDIT_PROFILE = 1;
 
@@ -67,7 +68,7 @@ public class ProfileFragment extends Fragment {
         binding.tags.setAdapter(tagsAdapter);
 
         // Set up Posts Adapter
-        postsAdapter = new PostsAdapter(new ArrayList<>());
+        postsAdapter = new PostAdapter(new ArrayList<>());
         binding.activities.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.activities.setAdapter(postsAdapter);
 
