@@ -27,10 +27,11 @@ public class CircleView extends View {
     Circle[] circles;
     private Matrix matrix;
     private Paint paint;
-    private float scaleFactor = 1f;
+    private float scaleFactor = 1.05f;
     private float lastTouchX;
     private float lastTouchY;
     private boolean isDragging = false;
+    Integer countDraw = 0;
     Map<Circle, String> circleTextMap = new HashMap<>();
 
 
@@ -40,11 +41,13 @@ public class CircleView extends View {
     // Constructors for XML inflation
     public CircleView(Context context) {
         super(context);
+        Log.d("CIRCLEVIEW", "circleview context");
         init();
     }
 
     public CircleView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        Log.d("CIRCLEVIEW", "circleview context + attrs");
         init();
     }
 
@@ -52,16 +55,19 @@ public class CircleView extends View {
     public CircleView(Context context, AttributeSet attrs, List<Circle> circles, int defStyle) {
         super(context, attrs, defStyle);
         this.circles = circles.toArray(new Circle[0]);
+        Log.d("CIRCLEVIEW", "circleview context + attrs + defstyle");
         init();
     }
 
     public CircleView(Context context, List<Circle> circles) {
         super(context);
         this.circles = circles.toArray(new Circle[0]);
+        Log.d("CIRCLEVIEW", "circleview context + list of circles");
         init();
     }
 
     private void init() {
+        Log.d("CIRCLEVIEW", "init");
 
         objScaleGestureDetector = new ScaleGestureDetector(this.getContext(), new PinchZoomListener());
 
@@ -70,13 +76,24 @@ public class CircleView extends View {
         paint.setColor(Color.WHITE);
         paint.setStrokeWidth(2);
         paint.setStyle(Paint.Style.STROKE);
+
+        for(Integer i = 0; i < 3; i++){
+            Log.d("CIRCLEVIEW", "scale factor change");
+
+            scaleFactor /= 1.05f;
+        }
+//        matrix.reset();
+        matrix.postScale(scaleFactor, scaleFactor, getWidth() / 2f, getHeight() / 2f);
+        invalidate();
     }
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
 
+        countDraw ++;
+
         super.onDraw(canvas);
-        Log.d("ONDRAW", "ondraw");
+        Log.d("CIRCLEVIEW", "on draw count " + countDraw);
 
         canvas.save();
         canvas.concat(matrix);
@@ -127,11 +144,29 @@ public class CircleView extends View {
         canvas.restore();
 //        drawZoomControls(canvas);
 
+//        scaleFactor /= 1.05f;
+//        matrix.reset();
+//        matrix.postScale(scaleFactor, scaleFactor, getWidth() / 2f, getHeight() / 2f);
+//        invalidate();
+
+        if(countDraw < 8) {
+            for (Integer i = 0; i < 3; i++) {
+                scaleFactor /= 1.05f;
+            }
+            matrix.reset();
+            matrix.postScale(scaleFactor, scaleFactor, getWidth() / 1.5f, getHeight() / 1.5f);
+            invalidate();
+        }
+
+//        postInvalidate();
     }
 
     public void setCircles(List<Circle> circles, HashMap<Circle, String> circleTextMap) {
+        Log.d("CIRCLEVIEW", "set circles");
+
         this.circles = circles.toArray(new Circle[0]);
         this.circleTextMap = circleTextMap;
+
         invalidate(); // Request a redraw
     }
 

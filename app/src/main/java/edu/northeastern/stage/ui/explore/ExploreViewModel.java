@@ -130,7 +130,7 @@ public class ExploreViewModel extends AndroidViewModel {
         while (circles.size() < 100 && attempts < maxAttempts) {
             float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
             float y = rand.nextFloat() * 2000 - 1000;
-            float radius = rand.nextFloat() * 200 + 5;
+            float radius = rand.nextFloat() * 200 + 100;
 
             // Ensure the newly created circle doesn't overlap with existing circles
             boolean isOverlapping = false;
