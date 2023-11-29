@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import edu.northeastern.stage.R;
-import edu.northeastern.stage.model.Song;
+import edu.northeastern.stage.model.music.Song;
 import edu.northeastern.stage.ui.ReviewAdapter;
 
 import androidx.recyclerview.widget.LinearLayoutManager;

@@ -1,13 +1,12 @@
 package edu.northeastern.stage.ui.viewmodels;
 
-import android.app.Application;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import edu.northeastern.stage.model.Song;
+import edu.northeastern.stage.model.music.Song;
 
 public class Explore_Review_SharedViewModel extends ViewModel {
     private MutableLiveData<Song> song = new MutableLiveData<>();
