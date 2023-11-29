@@ -3,12 +3,14 @@ package edu.northeastern.stage.ui.explore;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import edu.northeastern.stage.R;
+import edu.northeastern.stage.model.Song;
 
 public class ExploreFragment extends Fragment {
 
@@ -26,7 +29,8 @@ public class ExploreFragment extends Fragment {
     private Button buttonToMusicReview;
     private CircleView circleView;
     private SeekBar geoSlider;
-    private ExploreViewModel viewModel;
+    private edu.northeastern.stage.ui.viewmodels.ExploreViewModel viewModel;
+    private edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel sharedViewModel;
     TextView progressTextView;
 
 
@@ -61,20 +65,25 @@ public class ExploreFragment extends Fragment {
         geoSlider = fragmentView.findViewById(R.id.locationSeekBar);
         progressTextView = fragmentView.findViewById(R.id.textView);
 
-        viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
+        viewModel = new ViewModelProvider(this).get(edu.northeastern.stage.ui.viewmodels.ExploreViewModel.class);
         observeViewModel();
         viewModel.setCircles(circleView);
+
+        sharedViewModel = new ViewModelProvider(this).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
 
         actv.setThreshold(1);
         actv.addTextChangedListener(textWatcher);
         actv.setOnItemClickListener((parent, view, position, id) -> {
+            Log.d("Explore Fragment", "setOnItemClickListener");
             String selectedSong = (String) parent.getItemAtPosition(position);
-            viewModel.songSelected(selectedSong);
+//            viewModel.songSelected(selectedSong);
+            sharedViewModel.songSelected(selectedSong);
+            sharedViewModel.setSong(selectedSong);
             buttonToMusicReview.setEnabled(true);
         });
 
-
         buttonToMusicReview.setOnClickListener(v -> {
+
             // Use the NavController to navigate to the MusicReviewFragment
             NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
             navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
@@ -107,8 +116,6 @@ public class ExploreFragment extends Fragment {
             }
         });
 
-
-
         return fragmentView;
     }
 
@@ -118,6 +125,5 @@ public class ExploreFragment extends Fragment {
             actv.setAdapter(adapter);
         });
     }
-
 
 }

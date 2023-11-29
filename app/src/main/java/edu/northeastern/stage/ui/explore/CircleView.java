@@ -76,15 +76,6 @@ public class CircleView extends View {
         paint.setColor(Color.WHITE);
         paint.setStrokeWidth(2);
         paint.setStyle(Paint.Style.STROKE);
-
-        for(Integer i = 0; i < 3; i++){
-            Log.d("CIRCLEVIEW", "scale factor change");
-
-            scaleFactor /= 1.05f;
-        }
-//        matrix.reset();
-        matrix.postScale(scaleFactor, scaleFactor, getWidth() / 2f, getHeight() / 2f);
-        invalidate();
     }
 
     @Override
@@ -97,21 +88,6 @@ public class CircleView extends View {
 
         canvas.save();
         canvas.concat(matrix);
-
-        // Get the dimensions of the View
-        int viewWidth = getWidth();
-        int viewHeight = getHeight();
-
-        // Set the boundary for drawing
-        int left = 50;
-        int top = 50;
-        int right = viewWidth - 50;
-        int bottom = viewHeight - 50;
-
-//      canvas.clipOutRect(left, top, right, bottom);
-
-        // Draw a rectangle within the boundary
-//      canvas.drawRect(left, top, right, bottom, paint);
 
         if (circles != null) {
             // Draw each circle on the canvas
@@ -144,20 +120,16 @@ public class CircleView extends View {
         canvas.restore();
 //        drawZoomControls(canvas);
 
-//        scaleFactor /= 1.05f;
-//        matrix.reset();
-//        matrix.postScale(scaleFactor, scaleFactor, getWidth() / 2f, getHeight() / 2f);
-//        invalidate();
-
         if(countDraw < 8) {
             for (Integer i = 0; i < 3; i++) {
+                //best scale factor so far for current configs (phone size, maxAttempts, number of circles)
                 scaleFactor /= 1.05f;
             }
             matrix.reset();
-            matrix.postScale(scaleFactor, scaleFactor, getWidth() / 1.5f, getHeight() / 1.5f);
+            //best division factors for width and height so far for current configs (phone size, maxAttempts, number of circles)
+            matrix.postScale(scaleFactor, scaleFactor, getWidth() / 1.25f, getHeight() / 1.25f);
             invalidate();
         }
-
 //        postInvalidate();
     }
 
