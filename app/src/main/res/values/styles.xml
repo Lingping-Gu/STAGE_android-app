@@ -9,7 +9,7 @@
     </style>
 
     <!-- Button Style1: Dark -->
-    <style name="DarkButton" parent="Widget.AppCompat.Button">
+    <style name="DarkButton" parent="Widget.AppCompat.Button">s
         <item name="android:background">@drawable/btn_dark_background</item>
         <item name="android:textColor">@color/beige</item>
         <item name="android:textSize">17sp</item>

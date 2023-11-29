@@ -78,6 +78,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             holder.ivLike.setSelected(isLiked);
             //TODO: database update
         });
+
+        //display user avatar
+        Picasso.get()
+                .load(post.getUserAvatarUrl())
+                .error(R.drawable.default_pfp)
+                .into(holder.ivUserAvatar);
     }
 
     @Override

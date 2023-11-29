@@ -2,7 +2,8 @@
 <ScrollView android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:windowBackground="@color/beige" >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -117,7 +118,8 @@
                 app:layout_constraintVertical_bias="0.55">
             </AutoCompleteTextView>
 
-            <Button
+<!--            use this to set the background color of the button-->
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/buttonSaveProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

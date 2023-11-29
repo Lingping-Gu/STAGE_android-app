@@ -6,7 +6,7 @@
             <solid android:color="@color/olive_green" />
         </shape>
     </item>
-    <item>
+    <item android:state_pressed="false">
         <shape android:shape="rectangle">
             <corners android:radius="8dp" />
             <solid android:color="@color/olive_green_50" />

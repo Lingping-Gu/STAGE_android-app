@@ -11,6 +11,7 @@ import java.util.List;
 import edu.northeastern.stage.model.Post;
 
 public class ProfileViewModel extends ViewModel {
+    private MutableLiveData<String> userAvatarUrl;
     private MutableLiveData<List<Post>> posts;
     private MutableLiveData<List<String>> recentListenedUrls;
     private MutableLiveData<List<String>> tags;
@@ -22,6 +23,7 @@ public class ProfileViewModel extends ViewModel {
         loadPosts();
         tags = new MutableLiveData<>();
         loadTags();
+        userAvatarUrl = new MutableLiveData<>();
     }
 
     public LiveData<List<String>> getImageUrls() {
@@ -35,6 +37,10 @@ public class ProfileViewModel extends ViewModel {
         return tags;
     }
 
+    public MutableLiveData<String> getUserAvatarUrl() {
+        return userAvatarUrl;
+    }
+
     private void loadPosts() {
         // Load posts here
         // Once loaded, set them to the 'posts' LiveData
@@ -44,14 +50,14 @@ public class ProfileViewModel extends ViewModel {
         String musicImageUrl = "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228";
         Post examplePost = new Post("userAvatarUrl", musicLink, "Speak to me by Pink Floyd is amazing!", false,
                 "public", musicImageUrl, "Speak to me", "Pink Floyd");
-        exampleData.setValue(Arrays.asList(examplePost));
+        exampleData.setValue(Arrays.asList(examplePost, examplePost, examplePost));
         this.posts = exampleData;
     }
 
     private void loadImageUrls() {
         MutableLiveData<List<String>> exampleData = new MutableLiveData<>();
         String exampleUrl = "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228";
-        exampleData.setValue(Arrays.asList(exampleUrl));
+        exampleData.setValue(Arrays.asList(exampleUrl, exampleUrl));
         this.recentListenedUrls = exampleData;
     }
 
@@ -59,6 +65,11 @@ public class ProfileViewModel extends ViewModel {
         MutableLiveData<List<String>> exampleData = new MutableLiveData<>();
         exampleData.setValue(Arrays.asList("#IndiePop", "#AlternativeRock"));
         this.tags = exampleData;
+    }
+
+    private void loadUserAvatarUrl() {
+        MutableLiveData<String> exampleData = new MutableLiveData<>();
+        this.userAvatarUrl = exampleData;
     }
 
     public void setTags(List<String> tags) {

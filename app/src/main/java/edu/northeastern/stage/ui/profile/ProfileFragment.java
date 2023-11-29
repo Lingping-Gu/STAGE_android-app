@@ -32,6 +32,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,6 +90,21 @@ public class ProfileFragment extends Fragment {
     }
 
     private void observeViewModel() {
+        //get user avatar
+        viewModel.getUserAvatarUrl().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String url) {
+                if (url != null) {
+                    if (url != null) {
+                        Picasso.get()
+                                .load(url)
+                                .error(R.drawable.default_pfp)
+                                .into(binding.profileImage);
+                    }
+                }
+            }
+        });
+
         // Observe the LiveData for posts
         viewModel.getPosts().observe(getViewLifecycleOwner(), new Observer<List<Post>>() {
             @Override

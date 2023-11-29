@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
     app:cardCornerRadius="16dp"
@@ -83,18 +84,18 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/ivLike"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="bottom"
-            android:layout_marginLeft="5dp"
-            android:src="@drawable/selector_heart" />
+            android:id="@+id/visibleState"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:color="@color/olive_green" />
 
         <ImageView
-            android:id="@+id/visibleState"
+            android:id="@+id/ivLike"
             android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:color="@color/olive_green"/>
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:src="@drawable/selector_heart" />
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
