@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="70dp">
+
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextView"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:dropDownSelector="@color/white"
+        android:ems="10"
+        android:hint="@string/explore_search"
+        android:popupBackground="@color/beige"
+        android:shadowColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/reviewButton"
+        app:layout_constraintEnd_toEndOf="@id/reviewButton"
+        app:layout_constraintStart_toStartOf="@id/reviewButton"
+        app:layout_constraintTop_toTopOf="@+id/circleView"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <Button
+        android:id="@+id/reviewButton"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:enabled="false"
+        android:onClick="reviewButtonPressed"
+        android:text="@string/explore_review_button"
+        app:layout_constraintBottom_toTopOf="@+id/locationSeekBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.328"
+        app:layout_constraintStart_toEndOf="@+id/circleView"
+        app:layout_constraintTop_toBottomOf="@id/autoCompleteTextView" />
+
+    <edu.northeastern.stage.ui.explore.CircleView
+        android:id="@+id/circleView"
+        android:layout_width="350dp"
+        android:layout_height="220dp"
+        android:layout_marginRight="16dp"
+        android:background="#000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/reviewButton"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.496"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <SeekBar
+        android:id="@+id/locationSeekBar"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="16dp"
+        android:focusableInTouchMode="true"
+        android:max="100"
+        android:progressDrawable="@drawable/progress_selector"
+        android:thumb="@drawable/map_marker"
+        android:thumbOffset="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/circleView"
+        app:layout_constraintEnd_toEndOf="@+id/reviewButton"
+        app:layout_constraintStart_toStartOf="@+id/reviewButton"
+        app:layout_constraintTop_toBottomOf="@id/reviewButton" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        app:layout_constraintBottom_toBottomOf="@+id/circleView"
+        app:layout_constraintEnd_toEndOf="@+id/locationSeekBar"
+        app:layout_constraintHorizontal_bias="0.028"
+        app:layout_constraintStart_toStartOf="@+id/locationSeekBar"
+        app:layout_constraintTop_toBottomOf="@+id/locationSeekBar"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <!--    <Switch-->
+    <!--        android:id="@+id/CircleOrList"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:checked="false"-->
+    <!--        android:text="List"-->
+    <!--        app:layout_constraintBottom_toTopOf="@id/circleView"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintHorizontal_bias="0.1"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/reviewButton"-->
+    <!--        app:layout_constraintVertical_bias="0.0"-->
+    <!--        tools:textColor="@color/olive_green" />-->
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

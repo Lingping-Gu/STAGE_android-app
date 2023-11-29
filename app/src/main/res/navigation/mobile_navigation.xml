@@ -34,9 +34,22 @@
         tools:layout="@layout/fragment_profile" />
 
     <fragment
+        android:id="@+id/navigation_submit_review"
+        android:name="edu.northeastern.stage.ui.musicReview.SubmitReviewFragment"
+        android:label="Submit Review"
+        tools:layout="@layout/fragment_submit_review" />
+
+    <fragment
         android:id="@+id/navigation_music_review"
         android:name="edu.northeastern.stage.ui.musicReview.MusicReviewFragment"
         android:label="Music Review"
-        tools:layout="@layout/fragment_music_review" />
+        tools:layout="@layout/fragment_music_review" >
+        <action
+            android:id="@+id/action_navigation_music_review_to_navigation_explore"
+            app:destination="@id/navigation_explore" />
+        <action
+            android:id="@+id/action_navigation_music_review_to_submit_review"
+            app:destination="@id/navigation_submit_review" />
+    </fragment>
 
 </navigation>
