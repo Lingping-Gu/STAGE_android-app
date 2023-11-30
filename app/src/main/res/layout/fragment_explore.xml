@@ -81,19 +81,4 @@
         app:layout_constraintTop_toBottomOf="@id/circleView"
         app:layout_constraintVertical_chainStyle="packed" />
 
-<!--    <Switch-->
-<!--        android:id="@+id/CircleOrList"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:checked="false"-->
-<!--        android:text="List"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/circleView"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.1"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/reviewButton"-->
-<!--        app:layout_constraintVertical_bias="0.0"-->
-<!--        tools:textColor="@color/olive_green" />-->
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

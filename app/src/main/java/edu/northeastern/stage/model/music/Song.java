@@ -20,6 +20,9 @@ public class Song {
     private boolean isPlayable;
     private LinkedTrack linkedFrom;
 
+    public Song(String name) {
+      this.name = name;
+    }
     public Song(String name, String id, int durationMs, boolean explicit, ArrayList<String> availableMarkets,
                 String previewUrl, int popularity, int trackNumber, Album album, ArrayList<Artist> artists,
                 String spotifyUrl, String href, String uri, boolean isPlayable, LinkedTrack linkedFrom) {
@@ -66,6 +69,11 @@ public class Song {
 
     public String getPreciseReleaseDate() {
         return album.getReleaseDatePrecision();
+    }
+  
+    // to be removed later - should be able to update all the methods with getName
+    public String getTitle(){
+      return name;
     }
 
     public String getName() {

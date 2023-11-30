@@ -1,10 +1,13 @@
-package edu.northeastern.stage.ui.explore;
+package edu.northeastern.stage.ui.viewmodels;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,12 +24,15 @@ import java.util.Scanner;
 
 import edu.northeastern.stage.model.Circle;
 import edu.northeastern.stage.R;
+import edu.northeastern.stage.ui.explore.CircleView;
 
 public class ExploreViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<String>> recommendations = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private MutableLiveData<String> selectedSong = new MutableLiveData<>();
+//    private edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel sharedViewModel;
+
     private static final Random rand = new Random();
     CircleView circleView;
     Map<Circle, String> circleTextMap = new HashMap<>();
@@ -36,6 +42,7 @@ public class ExploreViewModel extends AndroidViewModel {
 
     public ExploreViewModel(Application application) {
         super(application);
+//        sharedViewModel = new ViewModelProvider(this).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
     }
 
     public LiveData<List<String>> getRecommendations() {
@@ -50,20 +57,23 @@ public class ExploreViewModel extends AndroidViewModel {
         if (text.isEmpty()) {
             recommendations.setValue(new ArrayList<>());
         } else {
+            Log.d("Explore View Model", "when searchTextChanged");
             makeDeezerReq(text);
         }
     }
 
-    public void songSelected(String song) {
-        selectedSong.setValue(song);
-        // Any other logic related to song selection
-    }
-
-    public LiveData<String> getSelectedSong() {
-        return selectedSong;
-    }
+//    public void songSelected(String song) {
+//        selectedSong.setValue(song);
+////        sharedViewModel.setSong(song);
+//    }
+//
+//    public LiveData<String> getSelectedSong() {
+//        return selectedSong;
+//    }
 
     public void makeDeezerReq(String inputArtistName) {
+        Log.d("Explore View Model", "makeDeezerReq");
+
         String deezerApiKey = getApplication().getString(R.string.DEEZER_API);
         isLoading.setValue(true);
 
@@ -130,7 +140,7 @@ public class ExploreViewModel extends AndroidViewModel {
         while (circles.size() < 100 && attempts < maxAttempts) {
             float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
             float y = rand.nextFloat() * 2000 - 1000;
-            float radius = rand.nextFloat() * 200 + 5;
+            float radius = rand.nextFloat() * 200 + 100;
 
             // Ensure the newly created circle doesn't overlap with existing circles
             boolean isOverlapping = false;
@@ -158,7 +168,6 @@ public class ExploreViewModel extends AndroidViewModel {
             circleView.setCircles(circles, (HashMap<Circle, String>) circleTextMap);
             circleView.invalidate(); // Request a redraw
         }
-
         return circles;
     }
 

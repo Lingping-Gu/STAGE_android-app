@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="16dp"
+    app:cardBackgroundColor="@color/medium_green_50" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginEnd="7dp" >
+
+        <TextView
+            android:id="@+id/tagTextEditProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TagText"
+            android:layout_marginLeft="9dp"
+            style="@style/TextStyle" />
+
+        <ImageView
+            android:id="@+id/removeTagEditProfile"
+            android:layout_width="17dp"
+            android:layout_height="17dp"
+            android:src="@drawable/ic_cross" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

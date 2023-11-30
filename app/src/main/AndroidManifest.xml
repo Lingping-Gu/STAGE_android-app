@@ -28,11 +28,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.profile.EditProfile"
+            android:name=".ui.editProfile.EditProfile"
             android:exported="false">
         </activity>
         <activity
-            android:name=".ui.profile.TagsAdapter"
+            android:name=".ui.adapters.TagsAdapter"
             android:exported="false">
         </activity>
         <activity
@@ -40,14 +40,15 @@
             android:exported="false">
         </activity>
         <activity
-            android:name=".ui.profile.RecentListenedAdapter"
+            android:name=".ui.adapters.RecentListenedAdapter"
             android:exported="false">
         </activity>
         <activity
-            android:name=".ui.profile.ProfileViewModel"
+            android:name=".ui.viewmodels.ProfileViewModel"
             android:exported="false">
         </activity>
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
