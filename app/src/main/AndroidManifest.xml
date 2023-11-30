@@ -32,7 +32,7 @@
             android:exported="false">
         </activity>
         <activity
-            android:name=".ui.profile.TagsAdapter"
+            android:name=".ui.TagsAdapter"
             android:exported="false">
         </activity>
         <activity
@@ -40,7 +40,7 @@
             android:exported="false">
         </activity>
         <activity
-            android:name=".ui.profile.RecentListenedAdapter"
+            android:name=".ui.RecentListenedAdapter"
             android:exported="false">
         </activity>
         <activity

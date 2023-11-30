@@ -27,10 +27,11 @@ public class CircleView extends View {
     Circle[] circles;
     private Matrix matrix;
     private Paint paint;
-    private float scaleFactor = 1f;
+    private float scaleFactor = 1.05f;
     private float lastTouchX;
     private float lastTouchY;
     private boolean isDragging = false;
+    Integer countDraw = 0;
     Map<Circle, String> circleTextMap = new HashMap<>();
 
 
@@ -40,11 +41,13 @@ public class CircleView extends View {
     // Constructors for XML inflation
     public CircleView(Context context) {
         super(context);
+        Log.d("CIRCLEVIEW", "circleview context");
         init();
     }
 
     public CircleView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        Log.d("CIRCLEVIEW", "circleview context + attrs");
         init();
     }
 
@@ -52,16 +55,19 @@ public class CircleView extends View {
     public CircleView(Context context, AttributeSet attrs, List<Circle> circles, int defStyle) {
         super(context, attrs, defStyle);
         this.circles = circles.toArray(new Circle[0]);
+        Log.d("CIRCLEVIEW", "circleview context + attrs + defstyle");
         init();
     }
 
     public CircleView(Context context, List<Circle> circles) {
         super(context);
         this.circles = circles.toArray(new Circle[0]);
+        Log.d("CIRCLEVIEW", "circleview context + list of circles");
         init();
     }
 
     private void init() {
+        Log.d("CIRCLEVIEW", "init");
 
         objScaleGestureDetector = new ScaleGestureDetector(this.getContext(), new PinchZoomListener());
 
@@ -75,26 +81,13 @@ public class CircleView extends View {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
 
+        countDraw ++;
+
         super.onDraw(canvas);
-        Log.d("ONDRAW", "ondraw");
+        Log.d("CIRCLEVIEW", "on draw count " + countDraw);
 
         canvas.save();
         canvas.concat(matrix);
-
-        // Get the dimensions of the View
-        int viewWidth = getWidth();
-        int viewHeight = getHeight();
-
-        // Set the boundary for drawing
-        int left = 50;
-        int top = 50;
-        int right = viewWidth - 50;
-        int bottom = viewHeight - 50;
-
-//      canvas.clipOutRect(left, top, right, bottom);
-
-        // Draw a rectangle within the boundary
-//      canvas.drawRect(left, top, right, bottom, paint);
 
         if (circles != null) {
             // Draw each circle on the canvas
@@ -127,11 +120,25 @@ public class CircleView extends View {
         canvas.restore();
 //        drawZoomControls(canvas);
 
+        if(countDraw < 8) {
+            for (Integer i = 0; i < 3; i++) {
+                //best scale factor so far for current configs (phone size, maxAttempts, number of circles)
+                scaleFactor /= 1.05f;
+            }
+            matrix.reset();
+            //best division factors for width and height so far for current configs (phone size, maxAttempts, number of circles)
+            matrix.postScale(scaleFactor, scaleFactor, getWidth() / 1.25f, getHeight() / 1.25f);
+            invalidate();
+        }
+//        postInvalidate();
     }
 
     public void setCircles(List<Circle> circles, HashMap<Circle, String> circleTextMap) {
+        Log.d("CIRCLEVIEW", "set circles");
+
         this.circles = circles.toArray(new Circle[0]);
         this.circleTextMap = circleTextMap;
+
         invalidate(); // Request a redraw
     }
 

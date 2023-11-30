@@ -24,6 +24,9 @@ import android.widget.TextView;
 
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import edu.northeastern.stage.model.music.Song;
+import edu.northeastern.stage.ui.ReviewAdapter;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,11 +34,13 @@ import java.util.Locale;
 
 public class MusicReviewFragment extends Fragment {
     private MusicReviewViewModel mViewModel;
+    private edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel sharedViewModel;
     private RecyclerView reviewsRecyclerView;
     private ReviewAdapter reviewAdapter;
     private TextView overallScoreTextView;
     private TextView noReviewsTextView;
     private Button addReviewButton;
+    Song s;
 
     public static MusicReviewFragment newInstance() {
         return new MusicReviewFragment();
@@ -56,6 +61,28 @@ public class MusicReviewFragment extends Fragment {
             // Use the NavController to navigate to the MusicReviewFragment
             NavController navController = NavHostFragment.findNavController(MusicReviewFragment.this);
             navController.navigate(R.id.action_navigation_music_review_to_submit_review);
+        });
+
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
+
+        Log.d("Music Review Fragment", "getSongTitle from explore fragment -> " + sharedViewModel.getSong());
+
+        s = sharedViewModel.getSong();
+        if(s!= null){
+            Log.d("Music Review Fragment", "getSongTitle if s not null -> " + s.getTitle());
+        }
+
+//        sharedViewModel.getSong().observe(getViewLifecycleOwner(), song -> {
+//            if(song != null) {
+//                Log.d("Song title", song.getTitle());
+//            }
+//        });
+        sharedViewModel.getLiveDataSong().observe(getViewLifecycleOwner(), song -> {
+            Log.d("Music Review Fragment", "in observe getlivedatasong in music reviewfragment");
+            if (song != null) {
+                // Update the UI with the song title
+                Log.d("Music Review Fragment", "getLiveDataSong from explore fragment -> " + song.getTitle());
+            }
         });
 
         mViewModel = new ViewModelProvider(this).get(MusicReviewViewModel.class);
