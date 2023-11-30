@@ -1,22 +1,15 @@
 package edu.northeastern.stage;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import edu.northeastern.stage.databinding.ActivityMainBinding;
-import edu.northeastern.stage.ui.explore.ExploreFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,8 +18,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -54,20 +45,25 @@ public class MainActivity extends AppCompatActivity {
                 if (binding.navView.getSelectedItemId() != R.id.navigation_explore) {
                     binding.navView.getMenu().findItem(R.id.navigation_explore).setChecked(true);
                 }
-            } else {
-                // Handle other destinations if needed
             }
         });
 
-        // used for handling selections of different items in the BottomNavigationView
         binding.navView.setOnItemSelectedListener(item -> {
-            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review && item.getItemId() == R.id.navigation_explore) {
-                // Navigate back to Explore fragment
-                navController.popBackStack(R.id.navigation_explore, false);
-                return true; // Event handled
+            int itemId = item.getItemId();
+            if (itemId == R.id.navigation_home) {
+                navController.navigate(R.id.navigation_home);
+                return true;
+            } else if (itemId == R.id.navigation_explore) {
+                navController.navigate(R.id.navigation_explore);
+                return true;
+            } else if (itemId == R.id.navigation_new_post) {
+                navController.navigate(R.id.navigation_new_post);
+                return true;
+            } else if (itemId == R.id.navigation_profile) {
+                navController.navigate(R.id.navigation_profile);
+                return true;
             }
-            // Default navigation behavior
-            return NavigationUI.onNavDestinationSelected(item, navController);
+            return false;
         });
 
         // used to handle the scenario where the user re-selects the Explore button while on the Music Review fragment
@@ -75,13 +71,17 @@ public class MainActivity extends AppCompatActivity {
             if (navController.getCurrentDestination().getId() == R.id.navigation_music_review && item.getItemId() == R.id.navigation_explore) {
                 // Navigate back to Explore fragment
                 navController.popBackStack(R.id.navigation_explore, false);
+            } else if (navController.getCurrentDestination().getId() == R.id.navigation_submit_review && item.getItemId() == R.id.navigation_explore) {
+                // Navigate back to music review page
+                navController.popBackStack(R.id.navigation_music_review, false);
             }
         });
 
+        // DO NOT USE: it hinders normal backstack operation.
         // Binds the BottomNavigationView to the NavController.
         // Sets up listeners on the bottom navigation items such that when the user tap an item,
         // the NavController receives a callback and takes the appropriate action defined in the navigation graph (mobile_navigation.xml).
         // The NavHostFragment then inflates the appropriate fragment.
-        NavigationUI.setupWithNavController(binding.navView, navController);
+//        NavigationUI.setupWithNavController(binding.navView, navController);
     }
 }
