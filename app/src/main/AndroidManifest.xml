@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.profile.EditProfile"
+            android:name=".ui.editProfile.EditProfile"
             android:exported="false">
         </activity>
         <activity
@@ -49,5 +49,6 @@
         </activity>
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

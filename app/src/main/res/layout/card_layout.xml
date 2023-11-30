@@ -4,7 +4,8 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
 android:layout_width="match_parent"
 android:layout_height="wrap_content"
 android:layout_margin="8dp"
-app:cardCornerRadius="16dp">
+app:cardCornerRadius="16dp"
+android:windowBackground="#80AAAAAA" >
 
 <LinearLayout
     android:layout_width="match_parent"
@@ -18,7 +19,7 @@ app:cardCornerRadius="16dp">
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginRight="16dp"
-        app:srcCompat="@drawable/default_pfp"  />
+        app:srcCompat="@drawable/default_pfp" />
 
     <!-- Vertical container for texts and like image -->
     <LinearLayout
@@ -41,6 +42,7 @@ app:cardCornerRadius="16dp">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Post content placeholder"
+            style="@style/TextStyle"
             android:layout_marginTop="8dp" />
     </LinearLayout>
 
@@ -50,14 +52,14 @@ app:cardCornerRadius="16dp">
         android:layout_height="20dp"
         android:layout_gravity="bottom"
         android:layout_marginLeft="16dp"
-        android:src="@drawable/profile_card_like" />
+        android:src="@drawable/selector_heart" />
 
     <ImageView
         android:id="@+id/visibleState"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:src="@drawable/profile_public"
-        android:layout_marginLeft="16dp" />
+        android:layout_marginLeft="16dp"
+        android:color="@color/olive_green"/>
 </LinearLayout>
 
 </androidx.cardview.widget.CardView>

@@ -3,8 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="16dp">
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    app:cardCornerRadius="16dp"
+    android:background="#80AAAAAA" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,10 +19,10 @@
         <!-- User avatar on the left -->
         <ImageView
             android:id="@+id/ivUserAvatar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_marginRight="16dp"
-            app:srcCompat="@drawable/default_pfp"  />
+            app:srcCompat="@drawable/default_pfp" />
 
         <!-- Vertical container for texts and like image -->
         <LinearLayout
@@ -27,13 +31,47 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <!-- Placeholder for music link -->
-            <TextView
-                android:id="@+id/tvMusicLink"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/songCard"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Music link placeholder"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:background="@color/medium_green_50"
+                android:padding="6dp">
+
+                <ImageView
+                android:id="@+id/tvMusicImage"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="16dp"
+                app:srcCompat="@drawable/default_pfp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:color="@color/medium_green_50">
+
+                    <TextView
+                        android:id="@+id/tvTrackName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TrackName"
+                        style="@style/TextStyle"
+                        android:textSize="15dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+                    <TextView
+                        android:id="@+id/tvArtistName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ArtistName"
+                        style="@style/TextStyle"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                </LinearLayout>
+            </LinearLayout>
 
             <!-- Post content below the music link placeholder -->
             <TextView
@@ -41,24 +79,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Post content placeholder"
+                style="@style/TextStyle"
                 android:layout_marginTop="8dp" />
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/ivLike"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginLeft="10dp"
-            android:src="@drawable/ic_favorite_black_24dp" />
+            android:id="@+id/visibleState"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:color="@color/olive_green" />
 
         <ImageView
-            android:id="@+id/visibleState"
+            android:id="@+id/ivLike"
             android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/profile_public"
-            android:layout_marginLeft="16dp" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:src="@drawable/selector_heart" />
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
-
