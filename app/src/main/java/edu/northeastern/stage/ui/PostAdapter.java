@@ -1,4 +1,4 @@
-package edu.northeastern.stage;
+package edu.northeastern.stage.ui;
 
 import static androidx.core.content.ContextCompat.startActivity;
 

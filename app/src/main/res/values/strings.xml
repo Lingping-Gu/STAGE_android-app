@@ -4,5 +4,7 @@
     <string name="title_new_post">New Post</string>
     <string name="title_explore">Explore</string>
     <string name="title_profile">Profile</string>
+    <string name="explore_search">Search…</string>
+    <string name="explore_review_button">Review Track</string>
     <string name="none">None</string>
 </resources>

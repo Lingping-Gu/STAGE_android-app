@@ -21,12 +21,35 @@
         android:id="@+id/navigation_explore"
         android:name="edu.northeastern.stage.ui.explore.ExploreFragment"
         android:label="@string/title_explore"
-        tools:layout="@layout/fragment_explore" />
+        tools:layout="@layout/fragment_explore">
+        <action
+            android:id="@+id/action_navigation_explore_to_navigation_music_review"
+            app:destination="@id/navigation_music_review" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_profile"
         android:name="edu.northeastern.stage.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/navigation_submit_review"
+        android:name="edu.northeastern.stage.ui.musicReview.SubmitReviewFragment"
+        android:label="Submit Review"
+        tools:layout="@layout/fragment_submit_review" />
+
+    <fragment
+        android:id="@+id/navigation_music_review"
+        android:name="edu.northeastern.stage.ui.musicReview.MusicReviewFragment"
+        android:label="Music Review"
+        tools:layout="@layout/fragment_music_review" >
+        <action
+            android:id="@+id/action_navigation_music_review_to_navigation_explore"
+            app:destination="@id/navigation_explore" />
+        <action
+            android:id="@+id/action_navigation_music_review_to_submit_review"
+            app:destination="@id/navigation_submit_review" />
+    </fragment>
 
 </navigation>
