@@ -53,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
                     binding.navView.setSelectedItemId(R.id.navigation_profile);
                 }
             }
-            if (destination.getId() == R.id.navigation_music_review || destination.getId() == R.id.navigation_submit_review) {
+            if (destination.getId() == R.id.navigation_music_review
+                    || destination.getId() == R.id.navigation_submit_review) {
                 // Only set the selected item if it's not already selected
                 if (binding.navView.getSelectedItemId() != R.id.navigation_explore) {
                     binding.navView.getMenu().findItem(R.id.navigation_explore).setChecked(true);
@@ -74,10 +75,12 @@ public class MainActivity extends AppCompatActivity {
 
         // used to handle the scenario where the user re-selects the Explore button while on the Music Review fragment
         binding.navView.setOnItemReselectedListener(item -> {
-            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review && item.getItemId() == R.id.navigation_explore) {
+            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review
+                    && item.getItemId() == R.id.navigation_explore) {
                 // Navigate back to Explore fragment
                 navController.popBackStack(R.id.navigation_explore, false);
-            } else if (navController.getCurrentDestination().getId() == R.id.navigation_submit_review && item.getItemId() == R.id.navigation_explore) {
+            } else if (navController.getCurrentDestination().getId() == R.id.navigation_submit_review
+                    && item.getItemId() == R.id.navigation_explore) {
                 // Navigate back to music review page
                 navController.popBackStack(R.id.navigation_music_review, false);
             }
