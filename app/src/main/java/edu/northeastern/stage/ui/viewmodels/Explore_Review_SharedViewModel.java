@@ -10,47 +10,29 @@ import edu.northeastern.stage.model.music.Song;
 
 public class Explore_Review_SharedViewModel extends ViewModel {
     private MutableLiveData<Song> song = new MutableLiveData<>();
-    private MutableLiveData<String> selectedSong = new MutableLiveData<>();
+    private MutableLiveData<String> trackId = new MutableLiveData<>();
 
-    private Song s;
 
     public Explore_Review_SharedViewModel() {
         Log.d("Explore Review SharedViewModel", "initialized");
     }
 
-    public Song getSong() {
-        return s;
-    }
-
     public LiveData<Song> getLiveDataSong(){
         Log.d("Explore Review SharedViewModel", "in getLiveDataSong song -> " + song);
-
         return song;
     }
 
-    public String getSongTitle(){
-        return song.getValue().getTitle();
-    }
-
     public void setSong(String title) {
-        Log.d("Explore Review SharedViewModel", "in set song");
-//        songString = new Song(title);
-        s = new Song(title);
+        Song s = new Song(title);
         song.setValue(s);
-//        song.postValue(s);
-        s.getTitle();
-        Log.d("Explore Review SharedViewModel", "s.getTitle() in shared model set song --> " + s.getTitle());
         Log.d("Explore Review SharedViewModel", "song.getValue() in shared model set song --> " + song.getValue().getTitle());
-
     }
 
-    public void songSelected(String songTitle) {
-        selectedSong.setValue(songTitle);
-//        s = new Song(songTitle);
-//        sharedViewModel.setSong(song);
+    public LiveData<String> getTrackId(){
+        return trackId;
     }
 
-    public LiveData<String> getSelectedSong() {
-        return selectedSong;
+    public void setTrackId(String id){
+        trackId.setValue(id);
     }
 }

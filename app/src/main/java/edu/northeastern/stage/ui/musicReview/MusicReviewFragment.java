@@ -37,6 +37,7 @@ public class MusicReviewFragment extends Fragment {
     private TextView overallScoreTextView;
     private TextView noReviewsTextView;
     private Button addReviewButton;
+    private TextView songTitleTV;
     Song s;
 
     public static MusicReviewFragment newInstance() {
@@ -53,6 +54,7 @@ public class MusicReviewFragment extends Fragment {
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         noReviewsTextView = view.findViewById(R.id.noReviewsTextView);
         addReviewButton = view.findViewById(R.id.addReviewButton);
+        songTitleTV = view.findViewById(R.id.musicTitleTextView);
 
         addReviewButton.setOnClickListener(v -> {
             // Use the NavController to navigate to the MusicReviewFragment
@@ -62,25 +64,14 @@ public class MusicReviewFragment extends Fragment {
 
         sharedViewModel = new ViewModelProvider(requireActivity()).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
 
-//        Log.d("Music Review Fragment", "getSongTitle from explore fragment -> " + sharedViewModel.getLiveDataSong().getValue().getTitle());
-
-//        s = sharedViewModel.getSong();
-//        if(s!= null){
-//            Log.d("Music Review Fragment", "getSongTitle if s not null -> " + s.getTitle());
-//        }
-
-        Log.d("Music Review Fragment", "sharedViewModel -> " + sharedViewModel);
-
         sharedViewModel.getLiveDataSong().observe(getViewLifecycleOwner(), song -> {
             Log.d("Music Review Fragment", "in observe getlivedatasong in music reviewfragment");
             if (song != null) {
-                // Update the UI with the song title
                 Log.d("Music Review Fragment", "getLiveDataSong from explore fragment -> " + song.getTitle());
+                // Update the UI with the song title
+                songTitleTV.setText(song.getTitle());
             }
         });
-
-        Log.d("Music Review Fragment", "sharedViewModel -> " + sharedViewModel);
-//        Log.d("Music Review Fragment", "getSongTitle -> " + sharedViewModel.getSongTitle());
 
 
         mViewModel = new ViewModelProvider(this).get(MusicReviewViewModel.class);

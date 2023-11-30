@@ -68,7 +68,7 @@ public class ExploreFragment extends Fragment {
         observeViewModel();
         viewModel.setCircles(circleView);
 
-        sharedViewModel = new ViewModelProvider(this).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
 
         actv.setThreshold(1);
         actv.addTextChangedListener(textWatcher);
@@ -76,7 +76,6 @@ public class ExploreFragment extends Fragment {
             Log.d("Explore Fragment", "setOnItemClickListener");
             String selectedSong = (String) parent.getItemAtPosition(position);
 //            viewModel.songSelected(selectedSong);
-            sharedViewModel.songSelected(selectedSong);
             sharedViewModel.setSong(selectedSong);
             buttonToMusicReview.setEnabled(true);
         });
