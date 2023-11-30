@@ -20,7 +20,6 @@ public class SubmitReviewFragment extends Fragment {
     private RatingBar reviewRatingBar;
     private Button submitReviewButton;
     private MusicReviewViewModel mViewModel;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import edu.northeastern.stage.R;
-import edu.northeastern.stage.ReviewAdapter;
 import edu.northeastern.stage.ui.explore.ExploreFragment;
 
 import android.widget.Button;
