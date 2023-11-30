@@ -1,11 +1,8 @@
 package edu.northeastern.stage.ui.profile;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
 import android.app.Activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,21 +14,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import edu.northeastern.stage.PostAdapter;
+import edu.northeastern.stage.ui.adapters.PostAdapter;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.databinding.FragmentProfileBinding;
+import edu.northeastern.stage.ui.adapters.RecentListenedAdapter;
+import edu.northeastern.stage.ui.adapters.TagsAdapter;
 import edu.northeastern.stage.ui.editProfile.EditProfile;
+import edu.northeastern.stage.ui.viewmodels.ProfileViewModel;
 
 import android.content.Intent;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 

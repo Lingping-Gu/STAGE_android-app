@@ -1,6 +1,4 @@
-package edu.northeastern.stage.ui;
-
-import static androidx.core.content.ContextCompat.startActivity;
+package edu.northeastern.stage.ui.adapters;
 
 import android.content.Intent;
 import android.net.Uri;

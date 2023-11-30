@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.editProfile;
+package edu.northeastern.stage.ui.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

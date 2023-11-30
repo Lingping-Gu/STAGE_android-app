@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 import edu.northeastern.stage.R;
+import edu.northeastern.stage.ui.adapters.TagsAdapter_EditProfile;
 
 
 public class EditProfile extends AppCompatActivity {
