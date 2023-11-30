@@ -1,13 +1,14 @@
 package edu.northeastern.stage;
 
 import android.os.Bundle;
-import android.os.StrictMode;
+import android.util.Log;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
@@ -15,6 +16,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import edu.northeastern.stage.databinding.ActivityMainBinding;
+import edu.northeastern.stage.ui.explore.ExploreFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,6 +59,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // used for handling selections of different items in the BottomNavigationView
+        binding.navView.setOnItemSelectedListener(item -> {
+            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review && item.getItemId() == R.id.navigation_explore) {
+                // Navigate back to Explore fragment
+                navController.popBackStack(R.id.navigation_explore, false);
+                return true; // Event handled
+            }
+            // Default navigation behavior
+            return NavigationUI.onNavDestinationSelected(item, navController);
+        });
+
+        // used to handle the scenario where the user re-selects the Explore button while on the Music Review fragment
+        binding.navView.setOnItemReselectedListener(item -> {
+            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review && item.getItemId() == R.id.navigation_explore) {
+                // Navigate back to Explore fragment
+                navController.popBackStack(R.id.navigation_explore, false);
+            }
+        });
 
         // Binds the BottomNavigationView to the NavController.
         // Sets up listeners on the bottom navigation items such that when the user tap an item,
