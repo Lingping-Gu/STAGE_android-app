@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import edu.northeastern.stage.ui.PostAdapter;
+import edu.northeastern.stage.ui.adapters.PostAdapter;
 import edu.northeastern.stage.R;
 
 public class HomeFragment extends Fragment {
