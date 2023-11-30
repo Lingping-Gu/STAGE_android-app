@@ -23,7 +23,13 @@ public class Explore_Review_SharedViewModel extends ViewModel {
     }
 
     public LiveData<Song> getLiveDataSong(){
+        Log.d("Explore Review SharedViewModel", "in getLiveDataSong song -> " + song);
+
         return song;
+    }
+
+    public String getSongTitle(){
+        return song.getValue().getTitle();
     }
 
     public void setSong(String title) {
@@ -34,7 +40,7 @@ public class Explore_Review_SharedViewModel extends ViewModel {
 //        song.postValue(s);
         s.getTitle();
         Log.d("Explore Review SharedViewModel", "s.getTitle() in shared model set song --> " + s.getTitle());
-        Log.d("Explore Review SharedViewModel", "song.getValue() in shared model set song --> " + song.getValue());
+        Log.d("Explore Review SharedViewModel", "song.getValue() in shared model set song --> " + song.getValue().getTitle());
 
     }
 

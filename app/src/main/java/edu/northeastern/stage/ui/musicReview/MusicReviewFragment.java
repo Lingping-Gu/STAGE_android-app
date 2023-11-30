@@ -62,18 +62,15 @@ public class MusicReviewFragment extends Fragment {
 
         sharedViewModel = new ViewModelProvider(requireActivity()).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
 
-        Log.d("Music Review Fragment", "getSongTitle from explore fragment -> " + sharedViewModel.getSong());
+//        Log.d("Music Review Fragment", "getSongTitle from explore fragment -> " + sharedViewModel.getLiveDataSong().getValue().getTitle());
 
-        s = sharedViewModel.getSong();
-        if(s!= null){
-            Log.d("Music Review Fragment", "getSongTitle if s not null -> " + s.getTitle());
-        }
+//        s = sharedViewModel.getSong();
+//        if(s!= null){
+//            Log.d("Music Review Fragment", "getSongTitle if s not null -> " + s.getTitle());
+//        }
 
-//        sharedViewModel.getSong().observe(getViewLifecycleOwner(), song -> {
-//            if(song != null) {
-//                Log.d("Song title", song.getTitle());
-//            }
-//        });
+        Log.d("Music Review Fragment", "sharedViewModel -> " + sharedViewModel);
+
         sharedViewModel.getLiveDataSong().observe(getViewLifecycleOwner(), song -> {
             Log.d("Music Review Fragment", "in observe getlivedatasong in music reviewfragment");
             if (song != null) {
@@ -81,6 +78,10 @@ public class MusicReviewFragment extends Fragment {
                 Log.d("Music Review Fragment", "getLiveDataSong from explore fragment -> " + song.getTitle());
             }
         });
+
+        Log.d("Music Review Fragment", "sharedViewModel -> " + sharedViewModel);
+//        Log.d("Music Review Fragment", "getSongTitle -> " + sharedViewModel.getSongTitle());
+
 
         mViewModel = new ViewModelProvider(this).get(MusicReviewViewModel.class);
         mViewModel.getReviews().observe(getViewLifecycleOwner(), reviews -> {
