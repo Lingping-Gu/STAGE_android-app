@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.home;
+package edu.northeastern.stage.ui.viewmodels;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

@@ -1,7 +1,5 @@
 package edu.northeastern.stage.ui.musicReview;
 
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -16,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import edu.northeastern.stage.R;
-import edu.northeastern.stage.ui.explore.ExploreFragment;
 
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,7 +21,8 @@ import android.widget.TextView;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import edu.northeastern.stage.model.music.Song;
-import edu.northeastern.stage.ui.ReviewAdapter;
+import edu.northeastern.stage.ui.adapters.ReviewAdapter;
+import edu.northeastern.stage.ui.viewmodels.MusicReviewViewModel;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;

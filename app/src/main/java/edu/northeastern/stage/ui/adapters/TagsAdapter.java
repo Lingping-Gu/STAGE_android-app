@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui;
+package edu.northeastern.stage.ui.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
