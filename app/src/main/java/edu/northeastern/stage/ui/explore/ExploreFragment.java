@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import edu.northeastern.stage.R;
+import edu.northeastern.stage.ui.viewmodels.ExploreViewModel;
 
 public class ExploreFragment extends Fragment {
 

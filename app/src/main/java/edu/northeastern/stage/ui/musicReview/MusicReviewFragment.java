@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import edu.northeastern.stage.R;
-import edu.northeastern.stage.ReviewAdapter;
 
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,6 +22,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import edu.northeastern.stage.model.music.Song;
 import edu.northeastern.stage.ui.adapters.ReviewAdapter;
+import edu.northeastern.stage.ui.viewmodels.MusicReviewViewModel;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;

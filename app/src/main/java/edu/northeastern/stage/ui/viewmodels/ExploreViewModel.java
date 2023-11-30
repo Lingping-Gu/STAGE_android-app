@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.explore;
+package edu.northeastern.stage.ui.viewmodels;
 
 import android.app.Application;
 import android.util.Log;
