@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- NavBar -->
+    <style name="BottomNavigationStyle" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="itemIconTint">@color/medium_green</item>
+        <item name="itemTextColor">@color/medium_green</item>
+        <item name="backgroundTint">@color/olive_green</item>
+    </style>
+
+    <!-- Button Style1: Dark -->
+    <style name="DarkButton" parent="Widget.AppCompat.Button">s
+        <item name="android:background">@drawable/btn_dark_background</item>
+        <item name="android:textColor">@color/beige</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:padding">3dp</item>
+    </style>
+
+    <!-- Button Style2: Light -->
+    <style name="LightButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/btn_light_background</item>
+        <item name="android:textColor">@color/beige</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:padding">3dp</item>
+    </style>
+
+    <!-- Like Button -->
+    <style name="HeartButton">
+        <item name="android:src">@drawable/selector_heart</item>
+    </style>
+
+    <style name="HeadingStyle">
+        <item name="android:fontFamily">@font/nunito_bold</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:color">@color/olive_green</item>
+    </style>
+
+    <style name="TextStyle">
+        <item name="android:fontFamily">@font/nunito_regular</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingExtra">-1dp</item>
+        <item name="android:color">@color/olive_green</item>
+    </style>
+
+    <style name="CustomEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:textColorHint">@color/olive_green_50</item>
+        <item name="android:color">@color/olive_green</item>
+    </style>
+
+</resources>
