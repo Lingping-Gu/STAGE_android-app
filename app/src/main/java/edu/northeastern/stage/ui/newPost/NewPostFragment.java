@@ -9,12 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
+import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
 
 public class NewPostFragment extends Fragment {
     private FragmentNewPostBinding binding;

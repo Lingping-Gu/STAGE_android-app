@@ -14,13 +14,13 @@ import android.widget.RatingBar;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Review;
+import edu.northeastern.stage.ui.viewmodels.MusicReviewViewModel;
 
 public class SubmitReviewFragment extends Fragment {
     private EditText reviewContentEditText;
     private RatingBar reviewRatingBar;
     private Button submitReviewButton;
     private MusicReviewViewModel mViewModel;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
