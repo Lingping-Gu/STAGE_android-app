@@ -14,6 +14,7 @@ import edu.northeastern.stage.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private boolean isUserInteraction = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +39,21 @@ public class MainActivity extends AppCompatActivity {
         // the NavController is responsible for switching fragments using res.navigation.mobile_navigation.xml
         NavController navController = navHostFragment.getNavController();
 
-        // Set up a NavController listener to handle menu item selection
+        // Handle bottom nav bar display
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.navigation_music_review) {
+            if (!isUserInteraction) { // Check if change is not due to user interaction
+                int destinationId = destination.getId();
+                if (destinationId == R.id.navigation_home) {
+                    binding.navView.setSelectedItemId(R.id.navigation_home);
+                } else if (destinationId == R.id.navigation_explore) {
+                    binding.navView.setSelectedItemId(R.id.navigation_explore);
+                } else if (destinationId == R.id.navigation_new_post) {
+                    binding.navView.setSelectedItemId(R.id.navigation_new_post);
+                } else if (destinationId == R.id.navigation_profile) {
+                    binding.navView.setSelectedItemId(R.id.navigation_profile);
+                }
+            }
+            if (destination.getId() == R.id.navigation_music_review || destination.getId() == R.id.navigation_submit_review) {
                 // Only set the selected item if it's not already selected
                 if (binding.navView.getSelectedItemId() != R.id.navigation_explore) {
                     binding.navView.getMenu().findItem(R.id.navigation_explore).setChecked(true);
@@ -48,22 +61,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Handle navigation through bottom nav bar
         binding.navView.setOnItemSelectedListener(item -> {
+            isUserInteraction = true;
             int itemId = item.getItemId();
-            if (itemId == R.id.navigation_home) {
-                navController.navigate(R.id.navigation_home);
-                return true;
-            } else if (itemId == R.id.navigation_explore) {
-                navController.navigate(R.id.navigation_explore);
-                return true;
-            } else if (itemId == R.id.navigation_new_post) {
-                navController.navigate(R.id.navigation_new_post);
-                return true;
-            } else if (itemId == R.id.navigation_profile) {
-                navController.navigate(R.id.navigation_profile);
-                return true;
+            if (navController.getCurrentDestination().getId() != itemId) {
+                navController.navigate(itemId);
             }
-            return false;
+            isUserInteraction = false;
+            return true;
         });
 
         // used to handle the scenario where the user re-selects the Explore button while on the Music Review fragment
