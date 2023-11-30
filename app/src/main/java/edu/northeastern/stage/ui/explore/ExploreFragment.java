@@ -75,8 +75,10 @@ public class ExploreFragment extends Fragment {
         actv.setOnItemClickListener((parent, view, position, id) -> {
             Log.d("Explore Fragment", "setOnItemClickListener");
             String selectedSong = (String) parent.getItemAtPosition(position);
-//            viewModel.songSelected(selectedSong);
             sharedViewModel.setSong(selectedSong);
+            // Todo - need a method that defines the trackId variable based on selected song
+            // Todo - validate the trackId before passing the value (just extra caution)
+            //sharedViewModel.setTrackId(trackId); //need the trackId variable defined
             buttonToMusicReview.setEnabled(true);
         });
 
