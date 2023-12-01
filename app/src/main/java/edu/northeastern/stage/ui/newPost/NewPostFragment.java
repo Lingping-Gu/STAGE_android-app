@@ -26,15 +26,11 @@ public class NewPostFragment extends Fragment {
 
         viewModel = new ViewModelProvider(this).get(NewPostViewModel.class);
 
-        // Initialize resources
-        String deezerBaseUrl = getString(R.string.DEEZER_BASE_URL);
-        String deezerApiKey = getString(R.string.DEEZER_API);
-
         // Set up the interactions for the new post elements
         binding.btnSubmitPost.setOnClickListener(v -> viewModel.submitPost(binding.etPostContent.getText().toString()));
 
         // Setup AutoCompleteTextView for song search
-        setupSearch(deezerBaseUrl, deezerApiKey);
+        setupSearch();
 
         // Observe the post submission status from the ViewModel
         viewModel.getPostSubmissionStatus().observe(getViewLifecycleOwner(), isSuccess -> {
@@ -44,7 +40,8 @@ public class NewPostFragment extends Fragment {
         return root;
     }
 
-    private void setupSearch(String deezerBaseUrl, String deezerApiKey) {
+    // TODO: it seems like the autocomplete/search doesn't work until you delete something from the search string
+    private void setupSearch() {
         ArrayAdapter<String> searchAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line);
         binding.actvSongSearch.setAdapter(searchAdapter);
 
@@ -54,7 +51,7 @@ public class NewPostFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                viewModel.performSearch(s.toString(), deezerBaseUrl, deezerApiKey)
+                viewModel.performSearch(s.toString()) // TODO: need to edit this so that picture can be included in adapter
                         .observe(getViewLifecycleOwner(), searchResults -> {
                             searchAdapter.clear();
                             searchAdapter.addAll(searchResults);

@@ -1,8 +1,12 @@
 package edu.northeastern.stage.ui.viewmodels;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.google.gson.JsonElement;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,10 +18,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
+
+import edu.northeastern.stage.API.Spotify;
 
 public class NewPostViewModel extends ViewModel {
     // LiveData for observing post submission status
     private final MutableLiveData<Boolean> postSubmissionStatus = new MutableLiveData<>();
+    // Initiate Spotify object
+    private Spotify spotify = new Spotify();
 
     // Method to handle post submission logic
     public void submitPost(String postContent) {
@@ -28,35 +37,18 @@ public class NewPostViewModel extends ViewModel {
     }
 
     // Method to handle search logic
-    public LiveData<List<String>> performSearch(String query, String deezerBaseUrl, String deezerApiKey) {
-        MutableLiveData<List<String>> searchResults = new MutableLiveData<>();
+    // TODO: need to change adapter so that each search can contain picture of album/artist
+    public LiveData<List<JsonElement>> performSearch(String query) {
+        MutableLiveData<List<JsonElement>> searchResults = new MutableLiveData<>();
 
-        new Thread(() -> {
-            List<String> results = searchMusic(query, deezerBaseUrl, deezerApiKey);
-            searchResults.postValue(results);
-        }).start();
-
-        return searchResults;
-    }
-
-    private List<String> searchMusic(String query, String deezerBaseUrl, String deezerApiKey) {
-        List<String> searchResults = new ArrayList<>();
-        try {
-            URL url = new URL(deezerBaseUrl + query);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setRequestProperty("X-RapidAPI-Key", deezerApiKey);
-            urlConnection.setRequestProperty("X-RapidAPI-Host", "deezerdevs-deezer.p.rapidapi.com");
-            urlConnection.setDoInput(true);
-            urlConnection.connect();
-
-            InputStream inputStream = urlConnection.getInputStream();
-            String jsonString = convertStreamToString(inputStream);
-            searchResults = parseJson(jsonString);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // change numResults
+        CompletableFuture<ArrayList<Object>> trackSearchFuture = spotify.trackSearch(query,10);
+        trackSearchFuture.thenAccept(searchResult -> {
+            searchResults.postValue(searchResult);
+        }).exceptionally(e -> {
+            Log.e("TrackSearchError",e.getMessage());
+            return null;
+        });
         return searchResults;
     }
 
@@ -76,11 +68,6 @@ public class NewPostViewModel extends ViewModel {
             e.printStackTrace();
         }
         return results;
-    }
-
-    private String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next().replace(",", ",\n") : "";
     }
 
     // Getters for LiveData
