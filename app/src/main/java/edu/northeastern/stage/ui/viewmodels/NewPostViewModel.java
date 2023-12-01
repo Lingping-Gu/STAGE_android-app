@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,11 +39,11 @@ public class NewPostViewModel extends ViewModel {
 
     // Method to handle search logic
     // TODO: need to change adapter so that each search can contain picture of album/artist
-    public LiveData<List<JsonElement>> performSearch(String query) {
-        MutableLiveData<List<JsonElement>> searchResults = new MutableLiveData<>();
+    public LiveData<List<JsonObject>> performSearch(String query) {
+        MutableLiveData<List<JsonObject>> searchResults = new MutableLiveData<>();
 
         // change numResults
-        CompletableFuture<ArrayList<Object>> trackSearchFuture = spotify.trackSearch(query,10);
+        CompletableFuture<ArrayList<JsonObject>> trackSearchFuture = spotify.trackSearch(query,10);
         trackSearchFuture.thenAccept(searchResult -> {
             searchResults.postValue(searchResult);
         }).exceptionally(e -> {

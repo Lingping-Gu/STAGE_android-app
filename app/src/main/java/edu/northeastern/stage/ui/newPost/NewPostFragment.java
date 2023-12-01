@@ -51,7 +51,7 @@ public class NewPostFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                viewModel.performSearch(s.toString()) // TODO: need to edit this so that picture can be included in adapter
+                viewModel.performSearch(s.toString())
                         .observe(getViewLifecycleOwner(), searchResults -> {
                             searchAdapter.clear();
                             searchAdapter.addAll(searchResults);

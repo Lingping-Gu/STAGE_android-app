@@ -91,9 +91,9 @@ public class Spotify {
         }
     }
 
-    public CompletableFuture<ArrayList<JsonElement>> artistSearch(final String artist, Integer numResults) {
+    public CompletableFuture<ArrayList<JsonObject>> artistSearch(final String artist, Integer numResults) {
         checkAccessToken();
-        CompletableFuture<ArrayList<JsonElement>> future = new CompletableFuture<>();
+        CompletableFuture<ArrayList<JsonObject>> future = new CompletableFuture<>();
 
         new Thread(new Runnable() {
             @Override
@@ -110,7 +110,7 @@ public class Spotify {
                     Response response = client.newCall(request).execute();
                     if (response.isSuccessful()) {
                         final String responseBody = response.body().string();
-                        final ArrayList<JsonElement> artists = handleArtistSearchResults(responseBody);
+                        final ArrayList<JsonObject> artists = handleArtistSearchResults(responseBody);
                         future.complete(artists);
                     } else {
                         // unsuccessful response
@@ -128,9 +128,9 @@ public class Spotify {
         return future;
     }
 
-    private ArrayList<JsonElement> handleArtistSearchResults(String responseBody) {
+    private ArrayList<JsonObject> handleArtistSearchResults(String responseBody) {
 
-        ArrayList<JsonElement> artists = new ArrayList<JsonElement>();
+        ArrayList<JsonObject> artists = new ArrayList<JsonObject>();
 
         try {
             JsonObject json = new Gson().fromJson(responseBody, JsonObject.class);
@@ -138,11 +138,11 @@ public class Spotify {
                 JsonArray items = json.getAsJsonObject("artists").getAsJsonArray("items");
                 if (items.size() > 0) {
                     for(int i = 0; i< items.size();i++) {
-                        artists.add(items.get(i));
+                        artists.add(items.get(i).getAsJsonObject());
                     }
                 } else {
-                    // No tracks found
-//                    Toast.makeText(context, "No artists found", Toast.LENGTH_SHORT).show();
+                    // No artists found
+                    Log.e("SearchError", "No artists found");
                 }
             } else {
                 // Unexpected response format
@@ -155,9 +155,9 @@ public class Spotify {
         return artists;
     }
 
-    public CompletableFuture<ArrayList<JsonElement>> trackSearch(final String track, Integer numResults) {
+    public CompletableFuture<ArrayList<JsonObject>> trackSearch(final String track, Integer numResults) {
         checkAccessToken();
-        CompletableFuture<ArrayList<JsonElement>> future = new CompletableFuture<>();
+        CompletableFuture<ArrayList<JsonObject>> future = new CompletableFuture<>();
 
         new Thread(new Runnable() {
             @Override
@@ -174,7 +174,7 @@ public class Spotify {
                     Response response = client.newCall(request).execute();
                     if (response.isSuccessful()) {
                         final String responseBody = response.body().string();
-                        final ArrayList<JsonElement> tracks = handleTrackSearchResults(responseBody);
+                        final ArrayList<JsonObject> tracks = handleTrackSearchResults(responseBody);
                         future.complete(tracks);
                     } else {
                         // unsuccessful response
@@ -192,9 +192,9 @@ public class Spotify {
         return future;
     }
 
-    private ArrayList<JsonElement> handleTrackSearchResults(String responseBody) {
+    private ArrayList<JsonObject> handleTrackSearchResults(String responseBody) {
 
-        ArrayList<JsonElement> tracks = new ArrayList<JsonElement>();
+        ArrayList<JsonObject> tracks = new ArrayList<JsonObject>();
 
         try {
             JsonObject json = new Gson().fromJson(responseBody, JsonObject.class);
@@ -202,11 +202,11 @@ public class Spotify {
                 JsonArray items = json.getAsJsonObject("tracks").getAsJsonArray("items");
                 if (items.size() > 0) {
                     for(int i = 0; i< items.size();i++) {
-                        tracks.add(items.get(i));
+                        tracks.add(items.get(i).getAsJsonObject());
                     }
                 } else {
                     // No tracks found
-//                    Toast.makeText(context, "No tracks found", Toast.LENGTH_SHORT).show();
+                    Log.e("SearchError", "No tracks found");
                 }
             } else {
                 // Unexpected response format
