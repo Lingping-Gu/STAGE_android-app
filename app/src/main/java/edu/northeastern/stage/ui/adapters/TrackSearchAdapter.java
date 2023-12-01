@@ -1,10 +1,13 @@
 package edu.northeastern.stage.ui.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,15 +26,20 @@ import edu.northeastern.stage.R;
 public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
 
     private LayoutInflater inflater;
+    private AutoCompleteTextView songSearchACTV;
+    private JsonObject selectedResult;
 
-    public TrackSearchAdapter(Context context) {
+    public TrackSearchAdapter(@NonNull Context context, AutoCompleteTextView songSearchACTV) {
         super(context, 0);
         inflater = LayoutInflater.from(context);
+        this.songSearchACTV = songSearchACTV;
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        Log.d("ViewHolder",getItem(position).toString());
+        Log.d("ViewHolder",String.valueOf(position));
         ViewHolder viewHolder;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.item_search, parent, false);
@@ -43,30 +51,40 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
 
         JsonObject result = getItem(position);
         if(result != null) {
-            viewHolder.bind(result);
+            viewHolder.bind(convertView.getContext(),result);
         }
 
         return convertView;
+    }
+
+    public JsonObject getSelectedResult() {
+        return selectedResult;
+    }
+
+    public void setSelectedResult(JsonObject selectedResult) {
+        this.selectedResult = selectedResult;
     }
 
     private static class ViewHolder {
         TextView trackTitleTV;
         TextView artistNameTV;
         ImageView albumIV;
-        Context context;
 
         ViewHolder(View view) {
-            context = view.getContext();
             trackTitleTV = view.findViewById(R.id.trackTitleTV);
             artistNameTV = view.findViewById(R.id.artistNameTV);
             albumIV = view.findViewById(R.id.songAlbumIV);
         }
 
-        void bind(JsonObject result) {
-            trackTitleTV.setText(result.get("name").getAsString());
+        void bind(Context context, JsonObject result) {
 
             String artists = "";
             String imageURL = "";
+            trackTitleTV.setText("");
+            artistNameTV.setText("");
+            albumIV.setImageDrawable(null);
+
+            trackTitleTV.setText(result.get("name").getAsString());
 
             JsonArray artistsArray = result.getAsJsonArray("artists");
             if (artistsArray != null && artistsArray.size() > 0) {
@@ -76,11 +94,14 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
             }
             artistNameTV.setText(artists);
 
-            JsonArray imagesArray = result.getAsJsonObject("album").getAsJsonArray("images");
-
-            if(imagesArray != null && imagesArray.size() > 0) {
-                imageURL = imagesArray.get(0).getAsJsonObject().get("url").getAsString();
+            JsonObject albumObject = result.getAsJsonObject("album");
+            if (albumObject != null) {
+                JsonArray imagesArray = albumObject.getAsJsonArray("images");
+                if (imagesArray != null && imagesArray.size() > 0) {
+                    imageURL = imagesArray.get(0).getAsJsonObject().get("url").getAsString();
+                }
             }
+
 
             Glide.with(context)
                     .load(imageURL)

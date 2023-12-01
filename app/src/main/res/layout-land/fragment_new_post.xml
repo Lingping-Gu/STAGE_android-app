@@ -62,6 +62,8 @@
         app:layout_constraintEnd_toEndOf="@+id/etPostContent"
         app:layout_constraintStart_toStartOf="@+id/etPostContent"
         app:layout_constraintTop_toTopOf="@+id/ivAlbumCover"
-        app:layout_constraintVertical_chainStyle="spread_inside" />
+        app:layout_constraintVertical_chainStyle="spread_inside"
+        android:completionThreshold="1"
+        android:dropDownHeight="wrap_content"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

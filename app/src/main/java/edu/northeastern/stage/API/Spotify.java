@@ -135,6 +135,61 @@ public class Spotify {
         return future;
     }
 
+    public CompletableFuture<JsonObject> trackSearchByID(final String trackID) {
+        checkAccessToken();
+
+        CompletableFuture<JsonObject> future = new CompletableFuture<>();
+
+        OkHttpClient client = new OkHttpClient();
+        String url = "https://api.spotify.com/v1/tracks/" + trackID;
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try {
+                    if (response.isSuccessful()) {
+                        final String responseBody = response.body().string();
+                        Log.d("SearchSuccess",responseBody);
+
+                        JsonObject trackJsonObject = handleSingleTrackSearchResult(responseBody);
+                        future.complete(trackJsonObject);
+                    } else {
+                        // unsuccessful response
+                        Log.e("SearchError", "Unsuccessful search response: " + response.code());
+                        final String errorMessage = "Unsuccessful search response: " + response.code();
+                        future.completeExceptionally(new RuntimeException(errorMessage));
+                    }
+                } catch (Exception e) {
+                    future.completeExceptionally(e);
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                // handle failure
+                future.completeExceptionally(e);
+            }
+        });
+
+        return future;
+    }
+
+    private JsonObject handleSingleTrackSearchResult(String responseBody) {
+        // Parse the JSON response and return a single JsonObject
+        // TODO: what if there is no response/ID is invalid?
+        try {
+            return new Gson().fromJson(responseBody, JsonObject.class);
+        } catch (JsonParseException e) {
+            // Handle JSON parsing exception
+            Log.e("SearchError", "JSON parsing exception");
+            throw new RuntimeException(e);
+        }
+    }
+
     private ArrayList<JsonObject> handleArtistSearchResults(String responseBody) {
 
         ArrayList<JsonObject> artists = new ArrayList<JsonObject>();
