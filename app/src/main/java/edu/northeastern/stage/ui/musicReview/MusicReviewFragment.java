@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
-import edu.northeastern.stage.model.music.Song;
+import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.adapters.ReviewAdapter;
 import edu.northeastern.stage.ui.viewmodels.MusicReviewViewModel;
 
@@ -37,7 +37,7 @@ public class MusicReviewFragment extends Fragment {
     private TextView overallScoreTextView;
     private TextView noReviewsTextView;
     private Button addReviewButton;
-    Song s;
+    Track s;
 
     public static MusicReviewFragment newInstance() {
         return new MusicReviewFragment();
@@ -66,7 +66,7 @@ public class MusicReviewFragment extends Fragment {
 
         s = sharedViewModel.getSong();
         if(s!= null){
-            Log.d("Music Review Fragment", "getSongTitle if s not null -> " + s.getTitle());
+            Log.d("Music Review Fragment", "getSongTitle if s not null -> " + s.getName());
         }
 
 //        sharedViewModel.getSong().observe(getViewLifecycleOwner(), song -> {
@@ -78,7 +78,7 @@ public class MusicReviewFragment extends Fragment {
             Log.d("Music Review Fragment", "in observe getlivedatasong in music reviewfragment");
             if (song != null) {
                 // Update the UI with the song title
-                Log.d("Music Review Fragment", "getLiveDataSong from explore fragment -> " + song.getTitle());
+                Log.d("Music Review Fragment", "getLiveDataSong from explore fragment -> " + song.getName());
             }
         });
 

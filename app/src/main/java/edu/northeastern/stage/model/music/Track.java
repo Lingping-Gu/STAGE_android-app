@@ -12,6 +12,9 @@ public class Track {
     private String name;
     private int popularity;
 
+    public Track(String name) {
+        this.name = name;
+    }
     public Track(Album album, ArrayList<Artist> artists, int durationMs, String spotifyUrl, String id, String name, int popularity) {
         this.album = album;
         this.artists = artists;

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
@@ -18,7 +19,7 @@ public class SpotifyAPIExample extends AppCompatActivity {
 
     Button searchArtistBT;
     Button searchTrackBT;
-    Spotify spotify = new Spotify(SpotifyAPIExample.this);
+    Spotify spotify = new Spotify();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +32,7 @@ public class SpotifyAPIExample extends AppCompatActivity {
         searchArtistBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CompletableFuture<ArrayList<JsonElement>> artistSearchFuture = spotify.artistSearch("Adele",10);
+                CompletableFuture<ArrayList<JsonObject>> artistSearchFuture = spotify.artistSearch("Adele",10);
                 artistSearchFuture.thenAccept(searchResult -> {
                     for(JsonElement track : searchResult) {
                         Log.d("ArtistSearch", track.toString());
@@ -46,7 +47,7 @@ public class SpotifyAPIExample extends AppCompatActivity {
         searchTrackBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CompletableFuture<ArrayList<JsonElement>> trackSearchFuture = spotify.trackSearch("hello",10);
+                CompletableFuture<ArrayList<JsonObject>> trackSearchFuture = spotify.trackSearch("hello",10);
                 trackSearchFuture.thenAccept(searchResult -> {
                     for(JsonElement track : searchResult) {
                         Log.d("TrackSearch", track.toString());

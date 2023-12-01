@@ -1,10 +1,8 @@
 package edu.northeastern.stage.API;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -12,11 +10,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.CompletableFuture;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.Credentials;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -93,38 +95,43 @@ public class Spotify {
 
     public CompletableFuture<ArrayList<JsonObject>> artistSearch(final String artist, Integer numResults) {
         checkAccessToken();
+
         CompletableFuture<ArrayList<JsonObject>> future = new CompletableFuture<>();
 
-        new Thread(new Runnable() {
+        OkHttpClient client = new OkHttpClient();
+        String url = "https://api.spotify.com/v1/search?q=" + artist + "&type=artist&limit=" + numResults.toString();
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
             @Override
-            public void run() {
-                OkHttpClient client = new OkHttpClient();
-
-                String url = "https://api.spotify.com/v1/search?q=" + artist + "&type=artist&limit=" + numResults.toString();
-                Request request = new Request.Builder()
-                        .url(url)
-                        .addHeader("Authorization", "Bearer " + accessToken)
-                        .build();
-
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    Response response = client.newCall(request).execute();
                     if (response.isSuccessful()) {
                         final String responseBody = response.body().string();
-                        final ArrayList<JsonObject> artists = handleArtistSearchResults(responseBody);
-                        future.complete(artists);
+                        Log.d("SearchSuccess",responseBody);
+                        final ArrayList<JsonObject> tracks = handleTrackSearchResults(responseBody);
+                        future.complete(tracks);
                     } else {
                         // unsuccessful response
                         Log.e("SearchError", "Unsuccessful search response: " + response.code());
                         final String errorMessage = "Unsuccessful search response: " + response.code();
                         future.completeExceptionally(new RuntimeException(errorMessage));
                     }
-                } catch (IOException e) {
-                    // handle IO exception
-                    e.printStackTrace();
+                } catch (Exception e) {
                     future.completeExceptionally(e);
                 }
             }
-        }).start();
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                // handle failure
+                future.completeExceptionally(e);
+            }
+        });
+
         return future;
     }
 
@@ -159,21 +166,20 @@ public class Spotify {
         checkAccessToken();
         CompletableFuture<ArrayList<JsonObject>> future = new CompletableFuture<>();
 
-        new Thread(new Runnable() {
+        OkHttpClient client = new OkHttpClient();
+        String url = "https://api.spotify.com/v1/search?q=" + track + "&type=track&limit=" + numResults.toString();
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
             @Override
-            public void run() {
-                OkHttpClient client = new OkHttpClient();
-
-                String url = "https://api.spotify.com/v1/search?q=" + track + "&type=track&limit=" + numResults.toString();
-                Request request = new Request.Builder()
-                        .url(url)
-                        .addHeader("Authorization", "Bearer " + accessToken)
-                        .build();
-
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    Response response = client.newCall(request).execute();
                     if (response.isSuccessful()) {
                         final String responseBody = response.body().string();
+                        Log.d("SearchSuccess",responseBody);
                         final ArrayList<JsonObject> tracks = handleTrackSearchResults(responseBody);
                         future.complete(tracks);
                     } else {
@@ -182,13 +188,18 @@ public class Spotify {
                         final String errorMessage = "Unsuccessful search response: " + response.code();
                         future.completeExceptionally(new RuntimeException(errorMessage));
                     }
-                } catch (IOException e) {
-                    // handle IO exception
-                    e.printStackTrace();
+                } catch (Exception e) {
                     future.completeExceptionally(e);
                 }
             }
-        }).start();
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                // handle failure
+                future.completeExceptionally(e);
+            }
+        });
+
         return future;
     }
 

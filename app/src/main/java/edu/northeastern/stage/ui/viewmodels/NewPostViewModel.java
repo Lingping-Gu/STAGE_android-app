@@ -2,26 +2,23 @@ package edu.northeastern.stage.ui.viewmodels;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.gson.JsonElement;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 
 import edu.northeastern.stage.API.Spotify;
+import edu.northeastern.stage.model.Post;
 
 public class NewPostViewModel extends ViewModel {
     // LiveData for observing post submission status
@@ -30,15 +27,37 @@ public class NewPostViewModel extends ViewModel {
     private Spotify spotify = new Spotify();
 
     // Method to handle post submission logic
-    public void submitPost(String postContent) {
-        // Logic to submit the post
+    public void createPost(Post post) {
+        // get instance of FBDB
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        // get reference to DB
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child("posts");
+
+        // generate unique ID for post
+        DatabaseReference newPostRef = reference.push();
+
+        // add fields to post
+        newPostRef.setValue(post, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if (error != null) {
+                    Log.d("NewPost", "New post created!");
+                } else {
+                    Log.d("NewPost", "New post created failed!");
+                }
+            }
+        });
 
         // Update the LiveData with the submission status
+        // TODO: what is the purpose of this?
         postSubmissionStatus.setValue(true); // Or false if submission fails
     }
 
+
     // Method to handle search logic
-    // TODO: need to change adapter so that each search can contain picture of album/artist
     public LiveData<List<JsonObject>> performSearch(String query) {
         MutableLiveData<List<JsonObject>> searchResults = new MutableLiveData<>();
 
@@ -51,24 +70,6 @@ public class NewPostViewModel extends ViewModel {
             return null;
         });
         return searchResults;
-    }
-
-    private List<String> parseJson(String jsonString) {
-        List<String> results = new ArrayList<>();
-        try {
-            JSONObject response = new JSONObject(jsonString);
-            JSONArray data = response.getJSONArray("data");
-            for (int i = 0; i < data.length(); i++) {
-                JSONObject currentResult = data.getJSONObject(i);
-                JSONObject artist = currentResult.getJSONObject("artist");
-                String trackName = currentResult.getString("title");
-                String artistName = artist.getString("name");
-                results.add(trackName + " by " + artistName);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return results;
     }
 
     // Getters for LiveData
