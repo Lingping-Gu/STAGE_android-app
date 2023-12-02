@@ -50,6 +50,7 @@ public class ExploreFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable s) {
+            Log.d("Explore Fragment", "afterTextChanged -> " + s.toString());
             viewModel.searchTextChanged(s.toString());
         }
     };
@@ -65,7 +66,6 @@ public class ExploreFragment extends Fragment {
         progressTextView = fragmentView.findViewById(R.id.textView);
 
         viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
-        observeViewModel();
         viewModel.setCircles(circleView);
 
         sharedViewModel = new ViewModelProvider(requireActivity()).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
@@ -75,15 +75,22 @@ public class ExploreFragment extends Fragment {
         actv.setOnItemClickListener((parent, view, position, id) -> {
             Log.d("Explore Fragment", "setOnItemClickListener");
             String selectedSong = (String) parent.getItemAtPosition(position);
+
+            // selected song
+            viewModel.songSelected(selectedSong);
+            viewModel.getSelectedSong();
+
             sharedViewModel.setSong(selectedSong);
+
             // Todo - need a method that defines the trackId variable based on selected song
             // Todo - validate the trackId before passing the value (just extra caution)
             //sharedViewModel.setTrackId(trackId); //need the trackId variable defined
             buttonToMusicReview.setEnabled(true);
+            observeViewModel();
+
         });
 
         buttonToMusicReview.setOnClickListener(v -> {
-
             // Use the NavController to navigate to the MusicReviewFragment
             NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
             navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
@@ -120,6 +127,8 @@ public class ExploreFragment extends Fragment {
     }
 
     private void observeViewModel() {
+        Log.d("Explore Fragment", "observeViewModel");
+
         viewModel.getRecommendations().observe(getViewLifecycleOwner(), recommendations -> {
             adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, recommendations);
             actv.setAdapter(adapter);

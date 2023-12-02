@@ -31,7 +31,6 @@ public class ExploreViewModel extends AndroidViewModel {
     private MutableLiveData<List<String>> recommendations = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private MutableLiveData<String> selectedSong = new MutableLiveData<>();
-//    private edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel sharedViewModel;
 
     private static final Random rand = new Random();
     CircleView circleView;
@@ -62,14 +61,14 @@ public class ExploreViewModel extends AndroidViewModel {
         }
     }
 
-//    public void songSelected(String song) {
-//        selectedSong.setValue(song);
-////        sharedViewModel.setSong(song);
-//    }
-//
-//    public LiveData<String> getSelectedSong() {
-//        return selectedSong;
-//    }
+    public void songSelected(String song) {
+        selectedSong.setValue(song);
+//        sharedViewModel.setSong(song);
+    }
+
+    public LiveData<String> getSelectedSong() {
+        return selectedSong;
+    }
 
     public void makeDeezerReq(String inputArtistName) {
         Log.d("Explore View Model", "makeDeezerReq");
@@ -103,6 +102,8 @@ public class ExploreViewModel extends AndroidViewModel {
 
     private void parseJsonAndUpdate(String jsonString) {
         try {
+            Log.d("Explore View Model", "parseJsonAndUpdate");
+
             JSONObject response = new JSONObject(jsonString);
             JSONArray data = response.getJSONArray("data");
             List<String> tempRecs = new ArrayList<>();
@@ -137,7 +138,7 @@ public class ExploreViewModel extends AndroidViewModel {
         int maxAttempts = 100000; // Limit the number of attempts to avoid infinite loop
         int MIN_DISTANCE_THRESHOLD = 10;
 
-        while (circles.size() < 100 && attempts < maxAttempts) {
+        while (circles.size() < 20 && attempts < maxAttempts) {
             float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
             float y = rand.nextFloat() * 2000 - 1000;
             float radius = rand.nextFloat() * 200 + 100;
