@@ -142,6 +142,7 @@ public class CircleView extends View {
 
     private void updateCirclePositions(Canvas canvas) {
 
+        // if moving while going right through each other is fine, then these lines of code
 //        for(Circle c : circles){
 //            //Move first
 //            c.move(canvas);
@@ -149,22 +150,24 @@ public class CircleView extends View {
 //            canvas.drawCircle(c.getX(), c.getY(), c.getRadius(), c.paint);
 //        }
 //        invalidate();
+
+        //moving and also bouncing off of each other
         for (int i = 0; i < circles.length; i++) {
             Circle c1 = circles[i];
             //Move first
             c1.move(canvas);
             //Draw them
-            canvas.drawCircle(c1.getX(), c1.getY(), c1.getRadius(), c1.paint);
+//            canvas.drawCircle(c1.getX(), c1.getY(), c1.getRadius(), c1.paint);
 
             // Update circle position based on velocity
-            c1.setX(c1.getX() + velocities[i * 2]);
-            c1.setY(c1.getY() + velocities[i * 2 + 1]);
-
-            // Check for collisions with other circles
-            for (int j = i + 1; j < circles.length; j++) {
-                Circle c2 = circles[j];
-                handleCollision(c1, c2, i, j, canvas);
-            }
+//            c1.setX(c1.getX() + velocities[i * 2]);
+//            c1.setY(c1.getY() + velocities[i * 2 + 1]);
+//
+//            // Check for collisions with other circles
+//            for (int j = i + 1; j < circles.length; j++) {
+//                Circle c2 = circles[j];
+//                handleCollision(c1, c2, i, j, canvas);
+//            }
         }
         invalidate();
     }
