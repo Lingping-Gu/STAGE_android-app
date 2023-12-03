@@ -27,75 +27,54 @@ import java.util.ArrayList;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentExploreBinding;
+import edu.northeastern.stage.model.music.Album;
+import edu.northeastern.stage.model.music.Artist;
+import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.viewmodels.ExploreViewModel;
+import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 public class ExploreFragment extends Fragment {
 
     private FragmentExploreBinding binding;
     private ExploreViewModel viewModel;
+    private JsonObject selectedTrack;
     private AutoCompleteTextView actv;
     private Button buttonToMusicReview;
     private CircleView circleView;
     private SeekBar geoSlider;
-    private edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel sharedViewModel;
-    TextView progressTextView;
-
-    TextWatcher textWatcher = new TextWatcher() {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            buttonToMusicReview.setEnabled(false);
-            if(s.length() == 0){
-            }
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if(s.length() == 0){
-            }
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            viewModel.searchTextChanged(s.toString());
-        }
-    };
+    private TextView progressTextView;
+    private SharedDataViewModel sharedDataViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.fragment_explore, container, false);
+        binding = FragmentExploreBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
 
-        buttonToMusicReview = fragmentView.findViewById(R.id.reviewButton);
-        circleView = fragmentView.findViewById(R.id.circleView);
-        actv = fragmentView.findViewById(R.id.autoCompleteTextView);
-        geoSlider = fragmentView.findViewById(R.id.locationSeekBar);
-        progressTextView = fragmentView.findViewById(R.id.textView);
+        // instantiate views
+        buttonToMusicReview = binding.reviewButton;
+        circleView = binding.circleView;
+        actv = binding.autoCompleteTextView;
+        geoSlider = binding.locationSeekBar;
+        progressTextView = binding.textView;
 
+        // set up view models to share data
+        sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
         viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
+
         //setup search
         setupSearch();
 
-        viewModel.setCircles(circleView);
-
-        sharedViewModel = new ViewModelProvider(this).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
-
-        actv.setThreshold(1);
-        actv.addTextChangedListener(textWatcher);
-        actv.setOnItemClickListener((parent, view, position, id) -> {
-            Log.d("Explore Fragment", "setOnItemClickListener");
-            String selectedSong = (String) parent.getItemAtPosition(position);
-            sharedViewModel.songSelected(selectedSong);
-            sharedViewModel.setSong(selectedSong);
-            buttonToMusicReview.setEnabled(true);
-        });
-
         buttonToMusicReview.setOnClickListener(v -> {
-
             // Use the NavController to navigate to the MusicReviewFragment
-            NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
-            navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
+            if(!actv.getText().toString().isEmpty()) {
+                NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
+                navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
+
+            }
         });
+
+        viewModel.setCircles(circleView);
 
         // perform seek bar change listener event used for getting the progress value
         geoSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -124,21 +103,30 @@ public class ExploreFragment extends Fragment {
             }
         });
 
-        return fragmentView;
+        return root;
     }
 
     private void setupSearch() {
-        TrackSearchAdapter searchAdapter = new TrackSearchAdapter(getContext(), binding.actvSongSearch);
+        TrackSearchAdapter searchAdapter = new TrackSearchAdapter(getContext(), actv);
 
-        binding.actvSongSearch.setAdapter(searchAdapter);
-        binding.actvSongSearch.addTextChangedListener(new TextWatcher() {
+        actv.setAdapter(searchAdapter);
+
+        actv.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                buttonToMusicReview.setEnabled(false);
+                if(s.length() == 0){
+                }
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length() == 0){
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
                 viewModel.performSearch(s.toString())
                         .observe(getViewLifecycleOwner(), searchResults -> {
                             searchAdapter.clear();
@@ -147,14 +135,9 @@ public class ExploreFragment extends Fragment {
                             searchAdapter.notifyDataSetChanged();
                         });
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
         });
 
-        binding.actvSongSearch.setOnItemClickListener((parent, view, position, id) -> {
+        actv.setOnItemClickListener((parent, view, position, id) -> {
             selectedTrack = searchAdapter.getItem(position);
             if (selectedTrack != null) {
                 String artists = "";
@@ -164,7 +147,10 @@ public class ExploreFragment extends Fragment {
                         artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
                     }
                 }
-                binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
+                actv.setText(selectedTrack.get("name").getAsString() + " by " + artists);
+                Track trackToStore = viewModel.createTrack(selectedTrack); // create track in view model
+                sharedDataViewModel.setTrack(trackToStore); // set track in shared data view model
+                buttonToMusicReview.setEnabled(true);
             }
         });
     }

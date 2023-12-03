@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
@@ -29,6 +31,9 @@ import java.util.concurrent.CompletableFuture;
 import edu.northeastern.stage.API.Spotify;
 import edu.northeastern.stage.model.Circle;
 import edu.northeastern.stage.R;
+import edu.northeastern.stage.model.music.Album;
+import edu.northeastern.stage.model.music.Artist;
+import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.explore.CircleView;
 
 public class ExploreViewModel extends ViewModel {
@@ -41,25 +46,52 @@ public class ExploreViewModel extends ViewModel {
     Map<Circle, String> circleTextMap = new HashMap<>();
     List<Circle> circles;
 
-    public void searchTextChanged(String text) {
-        if (text.isEmpty()) {
-            recommendations.setValue(new ArrayList<>());
-        } else {
-            Log.d("Explore View Model", "when searchTextChanged");
-            getRecommendations(text);
-        }
-    }
+    public LiveData<List<JsonObject>> performSearch(String query) {
+        MutableLiveData<List<JsonObject>> searchResults = new MutableLiveData<>();
 
-    public LiveData<List<JsonObject>> getRecommendations(String query) {
         // change numResults
         CompletableFuture<ArrayList<JsonObject>> trackSearchFuture = spotify.trackSearch(query, 10);
         trackSearchFuture.thenAccept(searchResult -> {
-            recommendations.postValue(searchResult);
+            searchResults.postValue(searchResult);
         }).exceptionally(e -> {
             Log.e("TrackSearchError", e.getMessage());
             return null;
         });
-        return recommendations;
+        return searchResults;
+    }
+
+    // method to create Track object based on the selectedTrack JsonObject from Spotify API
+    public Track createTrack(JsonObject selectedTrack) {
+        // album variables
+        String albumURL = selectedTrack.get("album").getAsJsonObject().get("external_urls").getAsJsonObject().get("spotify").getAsString();
+        String albumID = selectedTrack.get("album").getAsJsonObject().get("id").getAsString();
+        String albumImageURL = selectedTrack.get("album").getAsJsonObject().getAsJsonArray("images").get(0).getAsJsonObject().get("url").getAsString();
+        String albumName = selectedTrack.get("album").getAsJsonObject().get("name").getAsString();
+        String albumReleaseDate = selectedTrack.get("album").getAsJsonObject().get("release_date").getAsString();
+        String albumReleaseDatePrecision = selectedTrack.get("album").getAsJsonObject().get("release_date_precision").getAsString();
+        JsonArray albumArtistsJsonArray = selectedTrack.get("album").getAsJsonObject().getAsJsonArray("artists");
+        ArrayList<Artist> albumArtists = new ArrayList<Artist>();
+        for(JsonElement artist : albumArtistsJsonArray) {
+            Artist artistToAdd = new Artist(artist.getAsJsonObject().get("external_urls").getAsJsonObject().get("spotify").getAsString(),
+                    artist.getAsJsonObject().get("id").getAsString(),artist.getAsJsonObject().get("name").getAsString());
+            albumArtists.add(artistToAdd);
+        }
+
+        // track variables
+        Album album = new Album(albumURL, albumID, albumImageURL, albumName, albumReleaseDate, albumReleaseDatePrecision, albumArtists);
+        JsonArray trackArtistsJsonArray = selectedTrack.getAsJsonArray("artists");
+        ArrayList<Artist> trackArtists = new ArrayList<Artist>();
+        for(JsonElement artist : trackArtistsJsonArray) {
+            Artist artistToAdd = new Artist(artist.getAsJsonObject().get("external_urls").getAsJsonObject().get("spotify").getAsString(),
+                    artist.getAsJsonObject().get("id").getAsString(),artist.getAsJsonObject().get("name").getAsString());
+            trackArtists.add(artistToAdd);
+        }
+        int durationMs = selectedTrack.get("duration_ms").getAsInt();
+        String spotifyURL = selectedTrack.get("external_urls").getAsJsonObject().get("spotify").getAsString();
+        String trackID = selectedTrack.get("id").getAsString();
+        String trackName = selectedTrack.get("name").getAsString();
+        int popularity = selectedTrack.get("popularity").getAsInt();
+        return new Track(album,trackArtists,durationMs,spotifyURL,trackID,trackName,popularity);
     }
 
     public String getTrack() {
@@ -68,6 +100,10 @@ public class ExploreViewModel extends ViewModel {
 
     public void setTrack(String track) {
         this.track = track;
+    }
+
+    public MutableLiveData<List<JsonObject>> getRecommendations() {
+        return recommendations;
     }
 
     // TODO: maybe make circles a separate viewmodel
