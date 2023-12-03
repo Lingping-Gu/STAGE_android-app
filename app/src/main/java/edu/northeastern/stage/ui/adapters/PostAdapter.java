@@ -44,7 +44,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
         // set post Visibility
         // friend
-        if ("Friend".equals(viewType)) {
+        if ("friend".equals(viewType)) {
             String visibilityState = post.getVisibilityState();
             if ("private".equals(visibilityState)) {
                 holder.itemView.setVisibility(View.GONE);
@@ -53,7 +53,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             }
         }
         // stranger
-        if ("Stranger".equals(viewType)) {
+        if ("stranger".equals(viewType)) {
             String visibilityState = post.getVisibilityState();
             if (!"public".equals(visibilityState)) {
                 holder.itemView.setVisibility(View.GONE);
@@ -63,7 +63,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         }
 
         // set Visibility State Icon
-        if (viewType == "Owner") {
+        if (viewType == "owner") {
             switch (post.getVisibilityState()) {
                 case "public":
                     holder.visibleState.setImageResource(R.drawable.profile_public);
@@ -78,6 +78,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                     holder.visibleState.setImageResource(R.drawable.profile_public);
             }
         }
+
+        // set post content
         holder.tvPostContent.setText(post.getPostContent());
 
         //open music link

@@ -79,9 +79,10 @@ public class ProfileFragment extends Fragment {
         binding.tags.setAdapter(tagsAdapter);
 
         // Set up Posts Adapter
-        if (isOwner()) viewState = "Owner";
-        else if (isFriend()) viewState = "Friend";
-        else viewState = "Stranger";
+        // set up viewState
+        if (isOwner()) viewState = "owner";
+        else if (isFriend()) viewState = "friend";
+        else viewState = "stranger";
         // set posts
         postsAdapter = new PostAdapter(getActivity(), new ArrayList<>(), viewState);
         binding.activities.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -172,11 +173,6 @@ public class ProfileFragment extends Fragment {
     // TODO: Implement in DataBaseExample
     private boolean isFriend() {
         return true;
-    }
-
-    private boolean checkIfFriends() {
-        //TODO: Implement friends in database
-        return currentUserId.equals(profileOwnerId);
     }
 
     private void launchEditProfile() {
