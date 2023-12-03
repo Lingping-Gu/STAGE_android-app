@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
+import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
 
@@ -27,7 +28,7 @@ import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
 public class NewPostFragment extends Fragment {
     private FragmentNewPostBinding binding;
     private NewPostViewModel viewModel;
-    private JsonElement selectedTrack;
+    private JsonObject selectedTrack;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNewPostBinding.inflate(inflater, container, false);
@@ -36,7 +37,10 @@ public class NewPostFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(NewPostViewModel.class);
 
         // Set up the interactions for the new post elements
-        binding.btnSubmitPost.setOnClickListener(v -> createPostFromTrack());
+        binding.btnSubmitPost.setOnClickListener(v -> {
+            String postContent = binding.etPostContent.getText().toString();
+            viewModel.createPost(selectedTrack, postContent);
+        });
 
         // Setup AutoCompleteTextView for song search
         setupSearch();
@@ -49,9 +53,6 @@ public class NewPostFragment extends Fragment {
         return root;
     }
 
-    private void createPostFromTrack() {
-        Post newPost = new Post()
-    }
     // TODO: it seems like the autocomplete/search doesn't work until you delete something from the search string
     // TODO: API is getting 10 songs but the view is not being updated
     private void setupSearch() {

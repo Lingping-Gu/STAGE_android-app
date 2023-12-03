@@ -11,6 +11,8 @@ import androidx.lifecycle.ViewModel;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
@@ -27,8 +29,11 @@ public class NewPostViewModel extends ViewModel {
     private Spotify spotify = new Spotify();
 
     // Method to handle post submission logic
-    public void createPost(Post post) {
-        // get instance of FBDB
+    public void createPost(JsonObject selectedTrack, String postContent) {
+        Log.d("ABC123","Entered CreatePost");
+        Log.d("ABC123",selectedTrack.toString());
+        Log.d("ABC123",postContent);
+        // get instance of Firebase DB
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
         // get reference to DB
@@ -39,18 +44,45 @@ public class NewPostViewModel extends ViewModel {
         // generate unique ID for post
         DatabaseReference newPostRef = reference.push();
 
-        // add fields to post
-        newPostRef.setValue(post, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                if (error != null) {
-                    Log.d("NewPost", "New post created!");
-                } else {
-                    Log.d("NewPost", "New post created failed!");
+        // Set Post object
+        if(selectedTrack != null && selectedTrack.size() > 0 && !postContent.isEmpty()) {
+            Log.d("ABC123","set post object");
+            String trackName = selectedTrack.get("name").getAsString();
+            String trackID = selectedTrack.get("id").getAsString();
+            String artistName = "";
+            String content = postContent;
+            Long timestamp = System.currentTimeMillis();
+            String imageURL = "";
+
+            // get all artists
+            JsonArray artistsArray = selectedTrack.getAsJsonArray("artists");
+            if (artistsArray != null && artistsArray.size() > 0) {
+                for (JsonElement artist : artistsArray) {
+                    artistName = artistName + artist.getAsJsonObject().get("name").getAsString() + " ";
                 }
             }
-        });
 
+            // get first album object image
+            JsonObject albumObject = selectedTrack.getAsJsonObject("album");
+            if (albumObject != null) {
+                JsonArray imagesArray = albumObject.getAsJsonArray("images");
+                if (imagesArray != null && imagesArray.size() > 0) {
+                    imageURL = imagesArray.get(0).getAsJsonObject().get("url").getAsString();
+                }
+            }
+
+            Post post = new Post(trackName,trackID,artistName,content,timestamp,imageURL);
+            newPostRef.setValue(post, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                    if (error != null) {
+                        Log.d("NewPost", "New post created!");
+                    } else {
+                        Log.d("NewPost", "New post created failed!");
+                    }
+                }
+            });
+        }
         // Update the LiveData with the submission status
         // TODO: what is the purpose of this?
         postSubmissionStatus.setValue(true); // Or false if submission fails
