@@ -120,7 +120,8 @@ public class EditProfile extends AppCompatActivity {
                 Intent data = new Intent();
                 data.putExtra(EXTRA_USERNAME, editUsername.getText().toString());
                 data.putExtra(EXTRA_DESCRIPTION, editDescription.getText().toString());
-                data.putExtra(EXTRA_TAGS, editTags.getText().toString());
+                String[] tagsArray = selectedTags.toArray(new String[0]);
+                data.putExtra(EXTRA_TAGS, tagsArray);
                 setResult(RESULT_OK, data);
                 finish();
             }
