@@ -2,7 +2,10 @@ package edu.northeastern.stage.ui.explore;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -47,7 +50,7 @@ public class ExploreFragment extends Fragment {
     private SharedDataViewModel sharedDataViewModel;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentExploreBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
@@ -70,7 +73,6 @@ public class ExploreFragment extends Fragment {
             if(!actv.getText().toString().isEmpty()) {
                 NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
                 navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
-
             }
         });
 

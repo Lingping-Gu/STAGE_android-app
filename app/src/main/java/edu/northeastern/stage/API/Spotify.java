@@ -111,7 +111,7 @@ public class Spotify {
                 try {
                     if (response.isSuccessful()) {
                         final String responseBody = response.body().string();
-                        Log.d("SearchSuccess",responseBody);
+                        Log.d("SearchSuccess","Successful search");
                         final ArrayList<JsonObject> tracks = handleTrackSearchResults(responseBody);
                         future.complete(tracks);
                     } else {
@@ -153,8 +153,7 @@ public class Spotify {
                 try {
                     if (response.isSuccessful()) {
                         final String responseBody = response.body().string();
-                        Log.d("SearchSuccess",responseBody);
-
+                        Log.d("SearchSuccess","Successful search");
                         JsonObject trackJsonObject = handleSingleTrackSearchResult(responseBody);
                         future.complete(trackJsonObject);
                     } else {
@@ -234,7 +233,7 @@ public class Spotify {
                 try {
                     if (response.isSuccessful()) {
                         final String responseBody = response.body().string();
-                        Log.d("SearchSuccess",responseBody);
+                        Log.d("SearchSuccess","Successful search");
                         final ArrayList<JsonObject> tracks = handleTrackSearchResults(responseBody);
                         future.complete(tracks);
                     } else {

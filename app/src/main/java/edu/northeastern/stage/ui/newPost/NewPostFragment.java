@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.gson.JsonArray;
@@ -39,6 +41,7 @@ public class NewPostFragment extends Fragment {
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
         viewModel = new ViewModelProvider(this).get(NewPostViewModel.class);
 
+        // get user ID
         sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
             if (userID != null) {
                 viewModel.setUserID(userID);

@@ -1,9 +1,12 @@
 package edu.northeastern.stage.ui.musicReview;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,7 +29,6 @@ public class SubmitReviewFragment extends Fragment {
     private Button submitReviewButton;
     private MusicReviewViewModel mViewModel;
     private SharedDataViewModel sharedDataViewModel;
-    private JsonObject selectedTrack;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -36,14 +38,20 @@ public class SubmitReviewFragment extends Fragment {
         reviewRatingBar = view.findViewById(R.id.reviewRatingBar);
         submitReviewButton = view.findViewById(R.id.submitReviewButton);
 
+        sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(MusicReviewViewModel.class);
+
         sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
             if(userID != null) {
                 mViewModel.setUserID(userID);
             }
         });
 
-        sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
-        mViewModel = new ViewModelProvider(requireActivity()).get(MusicReviewViewModel.class);
+        sharedDataViewModel.getTrack().observe(getViewLifecycleOwner(), track -> {
+            if(track != null) {
+                mViewModel.setTrack(track);
+            }
+        });
 
         submitReviewButton.setOnClickListener(v -> submitReview());
 
@@ -52,17 +60,17 @@ public class SubmitReviewFragment extends Fragment {
 
     private void submitReview() {
         // TODO: hide keyboard after button press; handle empty rating or content
+        String userID = mViewModel.getUserID();
         String content = reviewContentEditText.getText().toString();
         float rating = reviewRatingBar.getRating();
-        String userID = mViewModel.getUserID();
+        Long timestamp = System.currentTimeMillis();
+        String trackID = mViewModel.getTrack().getId();
 
-        String userId = "user_id"; // Replace with actual user ID logic
-        String avatarUri = "avatar_uri"; // Replace with actual avatar URI logic
-
-        Review newReview = new Review(userId, avatarUri, content, rating);
-//        mViewModel.addReview(newReview);
+        Review newReview = new Review(userID,content,rating,timestamp,trackID);
+        mViewModel.addReview(newReview);
         // Clear the fields after submission
         reviewContentEditText.setText("");
         reviewRatingBar.setRating(0);
+        // TODO: intent to MusicReview Page
     }
 }

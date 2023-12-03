@@ -38,8 +38,6 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        Log.d("ViewHolder",getItem(position).toString());
-        Log.d("ViewHolder",String.valueOf(position));
         ViewHolder viewHolder;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.item_search, parent, false);
