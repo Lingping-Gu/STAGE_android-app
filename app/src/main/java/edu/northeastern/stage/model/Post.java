@@ -16,13 +16,12 @@ public class Post {
     // TODO: Simplify the Post constructor
     public Post(String userId, String userAvatarUrl, String musicLink, String postContent, ArrayList<String> likes, String visibilityState,
                 String musicImageUrl, String trackName, String artistName) {
-        // included
         this.user = userId;
         // user avatar, can get from usedId
+        // & get user name by userId
         this.userAvatarUrl = userAvatarUrl;
         // included
         this.postContent = postContent;
-        // like function need to be modified
         this.likes = likes;
         // need visible state
         this.visibilityState = visibilityState;

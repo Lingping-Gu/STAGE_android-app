@@ -48,7 +48,6 @@ public class ProfileFragment extends Fragment {
     private static final int REQUEST_EDIT_PROFILE = 1;
     private String currentUserId;
     private String profileOwnerId;
-    private String viewState;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -78,13 +77,8 @@ public class ProfileFragment extends Fragment {
         binding.tags.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.tags.setAdapter(tagsAdapter);
 
-        // Set up Posts Adapter
-        // set up viewState
-        if (isOwner()) viewState = "owner";
-        else if (isFriend()) viewState = "friend";
-        else viewState = "stranger";
         // set posts
-        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>(), viewState);
+        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>());
         binding.activities.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.activities.setAdapter(postsAdapter);
 
@@ -168,11 +162,6 @@ public class ProfileFragment extends Fragment {
 
     private boolean isOwner() {
         return currentUserId.equals(profileOwnerId);
-    }
-
-    // TODO: Implement in DataBaseExample
-    private boolean isFriend() {
-        return true;
     }
 
     private void launchEditProfile() {

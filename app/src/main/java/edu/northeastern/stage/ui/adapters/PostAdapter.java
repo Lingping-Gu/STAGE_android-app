@@ -11,6 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -24,11 +26,20 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     private Context context;
     private List<Post> postList;
     private String viewType;
+    private String currentUserId;
+    private String postOwnerId;
 
-    public PostAdapter(Context context, List<Post> postList, String viewType) {
+    public PostAdapter(Context context, List<Post> postList) {
         this.context = context;
         this.postList = postList;
-        this.viewType = viewType;
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            currentUserId = currentUser.getUid();
+        } else {
+            currentUserId = "TEST";
+        }
     }
 
     @Override
@@ -41,6 +52,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     public void onBindViewHolder(PostViewHolder holder, int position) {
         Post post = postList.get(position);
+
+        postOwnerId = post.getUser();
+        if (isOwner()) viewType = "owner";
+        else if (isFriend()) viewType = "friend";
+        else viewType = "stranger";
 
         // set post Visibility
         // friend
@@ -127,6 +143,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             i.setData(Uri.parse(url));
             v.getContext().startActivity(i);
         });
+    }
+
+    private boolean isOwner() {
+        return currentUserId.equals(postOwnerId);
+    }
+
+    // TODO: Implement in DataBaseExample
+    private boolean isFriend() {
+        return true;
     }
 
     @Override
