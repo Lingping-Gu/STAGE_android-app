@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.database.DatabaseError;
@@ -105,7 +104,6 @@ public class NewPostViewModel extends ViewModel {
         return searchResults;
     }
 
-    // Getters for LiveData
     public LiveData<Boolean> getPostSubmissionStatus() {
         return postSubmissionStatus;
     }

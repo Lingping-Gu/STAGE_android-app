@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.gson.JsonArray;
@@ -36,6 +35,7 @@ public class NewPostFragment extends Fragment {
         binding = FragmentNewPostBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // share data between models
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
         viewModel = new ViewModelProvider(this).get(NewPostViewModel.class);
 
@@ -66,45 +66,45 @@ public class NewPostFragment extends Fragment {
     // TODO: API is getting 10 songs but the view is not being updated
     private void setupSearch() {
 
-        TrackSearchAdapter searchAdapter = new TrackSearchAdapter(getContext(), binding.actvSongSearch);
+            TrackSearchAdapter searchAdapter = new TrackSearchAdapter(getContext(), binding.actvSongSearch);
 
-        binding.actvSongSearch.setAdapter(searchAdapter);
-        binding.actvSongSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            binding.actvSongSearch.setAdapter(searchAdapter);
+            binding.actvSongSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                viewModel.performSearch(s.toString())
-                        .observe(getViewLifecycleOwner(), searchResults -> {
-                            searchAdapter.clear();
-                            ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
-                            searchAdapter.addAll(newResults);
-                            searchAdapter.notifyDataSetChanged();
-                        });
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-        binding.actvSongSearch.setOnItemClickListener((parent, view, position, id) -> {
-            selectedTrack = searchAdapter.getItem(position);
-            if (selectedTrack != null) {
-                String artists = "";
-                JsonArray artistsArray = selectedTrack.getAsJsonArray("artists");
-                if (artistsArray != null && artistsArray.size() > 0) {
-                    for (JsonElement artist : artistsArray) {
-                        artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
-                    }
                 }
-                binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
-            }
-        });
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    viewModel.performSearch(s.toString())
+                            .observe(getViewLifecycleOwner(), searchResults -> {
+                                searchAdapter.clear();
+                                ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
+                                searchAdapter.addAll(newResults);
+                                searchAdapter.notifyDataSetChanged();
+                            });
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+
+            binding.actvSongSearch.setOnItemClickListener((parent, view, position, id) -> {
+                selectedTrack = searchAdapter.getItem(position);
+                if (selectedTrack != null) {
+                    String artists = "";
+                    JsonArray artistsArray = selectedTrack.getAsJsonArray("artists");
+                    if (artistsArray != null && artistsArray.size() > 0) {
+                        for (JsonElement artist : artistsArray) {
+                            artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
+                        }
+                    }
+                    binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
+                }
+            });
     }
 
     @Override

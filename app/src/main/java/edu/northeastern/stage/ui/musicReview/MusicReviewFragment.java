@@ -60,27 +60,7 @@ public class MusicReviewFragment extends Fragment {
             navController.navigate(R.id.action_navigation_music_review_to_submit_review);
         });
 
-        sharedViewModel = new ViewModelProvider(requireActivity()).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
-
-        Log.d("Music Review Fragment", "getSongTitle from explore fragment -> " + sharedViewModel.getSong());
-
-        s = sharedViewModel.getSong();
-        if(s!= null){
-            Log.d("Music Review Fragment", "getSongTitle if s not null -> " + s.getName());
-        }
-
-//        sharedViewModel.getSong().observe(getViewLifecycleOwner(), song -> {
-//            if(song != null) {
-//                Log.d("Song title", song.getTitle());
-//            }
-//        });
-        sharedViewModel.getLiveDataSong().observe(getViewLifecycleOwner(), song -> {
-            Log.d("Music Review Fragment", "in observe getlivedatasong in music reviewfragment");
-            if (song != null) {
-                // Update the UI with the song title
-                Log.d("Music Review Fragment", "getLiveDataSong from explore fragment -> " + song.getName());
-            }
-        });
+        // shared view model logic here to get trackID
 
         mViewModel = new ViewModelProvider(this).get(MusicReviewViewModel.class);
         mViewModel.getReviews().observe(getViewLifecycleOwner(), reviews -> {

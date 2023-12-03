@@ -18,20 +18,28 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import java.util.ArrayList;
+
 import edu.northeastern.stage.R;
+import edu.northeastern.stage.databinding.FragmentExploreBinding;
+import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.viewmodels.ExploreViewModel;
 
 public class ExploreFragment extends Fragment {
 
-    private ArrayAdapter<String> adapter;
+    private FragmentExploreBinding binding;
+    private ExploreViewModel viewModel;
     private AutoCompleteTextView actv;
     private Button buttonToMusicReview;
     private CircleView circleView;
     private SeekBar geoSlider;
-    private ExploreViewModel viewModel;
     private edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel sharedViewModel;
     TextView progressTextView;
-
 
     TextWatcher textWatcher = new TextWatcher() {
 
@@ -65,7 +73,9 @@ public class ExploreFragment extends Fragment {
         progressTextView = fragmentView.findViewById(R.id.textView);
 
         viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
-        observeViewModel();
+        //setup search
+        setupSearch();
+
         viewModel.setCircles(circleView);
 
         sharedViewModel = new ViewModelProvider(this).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
@@ -75,7 +85,6 @@ public class ExploreFragment extends Fragment {
         actv.setOnItemClickListener((parent, view, position, id) -> {
             Log.d("Explore Fragment", "setOnItemClickListener");
             String selectedSong = (String) parent.getItemAtPosition(position);
-//            viewModel.songSelected(selectedSong);
             sharedViewModel.songSelected(selectedSong);
             sharedViewModel.setSong(selectedSong);
             buttonToMusicReview.setEnabled(true);
@@ -118,11 +127,45 @@ public class ExploreFragment extends Fragment {
         return fragmentView;
     }
 
-    private void observeViewModel() {
-        viewModel.getRecommendations().observe(getViewLifecycleOwner(), recommendations -> {
-            adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, recommendations);
-            actv.setAdapter(adapter);
+    private void setupSearch() {
+        TrackSearchAdapter searchAdapter = new TrackSearchAdapter(getContext(), binding.actvSongSearch);
+
+        binding.actvSongSearch.setAdapter(searchAdapter);
+        binding.actvSongSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.performSearch(s.toString())
+                        .observe(getViewLifecycleOwner(), searchResults -> {
+                            searchAdapter.clear();
+                            ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
+                            searchAdapter.addAll(newResults);
+                            searchAdapter.notifyDataSetChanged();
+                        });
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        binding.actvSongSearch.setOnItemClickListener((parent, view, position, id) -> {
+            selectedTrack = searchAdapter.getItem(position);
+            if (selectedTrack != null) {
+                String artists = "";
+                JsonArray artistsArray = selectedTrack.getAsJsonArray("artists");
+                if (artistsArray != null && artistsArray.size() > 0) {
+                    for (JsonElement artist : artistsArray) {
+                        artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
+                    }
+                }
+                binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
+            }
         });
     }
-
 }
