@@ -12,6 +12,12 @@ public class User {
         this.lastLocation = lastLocation;
     }
 
+    public User(Long lastLoggedInTimeStamp, Location lastLocation) {
+        this.lastLoggedInTimeStamp = lastLoggedInTimeStamp;
+        this.lastLocation = lastLocation;
+    }
+
+
     public Long getLastLoggedInTimeStamp() {
         return lastLoggedInTimeStamp;
     }

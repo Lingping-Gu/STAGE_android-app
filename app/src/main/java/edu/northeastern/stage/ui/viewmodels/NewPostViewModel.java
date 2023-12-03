@@ -35,8 +35,6 @@ public class NewPostViewModel extends ViewModel {
     public void createPost(JsonObject selectedTrack, String postContent) {
         // get instance of Firebase DB
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        Log.d("ABC123",userID);
-
         if (getUserID() != null) {
             // get reference to DB
             DatabaseReference reference = mDatabase
@@ -47,7 +45,6 @@ public class NewPostViewModel extends ViewModel {
             // generate unique ID for post
             DatabaseReference newPostRef = reference.push();
 
-            // Set Post object
             if (selectedTrack != null && selectedTrack.size() > 0 && !postContent.isEmpty()) {
                 String trackName = selectedTrack.get("name").getAsString();
                 String trackID = selectedTrack.get("id").getAsString();
@@ -74,6 +71,7 @@ public class NewPostViewModel extends ViewModel {
                     }
                 }
 
+                // Set Post object
                 Post post = new Post(trackName, trackID, artistName, content, timestamp, imageURL);
                 newPostRef.setValue(post, new DatabaseReference.CompletionListener() {
                     @Override
