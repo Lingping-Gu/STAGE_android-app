@@ -1,4 +1,4 @@
-package edu.northeastern.stage.API;
+package edu.northeastern.stage.model;
 
 public class User {
 

@@ -1,4 +1,4 @@
-package edu.northeastern.stage.API;
+package edu.northeastern.stage.ui.authentication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +19,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import edu.northeastern.stage.API.ResetPWDialogFragment;
+import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.R;
 
 public class Login extends AppCompatActivity {
@@ -118,7 +120,7 @@ public class Login extends AppCompatActivity {
 
     private void loginSuccessIntent() {
         //  change this intent
-        Intent intent = new Intent(Login.this, LoginRegisterExample.class);
+        Intent intent = new Intent(Login.this, MainActivity.class);
         startActivity(intent);
     }
 }

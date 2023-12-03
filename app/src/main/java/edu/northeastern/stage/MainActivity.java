@@ -1,37 +1,54 @@
 package edu.northeastern.stage;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import edu.northeastern.stage.databinding.ActivityMainBinding;
-import edu.northeastern.stage.ui.explore.ExploreFragment;
+import edu.northeastern.stage.ui.authentication.Login;
+import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-
+    private SharedDataViewModel viewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+        viewModel = new ViewModelProvider(this).get(SharedDataViewModel.class);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        String UID = "";
+        if (currentUser != null) {
+            UID = currentUser.getUid();
+            viewModel.setUserID(UID);
+        } else {
+            Intent intent = new Intent(MainActivity.this, Login.class);
+            startActivity(intent);
+            finish();
+        }
+
 
         // This is for the appbar/actionbar/toolbar at the top of the screen if we are to implement it.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(

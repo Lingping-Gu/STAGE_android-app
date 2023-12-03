@@ -7,8 +7,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.gson.JsonArray;
@@ -17,24 +19,31 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
-import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
-import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
+import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 // TODO: resolve errors
 
 public class NewPostFragment extends Fragment {
     private FragmentNewPostBinding binding;
     private NewPostViewModel viewModel;
+    private SharedDataViewModel sharedDataViewModel;
     private JsonObject selectedTrack;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNewPostBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
         viewModel = new ViewModelProvider(this).get(NewPostViewModel.class);
+
+        sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
+            if (userID != null) {
+                viewModel.setUserID(userID);
+            }
+        });
 
         // Set up the interactions for the new post elements
         binding.btnSubmitPost.setOnClickListener(v -> {
@@ -57,7 +66,7 @@ public class NewPostFragment extends Fragment {
     // TODO: API is getting 10 songs but the view is not being updated
     private void setupSearch() {
 
-        TrackSearchAdapter searchAdapter = new TrackSearchAdapter(getContext(),binding.actvSongSearch);
+        TrackSearchAdapter searchAdapter = new TrackSearchAdapter(getContext(), binding.actvSongSearch);
 
         binding.actvSongSearch.setAdapter(searchAdapter);
         binding.actvSongSearch.addTextChangedListener(new TextWatcher() {

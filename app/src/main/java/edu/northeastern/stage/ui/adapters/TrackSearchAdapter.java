@@ -102,7 +102,6 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
                 }
             }
 
-
             Glide.with(context)
                     .load(imageURL)
 //                  .placeholder(R.drawable.placeholder_image) // Set a placeholder image
