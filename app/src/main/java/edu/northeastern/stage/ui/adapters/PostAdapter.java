@@ -1,5 +1,6 @@
 package edu.northeastern.stage.ui.adapters;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -12,17 +13,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
+import edu.northeastern.stage.ui.profile.ProfileFragment;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
-
+    private Context context;
     private List<Post> postList;
+    private String viewType;
 
-    public PostAdapter(List<Post> postList) {
+    public PostAdapter(Context context, List<Post> postList, String viewType) {
+        this.context = context;
         this.postList = postList;
+        this.viewType = viewType;
     }
 
     @Override
@@ -35,21 +41,44 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     public void onBindViewHolder(PostViewHolder holder, int position) {
         Post post = postList.get(position);
-        holder.tvPostContent.setText(post.getPostContent());
 
-        switch (post.getVisibilityState()) {
-            case "public":
-                holder.visibleState.setImageResource(R.drawable.profile_public);
-                break;
-            case "friends":
-                holder.visibleState.setImageResource(R.drawable.profile_friends);
-                break;
-            case "private":
-                holder.visibleState.setImageResource(R.drawable.profile_private);
-                break;
-            default:
-                holder.visibleState.setImageResource(R.drawable.profile_public);
+        // set post Visibility
+        // friend
+        if ("Friend".equals(viewType)) {
+            String visibilityState = post.getVisibilityState();
+            if ("private".equals(visibilityState)) {
+                holder.itemView.setVisibility(View.GONE);
+            } else {
+                holder.itemView.setVisibility(View.VISIBLE);
+            }
         }
+        // stranger
+        if ("Stranger".equals(viewType)) {
+            String visibilityState = post.getVisibilityState();
+            if (!"public".equals(visibilityState)) {
+                holder.itemView.setVisibility(View.GONE);
+            } else {
+                holder.itemView.setVisibility(View.VISIBLE);
+            }
+        }
+
+        // set Visibility State Icon
+        if (viewType == "Owner") {
+            switch (post.getVisibilityState()) {
+                case "public":
+                    holder.visibleState.setImageResource(R.drawable.profile_public);
+                    break;
+                case "friends":
+                    holder.visibleState.setImageResource(R.drawable.profile_friends);
+                    break;
+                case "private":
+                    holder.visibleState.setImageResource(R.drawable.profile_private);
+                    break;
+                default:
+                    holder.visibleState.setImageResource(R.drawable.profile_public);
+            }
+        }
+        holder.tvPostContent.setText(post.getPostContent());
 
         //open music link
         String url = postList.get(position).getMusicLink();
@@ -70,10 +99,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
         // Set the like status on the ivLike ImageView
         holder.ivLike.setOnClickListener(v -> {
-            boolean isLiked = !post.isLiked();
-            post.setLiked(isLiked);
+            ArrayList<String> likes = post.getLikes();
+            // get current isLiked state
+            boolean isLiked = likes.contains(post.getUser());
+            // database update
+            FirebaseExample firebaseExample = new FirebaseEaxmple();
+            firebaseExample.likePost(isLiked);
+            isLiked = !isLiked;
+            // show the like icon
             holder.ivLike.setSelected(isLiked);
-            //TODO: database update
         });
 
         //display user avatar
@@ -81,6 +115,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 .load(post.getUserAvatarUrl())
                 .error(R.drawable.default_pfp)
                 .into(holder.ivUserAvatar);
+
+        // When click on the user avatar in the post, it goes to the profile of this user.
+        holder.ivUserAvatar.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ProfileFragment.class);
+            context.startActivity(intent);
+            intent.putExtra("PROFILE_OWNER_ID", post.getUser());
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            v.getContext().startActivity(i);
+        });
     }
 
     @Override

@@ -1,25 +1,44 @@
 package edu.northeastern.stage.model;
 
+import java.util.ArrayList;
+
 public class Post {
+    private String user;
     private String userAvatarUrl;
     private String musicLink;
     private String musicImageUrl;
     private String trackName;
     private String artistName;
     private String postContent;
-    private boolean isLiked;
+    private ArrayList<String> likes;
     private String visibilityState;
 
-    public Post(String userAvatarUrl, String musicLink, String postContent, boolean isLiked, String visibilityState,
+    // TODO: Simplify the Post constructor
+    public Post(String userId, String userAvatarUrl, String musicLink, String postContent, ArrayList<String> likes, String visibilityState,
                 String musicImageUrl, String trackName, String artistName) {
+        // included
+        this.user = userId;
+        // user avatar, can get from usedId
         this.userAvatarUrl = userAvatarUrl;
-        this.musicLink = musicLink;
+        // included
         this.postContent = postContent;
-        this.isLiked = isLiked;
+        // like function need to be modified
+        this.likes = likes;
+        // need visible state
         this.visibilityState = visibilityState;
+        // have track info, can get from track Id
+        this.musicLink = musicLink;
         this.musicImageUrl = musicImageUrl;
         this.trackName = trackName;
         this.artistName = artistName;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getUser() {
+        return user;
     }
 
     // Getters and Setters
@@ -47,12 +66,12 @@ public class Post {
         this.postContent = postContent;
     }
 
-    public boolean isLiked() {
-        return isLiked;
+    public ArrayList<String> getLikes() {
+        return likes;
     }
 
-    public void setLiked(boolean liked) {
-        isLiked = liked;
+    public void setLikes(ArrayList<String> likes) {
+        this.likes = likes;
     }
 
     public String getVisibilityState() {

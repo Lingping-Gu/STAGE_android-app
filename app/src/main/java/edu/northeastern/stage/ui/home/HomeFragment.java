@@ -28,7 +28,7 @@ public class HomeFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new PostAdapter(new ArrayList<>()); // Initialize with empty list
+        adapter = new PostAdapter(getActivity(), new ArrayList<>(), "VisibilityState"); // Initialize with empty list
         recyclerView.setAdapter(adapter);
         observeViewModel();
         return view;
