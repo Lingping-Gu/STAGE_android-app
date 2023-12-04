@@ -1,74 +1,21 @@
 package edu.northeastern.stage.model;
 
 public class Post {
-    private String userAvatarUrl;
-    private String musicLink;
-    private String musicImageUrl;
+    // no need for userID or postID because Firebase DB is set up to identify these
     private String trackName;
+    private String trackID;
     private String artistName;
-    private String postContent;
-    private boolean isLiked;
-    private String visibilityState;
+    private String content;
+    private Long timestamp;
+    private String imageURL;
 
-    public Post(String userAvatarUrl, String musicLink, String postContent, boolean isLiked, String visibilityState,
-                String musicImageUrl, String trackName, String artistName) {
-        this.userAvatarUrl = userAvatarUrl;
-        this.musicLink = musicLink;
-        this.postContent = postContent;
-        this.isLiked = isLiked;
-        this.visibilityState = visibilityState;
-        this.musicImageUrl = musicImageUrl;
+    public Post(String trackName, String trackID, String artistName, String content, Long timestamp, String imageURL) {
         this.trackName = trackName;
+        this.trackID = trackID;
         this.artistName = artistName;
-    }
-
-    // Getters and Setters
-    public String getUserAvatarUrl() {
-        return userAvatarUrl;
-    }
-
-    public void setUserAvatarUrl(String userAvatarUrl) {
-        this.userAvatarUrl = userAvatarUrl;
-    }
-
-    public String getMusicLink() {
-        return musicLink;
-    }
-
-    public void setMusicLink(String musicLink) {
-        this.musicLink = musicLink;
-    }
-
-    public String getPostContent() {
-        return postContent;
-    }
-
-    public void setPostContent(String postContent) {
-        this.postContent = postContent;
-    }
-
-    public boolean isLiked() {
-        return isLiked;
-    }
-
-    public void setLiked(boolean liked) {
-        isLiked = liked;
-    }
-
-    public String getVisibilityState() {
-        return visibilityState;
-    }
-
-    public void setVisibilityState(String visibilityState) {
-        this.visibilityState = visibilityState;
-    }
-
-    public String getMusicImageUrl() {
-        return musicImageUrl;
-    }
-
-    public void setMusicImageUrl(String musicImageUrl) {
-        this.musicImageUrl = musicImageUrl;
+        this.content = content;
+        this.timestamp = timestamp;
+        this.imageURL = imageURL;
     }
 
     public String getTrackName() {
@@ -79,6 +26,14 @@ public class Post {
         this.trackName = trackName;
     }
 
+    public String getTrackID() {
+        return trackID;
+    }
+
+    public void setTrackID(String trackID) {
+        this.trackID = trackID;
+    }
+
     public String getArtistName() {
         return artistName;
     }
@@ -87,4 +42,27 @@ public class Post {
         this.artistName = artistName;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
 }

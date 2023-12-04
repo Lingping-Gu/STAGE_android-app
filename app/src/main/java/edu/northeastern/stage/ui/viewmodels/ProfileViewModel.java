@@ -45,13 +45,14 @@ public class ProfileViewModel extends ViewModel {
         // Load posts here
         // Once loaded, set them to the 'posts' LiveData
         // posts.setValue(loadedPosts);
-        MutableLiveData<List<Post>> exampleData = new MutableLiveData<>();
-        String musicLink = "http://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6";
-        String musicImageUrl = "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228";
-        Post examplePost = new Post("userAvatarUrl", musicLink, "Speak to me by Pink Floyd is amazing!", false,
-                "public", musicImageUrl, "Speak to me", "Pink Floyd");
-        exampleData.setValue(Arrays.asList(examplePost, examplePost, examplePost));
-        this.posts = exampleData;
+
+//        MutableLiveData<List<Post>> exampleData = new MutableLiveData<>();
+//        String musicLink = "http://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6";
+//        String musicImageUrl = "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228";
+//        Post examplePost = new Post("userAvatarUrl", musicLink, "Speak to me by Pink Floyd is amazing!", false,
+//                "public", musicImageUrl, "Speak to me", "Pink Floyd",11111);
+//        exampleData.setValue(Arrays.asList(examplePost, examplePost, examplePost));
+//        this.posts = exampleData;
     }
 
     private void loadImageUrls() {

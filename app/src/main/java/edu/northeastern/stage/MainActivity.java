@@ -1,18 +1,26 @@
 package edu.northeastern.stage;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import edu.northeastern.stage.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
-
     private ActivityMainBinding binding;
     private boolean isUserInteraction = false;
 
@@ -24,6 +32,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        String UID = "";
+        if (currentUser != null) {
+            UID = currentUser.getUid();
+            viewModel.setUserID(UID);
+            updateUser(UID);
+        } else {
+            Intent intent = new Intent(MainActivity.this, Login.class);
+            startActivity(intent);
+            finish();
+        }
 
         // This is for the appbar/actionbar/toolbar at the top of the screen if we are to implement it.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -92,5 +114,28 @@ public class MainActivity extends AppCompatActivity {
         // the NavController receives a callback and takes the appropriate action defined in the navigation graph (mobile_navigation.xml).
         // The NavHostFragment then inflates the appropriate fragment.
 //        NavigationUI.setupWithNavController(binding.navView, navController);
+    }
+
+    private void updateUser(String UID) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(UID);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("lastLocation",new Location(100.0,100.0)); // need to edit this
+        updates.put("lastLoggedInTimeStamp",System.currentTimeMillis());
+
+        reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if (error == null) {
+                    Log.d("UpdateUser", "User update successful");
+                } else {
+                    Log.e("UpdateUser","Update user failed: " + error.getMessage());
+                }
+            }
+        });
     }
 }
