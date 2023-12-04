@@ -48,32 +48,6 @@ public class ExploreFragment extends Fragment {
     private SeekBar geoSlider;
     private TextView progressTextView;
     private SharedDataViewModel sharedDataViewModel;
-    private ExploreViewModel viewModel;
-    private edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel sharedViewModel;
-    TextView progressTextView;
-
-
-    TextWatcher textWatcher = new TextWatcher() {
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            buttonToMusicReview.setEnabled(false);
-            if(s.length() == 0){
-            }
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if(s.length() == 0){
-            }
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            Log.d("Explore Fragment", "afterTextChanged -> " + s.toString());
-            viewModel.searchTextChanged(s.toString());
-        }
-    };
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
