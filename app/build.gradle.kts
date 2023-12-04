@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "edu.northeastern.stage"
-        minSdk = 33
+        minSdk = 27
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
