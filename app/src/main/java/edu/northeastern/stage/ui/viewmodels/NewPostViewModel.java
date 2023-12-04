@@ -58,7 +58,7 @@ public class NewPostViewModel extends ViewModel {
                     for (JsonElement artist : artistsArray) {
                         artistName = artistName + artist.getAsJsonObject().get("name").getAsString() + " ";
                     }
-                    artistName.trim();
+                    artistName = artistName.trim();
                 }
 
                 // get first album object image

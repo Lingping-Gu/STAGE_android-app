@@ -25,12 +25,10 @@ import java.util.Map;
 
 import edu.northeastern.stage.databinding.ActivityMainBinding;
 import edu.northeastern.stage.model.Location;
-import edu.northeastern.stage.model.User;
 import edu.northeastern.stage.ui.authentication.Login;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 public class MainActivity extends AppCompatActivity {
-
     private ActivityMainBinding binding;
     private SharedDataViewModel viewModel;
     @Override
@@ -112,8 +110,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUser(String UID) {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-
-        User user = new User(System.currentTimeMillis(),new Location(100.0,100.0));
 
         DatabaseReference reference = mDatabase
                 .getReference("users")

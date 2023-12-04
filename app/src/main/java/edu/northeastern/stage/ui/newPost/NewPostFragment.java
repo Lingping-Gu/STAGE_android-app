@@ -80,6 +80,10 @@ public class NewPostFragment extends Fragment {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
                     viewModel.performSearch(s.toString())
                             .observe(getViewLifecycleOwner(), searchResults -> {
                                 searchAdapter.clear();
@@ -87,11 +91,6 @@ public class NewPostFragment extends Fragment {
                                 searchAdapter.addAll(newResults);
                                 searchAdapter.notifyDataSetChanged();
                             });
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-
                 }
             });
 
@@ -105,6 +104,7 @@ public class NewPostFragment extends Fragment {
                             artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
                         }
                     }
+                    artists = artists.trim();
                     binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
                 }
             });

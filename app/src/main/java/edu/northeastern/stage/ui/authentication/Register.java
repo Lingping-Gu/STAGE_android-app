@@ -1,15 +1,21 @@
 package edu.northeastern.stage.ui.authentication;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -20,19 +26,30 @@ import com.google.firebase.auth.FirebaseAuthEmailException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import org.w3c.dom.Text;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.R;
+import edu.northeastern.stage.ui.adapters.ImageAdapter;
 
 public class Register extends AppCompatActivity {
 
     private static final String TAG = "Register";
     private FirebaseAuth mAuth;
-    ImageView pwConfirmIV;
-    EditText emailET;
-    EditText pwET;
-    EditText pwConfirmET;
-    Button registerBT;
+    private ImageView pwConfirmIV;
+    private EditText emailET;
+    private EditText pwET;
+    private EditText pwConfirmET;
+    private Button registerBT;
+    private Spinner imageSpinner;
+    private Integer profilePicSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +60,8 @@ public class Register extends AppCompatActivity {
 
         if (user != null) {
             // change intent
-           Intent intent = new Intent(Register.this, MainActivity.class);
-           startActivity(intent);
+            Intent intent = new Intent(Register.this, MainActivity.class);
+            startActivity(intent);
         }
 
         pwConfirmIV = findViewById(R.id.pwConfirmIV);
@@ -52,6 +69,24 @@ public class Register extends AppCompatActivity {
         pwET = findViewById(R.id.passwordET);
         pwConfirmET = findViewById(R.id.pwConfirmET);
         registerBT = findViewById(R.id.registerBT);
+        imageSpinner = findViewById(R.id.spinnerIV);
+
+        Integer[] images = {R.drawable.anger, R.drawable.sad, R.drawable.sob, R.drawable.shock, R.drawable.blush};
+
+        ImageAdapter adapter = new ImageAdapter(this, images);
+        imageSpinner.setAdapter(adapter);
+
+        imageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                profilePicSelected = images[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         if (savedInstanceState != null) {
             emailET.setText(savedInstanceState.getString("email"));
@@ -59,10 +94,32 @@ public class Register extends AppCompatActivity {
             pwConfirmET.setText(savedInstanceState.getString("passwordConfirm"));
         }
 
+        pwConfirmET.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!pwConfirmET.getText().toString().isEmpty() && !pwET.getText().toString().isEmpty()
+                        && pwConfirmET.getText().toString().equals(pwET.getText().toString())) {
+                    pwConfirmIV.setImageResource(R.drawable.ic_checkmark);
+                } else {
+                    pwConfirmIV.setImageResource(R.drawable.ic_cross);
+                }
+            }
+        });
+
         registerBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createUserAccount(emailET.getText().toString(),pwET.getText().toString(),pwConfirmET.getText().toString());
+                createUserAccount(emailET.getText().toString(), pwET.getText().toString(), pwConfirmET.getText().toString());
             }
         });
     }
@@ -76,7 +133,7 @@ public class Register extends AppCompatActivity {
     }
 
     private void createUserAccount(String email, String password, String confirmPassword) {
-        if (email == null || password == null || confirmPassword == null || email == "" || password == "" || confirmPassword == "") {
+        if (email == null || password == null || confirmPassword == null || email == "" || password == "" || confirmPassword == "" || profilePicSelected == null) {
             Toast.makeText(Register.this, "Register failed. Please make sure to enter an email and password.", Toast.LENGTH_SHORT).show();
         } else {
             mAuth.createUserWithEmailAndPassword(email, password)
@@ -85,6 +142,25 @@ public class Register extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "createUserWithEmail:success");
+                                FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                // get reference to DB
+                                DatabaseReference reference = mDatabase.getReference("users");
+
+                                Map<String, Object> updates = new HashMap<>();
+                                updates.put("profilePicResource",profilePicSelected);
+
+                                reference.child(user.getUid()).updateChildren(updates, new DatabaseReference.CompletionListener() {
+                                    @Override
+                                    public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                                        if (error == null) {
+                                            Log.d(TAG, "Profile picture resource updated successfully");
+                                        } else {
+                                            Log.e(TAG, "Failed to update profile picture resource: " + error.getMessage());
+                                        }
+                                    }
+                                });
+
                                 // change intent
                                 Intent intent = new Intent(Register.this, MainActivity.class);
                                 startActivity(intent);

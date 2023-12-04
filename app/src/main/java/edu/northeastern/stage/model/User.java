@@ -3,24 +3,26 @@ package edu.northeastern.stage.model;
 public class User {
 
     private String userID;
+    private String email;
     private Long lastLoggedInTimeStamp;
-    private Name name;
     private Location lastLocation;
     private String profilePicURL;
 
-    public User(String userID, Long lastLoggedInTimeStamp, Name name, Location lastLocation, String profilePicURL) {
+    public User(String userID, String email, Long lastLoggedInTimeStamp, Location lastLocation, String profilePicURL) {
         this.userID = userID;
+        this.email = email;
         this.lastLoggedInTimeStamp = lastLoggedInTimeStamp;
-        this.name = name;
         this.lastLocation = lastLocation;
         this.profilePicURL = profilePicURL;
     }
 
-    public User(Long lastLoggedInTimeStamp, Location lastLocation) {
-        this.lastLoggedInTimeStamp = lastLoggedInTimeStamp;
-        this.lastLocation = lastLocation;
+    public String getEmail() {
+        return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public Long getLastLoggedInTimeStamp() {
         return lastLoggedInTimeStamp;
@@ -37,15 +39,6 @@ public class User {
     public void setUserID(String userID) {
         this.userID = userID;
     }
-
-    public Name getName() {
-        return name;
-    }
-
-    public void setName(Name name) {
-        this.name = name;
-    }
-
     public Location getLastLocation() {
         return lastLocation;
     }
