@@ -1,5 +1,7 @@
 package edu.northeastern.stage.ui.musicReview;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -20,39 +22,61 @@ import android.widget.TextView;
 
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
-import edu.northeastern.stage.model.music.Song;
+
+import edu.northeastern.stage.databinding.FragmentMusicReviewBinding;
 import edu.northeastern.stage.ui.adapters.ReviewAdapter;
 import edu.northeastern.stage.ui.viewmodels.MusicReviewViewModel;
+import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import java.util.Locale;
 
 public class MusicReviewFragment extends Fragment {
+    private FragmentMusicReviewBinding binding;
     private MusicReviewViewModel mViewModel;
-    private edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel sharedViewModel;
+    private SharedDataViewModel sharedDataViewModel;
     private RecyclerView reviewsRecyclerView;
     private ReviewAdapter reviewAdapter;
     private TextView overallScoreTextView;
     private TextView noReviewsTextView;
     private Button addReviewButton;
-    Song s;
-
-    public static MusicReviewFragment newInstance() {
-        return new MusicReviewFragment();
-    }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_music_review, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+        binding = FragmentMusicReviewBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
 
-        reviewsRecyclerView = view.findViewById(R.id.reviewsRecyclerView);
-        overallScoreTextView = view.findViewById(R.id.overallScoreTextView);
+        // share data between models
+        sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(MusicReviewViewModel.class);
+
+        // set current user
+        sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
+            if (userID != null) {
+                mViewModel.setUserID(userID);
+            }
+        });
+
+        // set track
+        sharedDataViewModel.getTrack().observe(getViewLifecycleOwner(), track -> {
+            if (track != null) {
+                mViewModel.setTrack(track);
+                Glide.with(this)
+                        .load(track.getAlbum().getImageURL())
+//                  .placeholder(R.drawable.placeholder_image) // Set a placeholder image
+//                  .error(R.drawable.error_image) // Set an error image
+                        .into(binding.albumCoverImageView);
+            }
+        });
+
+        reviewsRecyclerView = binding.reviewsRecyclerView;
+        overallScoreTextView = binding.overallScoreTextView;
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        noReviewsTextView = view.findViewById(R.id.noReviewsTextView);
-        addReviewButton = view.findViewById(R.id.addReviewButton);
+        noReviewsTextView = binding.noReviewsTextView;
+        addReviewButton = binding.addReviewButton;
 
         addReviewButton.setOnClickListener(v -> {
             // Use the NavController to navigate to the MusicReviewFragment
@@ -60,29 +84,6 @@ public class MusicReviewFragment extends Fragment {
             navController.navigate(R.id.action_navigation_music_review_to_submit_review);
         });
 
-        sharedViewModel = new ViewModelProvider(requireActivity()).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
-
-        Log.d("Music Review Fragment", "getSongTitle from explore fragment -> " + sharedViewModel.getSong());
-
-        s = sharedViewModel.getSong();
-        if(s!= null){
-            Log.d("Music Review Fragment", "getSongTitle if s not null -> " + s.getTitle());
-        }
-
-//        sharedViewModel.getSong().observe(getViewLifecycleOwner(), song -> {
-//            if(song != null) {
-//                Log.d("Song title", song.getTitle());
-//            }
-//        });
-        sharedViewModel.getLiveDataSong().observe(getViewLifecycleOwner(), song -> {
-            Log.d("Music Review Fragment", "in observe getlivedatasong in music reviewfragment");
-            if (song != null) {
-                // Update the UI with the song title
-                Log.d("Music Review Fragment", "getLiveDataSong from explore fragment -> " + song.getTitle());
-            }
-        });
-
-        mViewModel = new ViewModelProvider(this).get(MusicReviewViewModel.class);
         mViewModel.getReviews().observe(getViewLifecycleOwner(), reviews -> {
             if (reviews == null || reviews.isEmpty()) {
                 // Show "No reviews yet." text and hide RecyclerView
@@ -98,17 +99,13 @@ public class MusicReviewFragment extends Fragment {
                 updateOverallScore();
             }
         });
-        mViewModel.fetchReviews(); // Simulate fetching data
-
-        return view;
+        return root;
     }
 
-    // TODO: validate observers and/or find better way to refresh data
     @Override
     public void onResume() {
         super.onResume();
-        // Trigger a refresh of data
-        mViewModel.fetchReviews();
+        mViewModel.fetchReviews(); // fetch all reviews
     }
 
     private void updateOverallScore() {

@@ -3,36 +3,22 @@ package edu.northeastern.stage.model;
 import androidx.annotation.NonNull;
 
 public class Review {
-    private String userId;
-    private String avatarUri;
+    private String userID;
     private String content;
     private float rating;
+    private Long timestamp;
+    private String trackID;
 
     // Constructor
-    public Review(String userId, String avatarUri, String content, float rating) {
-        this.userId = userId;
-        this.avatarUri = avatarUri;
+    public Review(String userID, String content, float rating, Long timestamp, String trackID) {
+        this.userID = userID;
         this.content = content;
         this.rating = rating;
+        this.timestamp = timestamp;
+        this.trackID = trackID;
     }
 
     // Getters and Setters
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getAvatarUri() {
-        return avatarUri;
-    }
-
-    public void setAvatarUri(String avatarUri) {
-        this.avatarUri = avatarUri;
-    }
-
     public String getContent() {
         return content;
     }
@@ -49,16 +35,28 @@ public class Review {
         this.rating = rating;
     }
 
-    // toString() method for easy printing of Review object data
-    @NonNull
-    @Override
-    public String toString() {
-        return "Review{" +
-                "userId='" + userId + '\'' +
-                ", avatarUri='" + avatarUri + '\'' +
-                ", content='" + content + '\'' +
-                ", rating=" + rating +
-                '}';
+    public String getTrackID() {
+        return trackID;
+    }
+
+    public void setTrackID(String trackID) {
+        this.trackID = trackID;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 }
 
