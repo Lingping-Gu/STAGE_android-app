@@ -67,7 +67,6 @@ public class MusicReviewViewModel extends ViewModel {
                         return Long.compare(o2.getTimestamp(), o1.getTimestamp());
                     }
                 });
-
                 setReviews(currentReviews);
             }
 
