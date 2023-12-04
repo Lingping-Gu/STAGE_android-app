@@ -29,7 +29,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
         Review review = reviewList.get(position);
-        holder.userIdTextView.setText(review.getUserId());
+        holder.userIdTextView.setText(review.getUserID());
         holder.contentTextView.setText(review.getContent());
         holder.ratingTextView.setText(String.valueOf(review.getRating()));
         // If to use Glide or Picasso, load image here

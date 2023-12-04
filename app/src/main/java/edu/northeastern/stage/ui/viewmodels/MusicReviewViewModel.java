@@ -2,46 +2,132 @@ package edu.northeastern.stage.ui.viewmodels;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModel;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.model.Review;
+import edu.northeastern.stage.model.music.Track;
 
 public class MusicReviewViewModel extends ViewModel {
-    private MutableLiveData<List<Review>> reviews;
+    private MutableLiveData<List<Review>> reviews = new MutableLiveData<>();
+    private Track track;
+    private String userID;
 
-    public MusicReviewViewModel() {
-        reviews = new MutableLiveData<>();
+    // Method to fetch all reviews for track
+    public void fetchReviews() {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference rootRef = mDatabase.getReference();
+        DatabaseReference userRef = rootRef.child("users");
 
-        reviews.setValue(new ArrayList<>());
+        List<Review> currentReviews = new ArrayList<>();
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot user : snapshot.getChildren()) {
+                    DataSnapshot reviewsSnapshot = user.child("reviews");
+
+                    for (DataSnapshot reviewSnapshot : reviewsSnapshot.getChildren()) {
+                        if (reviewSnapshot.child("trackID").getValue().toString().equals(track.getId())) {
+                            Review review = new Review(userID,
+                                    reviewSnapshot.child("content").getValue().toString(),
+                                    Float.parseFloat(reviewSnapshot.child("rating").getValue().toString()),
+                                    Long.parseLong(reviewSnapshot.child("timestamp").getValue().toString()),
+                                    reviewSnapshot.child("trackID").getValue().toString());
+                            currentReviews.add(review);
+                        }
+                    }
+                }
+
+                // descending timestamp order
+                Collections.sort(currentReviews, new Comparator<Review>() {
+                    @Override
+                    public int compare(Review o1, Review o2) {
+                        return Long.compare(o2.getTimestamp(), o1.getTimestamp());
+                    }
+                });
+                setReviews(currentReviews);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    // Method to add review
+    public void addReview(Review review) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        if (getUserID() != null) {
+            // get reference to DB
+            DatabaseReference reference = mDatabase
+                    .getReference("users")
+                    .child(getUserID())
+                    .child("reviews");
+
+            // generate unique ID for review
+            DatabaseReference newReviewRef = reference.push();
+
+            if (track != null && review != null) {
+                newReviewRef.setValue(review, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                        if (error != null) {
+                            Log.d("NewReview", "New review created failed!");
+                        } else {
+                            Log.d("NewReview", "New review created!");
+                        }
+                    }
+                });
+            }
+        }
+        fetchReviews();
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public Track getTrack() {
+        return track;
+    }
+
+    public void setTrack(Track track) {
+        this.track = track;
     }
 
     public LiveData<List<Review>> getReviews() {
         return reviews;
     }
 
-    // Method to add a review, simulate fetching data
-    public void fetchReviews() {
-        // replace by actual data retrieval logic
-        List<Review> reviewList = new ArrayList<>();
-        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 3.2f));
-        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.8f));
-        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
-        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 5f));
-        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 3.9f));
-        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
-        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
-        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
-        reviewList.add(new Review("user123", "uri_to_avatar", "This album is great!", 4.5f));
-        reviewList.add(new Review("user123", "uri_to_avatar", "last", 4.5f));
-        reviewList.add(new Review("user123", "uri_to_avatar", "last+1", 4.5f));
-        // ... add more reviews
-        reviews.setValue(reviewList);
+    public void setReviews(List<Review> reviews) {
+        this.reviews.setValue(reviews);
     }
 
     // Method to calculate the overall rating
@@ -55,14 +141,5 @@ public class MusicReviewViewModel extends ViewModel {
             totalRating += review.getRating();
         }
         return totalRating / reviewList.size();
-    }
-
-    public void addReview(Review review) {
-        List<Review> currentReviews = reviews.getValue();
-        if (currentReviews == null) {
-            currentReviews = new ArrayList<>();
-        }
-        currentReviews.add(review);
-        reviews.setValue(currentReviews);
     }
 }

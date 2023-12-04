@@ -6,8 +6,13 @@ import android.util.Log;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,111 +26,88 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
 
+import edu.northeastern.stage.API.Spotify;
 import edu.northeastern.stage.model.Circle;
 import edu.northeastern.stage.R;
+import edu.northeastern.stage.model.music.Album;
+import edu.northeastern.stage.model.music.Artist;
+import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.explore.CircleView;
 
-public class ExploreViewModel extends AndroidViewModel {
+public class ExploreViewModel extends ViewModel {
 
-    private MutableLiveData<List<String>> recommendations = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
-    private MutableLiveData<String> selectedSong = new MutableLiveData<>();
-
+    private MutableLiveData<List<JsonObject>> recommendations = new MutableLiveData<>();
+    private String track;
+    private Spotify spotify = new Spotify();
     private static final Random rand = new Random();
     CircleView circleView;
     Map<Circle, String> circleTextMap = new HashMap<>();
     List<Circle> circles;
 
+    public LiveData<List<JsonObject>> performSearch(String query) {
+        MutableLiveData<List<JsonObject>> searchResults = new MutableLiveData<>();
 
-
-    public ExploreViewModel(Application application) {
-        super(application);
-//        sharedViewModel = new ViewModelProvider(this).get(edu.northeastern.stage.ui.viewmodels.Explore_Review_SharedViewModel.class);
+        // change numResults
+        CompletableFuture<ArrayList<JsonObject>> trackSearchFuture = spotify.trackSearch(query, 10);
+        trackSearchFuture.thenAccept(searchResult -> {
+            searchResults.postValue(searchResult);
+        }).exceptionally(e -> {
+            Log.e("TrackSearchError", e.getMessage());
+            return null;
+        });
+        return searchResults;
     }
 
-    public LiveData<List<String>> getRecommendations() {
+    // method to create Track object based on the selectedTrack JsonObject from Spotify API
+    public Track createTrack(JsonObject selectedTrack) {
+        // album variables
+        String albumURL = selectedTrack.get("album").getAsJsonObject().get("external_urls").getAsJsonObject().get("spotify").getAsString();
+        String albumID = selectedTrack.get("album").getAsJsonObject().get("id").getAsString();
+        String albumImageURL = selectedTrack.get("album").getAsJsonObject().getAsJsonArray("images").get(0).getAsJsonObject().get("url").getAsString();
+        String albumName = selectedTrack.get("album").getAsJsonObject().get("name").getAsString();
+        String albumReleaseDate = selectedTrack.get("album").getAsJsonObject().get("release_date").getAsString();
+        String albumReleaseDatePrecision = selectedTrack.get("album").getAsJsonObject().get("release_date_precision").getAsString();
+        JsonArray albumArtistsJsonArray = selectedTrack.get("album").getAsJsonObject().getAsJsonArray("artists");
+        ArrayList<Artist> albumArtists = new ArrayList<Artist>();
+        for(JsonElement artist : albumArtistsJsonArray) {
+            Artist artistToAdd = new Artist(artist.getAsJsonObject().get("external_urls").getAsJsonObject().get("spotify").getAsString(),
+                    artist.getAsJsonObject().get("id").getAsString(),artist.getAsJsonObject().get("name").getAsString());
+            albumArtists.add(artistToAdd);
+        }
+
+        // track variables
+        Album album = new Album(albumURL, albumID, albumImageURL, albumName, albumReleaseDate, albumReleaseDatePrecision, albumArtists);
+        JsonArray trackArtistsJsonArray = selectedTrack.getAsJsonArray("artists");
+        ArrayList<Artist> trackArtists = new ArrayList<Artist>();
+        for(JsonElement artist : trackArtistsJsonArray) {
+            Artist artistToAdd = new Artist(artist.getAsJsonObject().get("external_urls").getAsJsonObject().get("spotify").getAsString(),
+                    artist.getAsJsonObject().get("id").getAsString(),artist.getAsJsonObject().get("name").getAsString());
+            trackArtists.add(artistToAdd);
+        }
+        int durationMs = selectedTrack.get("duration_ms").getAsInt();
+        String spotifyURL = selectedTrack.get("external_urls").getAsJsonObject().get("spotify").getAsString();
+        String trackID = selectedTrack.get("id").getAsString();
+        String trackName = selectedTrack.get("name").getAsString();
+        int popularity = selectedTrack.get("popularity").getAsInt();
+        return new Track(album,trackArtists,durationMs,spotifyURL,trackID,trackName,popularity);
+    }
+
+    public String getTrack() {
+        return track;
+    }
+
+    public void setTrack(String track) {
+        this.track = track;
+
+    }
+
+    public MutableLiveData<List<JsonObject>> getRecommendations() {
         return recommendations;
     }
 
-    public LiveData<Boolean> getIsLoading() {
-        return isLoading;
-    }
-
-    public void searchTextChanged(String text) {
-        if (text.isEmpty()) {
-            recommendations.setValue(new ArrayList<>());
-        } else {
-            Log.d("Explore View Model", "when searchTextChanged");
-            makeDeezerReq(text);
-        }
-    }
-
-    public void songSelected(String song) {
-        selectedSong.setValue(song);
-//        sharedViewModel.setSong(song);
-    }
-
-    public LiveData<String> getSelectedSong() {
-        return selectedSong;
-    }
-
-    public void makeDeezerReq(String inputArtistName) {
-        Log.d("Explore View Model", "makeDeezerReq");
-
-        String deezerApiKey = getApplication().getString(R.string.DEEZER_API);
-        isLoading.setValue(true);
-
-        new Thread(() -> {
-            try {
-                URL url = new URL(getApplication().getString(R.string.DEEZER_BASE_URL) + inputArtistName);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setRequestProperty("X-RapidAPI-Key", deezerApiKey);
-                urlConnection.setRequestProperty("X-RapidAPI-Host", "deezerdevs-deezer.p.rapidapi.com");
-                urlConnection.setDoInput(true);
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                String jsonString = convertStreamToString(inputStream);
-                parseJsonAndUpdate(jsonString);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                recommendations.postValue(new ArrayList<>());
-            } finally {
-                isLoading.postValue(false);
-            }
-        }).start();
-    }
-
-
-    private void parseJsonAndUpdate(String jsonString) {
-        try {
-            Log.d("Explore View Model", "parseJsonAndUpdate");
-
-            JSONObject response = new JSONObject(jsonString);
-            JSONArray data = response.getJSONArray("data");
-            List<String> tempRecs = new ArrayList<>();
-            for (int i = 0; i < data.length(); i++) {
-                JSONObject currentResult = data.getJSONObject(i);
-                JSONObject artist = currentResult.getJSONObject("artist");
-                String trackName = currentResult.getString("title");
-                String artistName = artist.getString("name");
-                tempRecs.add(trackName + " by " + artistName);
-            }
-            recommendations.postValue(tempRecs);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next().replace(",", ",\n") : "";
-    }
-
-
+    // TODO: maybe make circles a separate viewmodel
     public void setCircles(CircleView circleView) {
         // Process the circles as needed in the ViewModel
         this.circleView = circleView;

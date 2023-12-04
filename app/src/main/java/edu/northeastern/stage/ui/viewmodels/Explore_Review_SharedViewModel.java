@@ -6,26 +6,36 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import edu.northeastern.stage.model.music.Song;
+import edu.northeastern.stage.model.music.Track;
 
 public class Explore_Review_SharedViewModel extends ViewModel {
+
     private MutableLiveData<Song> song = new MutableLiveData<>();
     private MutableLiveData<String> trackId = new MutableLiveData<>();
-
 
     public Explore_Review_SharedViewModel() {
         Log.d("Explore Review SharedViewModel", "initialized");
     }
 
-    public LiveData<Song> getLiveDataSong(){
-        Log.d("Explore Review SharedViewModel", "in getLiveDataSong song -> " + song);
-        return song;
+
+    public Track getSong() {
+        return s;
+    }
+
+    public LiveData<Track> getLiveDataSong(){
+        return track;
     }
 
     public void setSong(String title) {
-        Song s = new Song(title);
-        song.setValue(s);
-        Log.d("Explore Review SharedViewModel", "song.getValue() in shared model set song --> " + song.getValue().getTitle());
+        Log.d("Explore Review SharedViewModel", "in set song");
+//        songString = new Song(title);
+        s = new Track(title);
+        track.setValue(s);
+//        song.postValue(s);
+        s.getName();
+        Log.d("Explore Review SharedViewModel", "s.getTitle() in shared model set song --> " + s.getName());
+        Log.d("Explore Review SharedViewModel", "song.getValue() in shared model set song --> " + track.getValue());
+
     }
 
     public LiveData<String> getTrackId(){

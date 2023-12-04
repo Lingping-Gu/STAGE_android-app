@@ -71,6 +71,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivAlbumCover" />
+        app:layout_constraintTop_toBottomOf="@+id/ivAlbumCover"
+        android:dropDownHeight="wrap_content"
+        android:completionThreshold="1"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

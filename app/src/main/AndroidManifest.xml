@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <!-- need to implement redirect URI for Spotify API -->
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -23,9 +25,16 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.authentication.Login"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".ui.authentication.Register"
+            android:exported="false">
         </activity>
         <activity
             android:name=".ui.editProfile.EditProfile"
@@ -48,5 +57,4 @@
             android:exported="false">
         </activity>
     </application>
-
 </manifest>
