@@ -61,6 +61,7 @@ public class Register extends AppCompatActivity {
         if (user != null) {
             // change intent
             Intent intent = new Intent(Register.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
 
@@ -163,6 +164,7 @@ public class Register extends AppCompatActivity {
 
                                 // change intent
                                 Intent intent = new Intent(Register.this, MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                             } else {
                                 // register fail, check which exception
