@@ -21,6 +21,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import edu.northeastern.stage.model.Post;
@@ -57,6 +59,15 @@ public class MusicReviewViewModel extends ViewModel {
                         }
                     }
                 }
+
+                // descending timestamp order
+                Collections.sort(currentReviews, new Comparator<Review>() {
+                    @Override
+                    public int compare(Review o1, Review o2) {
+                        return Long.compare(o2.getTimestamp(), o1.getTimestamp());
+                    }
+                });
+
                 setReviews(currentReviews);
             }
 
