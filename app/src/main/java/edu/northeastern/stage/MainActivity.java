@@ -119,7 +119,11 @@ public class MainActivity extends AppCompatActivity {
                 .getReference("users")
                 .child(UID);
 
-        reference.setValue(user, new DatabaseReference.CompletionListener() {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("lastLocation",new Location(100.0,100.0)); // need to edit this
+        updates.put("lastLoggedInTimeStamp",System.currentTimeMillis());
+
+        reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
                 if (error == null) {

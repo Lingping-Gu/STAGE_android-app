@@ -71,6 +71,7 @@ public class ExploreFragment extends Fragment {
         buttonToMusicReview.setOnClickListener(v -> {
             // Use the NavController to navigate to the MusicReviewFragment
             if(!actv.getText().toString().isEmpty()) {
+                actv.setText("");
                 NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
                 navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
             }

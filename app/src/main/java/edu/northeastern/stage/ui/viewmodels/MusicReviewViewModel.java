@@ -40,25 +40,31 @@ public class MusicReviewViewModel extends ViewModel {
 
         List<Review> currentReviews = new ArrayList<>();
 
-        Query reviewQuery = userRef.orderByChild("reviews/trackID").equalTo(track.getId());
-        reviewQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
-                    Review review = new Review(reviewSnapshot.child("userID").getValue().toString(),
-                            reviewSnapshot.child("content").getValue().toString(),
-                            Float.parseFloat(reviewSnapshot.child("rating").getValue().toString()),
-                            Long.parseLong(reviewSnapshot.child("timestamp").getValue().toString()),
-                            reviewSnapshot.child("trackID").getValue().toString());
-                    currentReviews.add(review);
+                for(DataSnapshot user : snapshot.getChildren()) {
+                    DataSnapshot reviewsSnapshot = user.child("reviews");
+
+                    for (DataSnapshot reviewSnapshot : reviewsSnapshot.getChildren()) {
+                        if (reviewSnapshot.child("trackID").getValue().toString().equals(track.getId())) {
+                            Review review = new Review(userID,
+                                    reviewSnapshot.child("content").getValue().toString(),
+                                    Float.parseFloat(reviewSnapshot.child("rating").getValue().toString()),
+                                    Long.parseLong(reviewSnapshot.child("timestamp").getValue().toString()),
+                                    reviewSnapshot.child("trackID").getValue().toString());
+                            currentReviews.add(review);
+                        }
+                    }
                 }
+                setReviews(currentReviews);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
-        setReviews(currentReviews);
     }
 
     // Method to add review
@@ -79,14 +85,15 @@ public class MusicReviewViewModel extends ViewModel {
                     @Override
                     public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
                         if (error != null) {
-                            Log.d("NewReview", "New review created!");
-                        } else {
                             Log.d("NewReview", "New review created failed!");
+                        } else {
+                            Log.d("NewReview", "New review created!");
                         }
                     }
                 });
             }
         }
+        fetchReviews();
     }
 
     public String getUserID() {
