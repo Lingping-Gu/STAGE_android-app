@@ -9,14 +9,14 @@ import androidx.lifecycle.ViewModel;
 import edu.northeastern.stage.model.music.Track;
 
 public class Explore_Review_SharedViewModel extends ViewModel {
-    private MutableLiveData<Track> track = new MutableLiveData<>();
-    private MutableLiveData<String> selectedSong = new MutableLiveData<>();
 
-    private Track s;
+    private MutableLiveData<Song> song = new MutableLiveData<>();
+    private MutableLiveData<String> trackId = new MutableLiveData<>();
 
     public Explore_Review_SharedViewModel() {
         Log.d("Explore Review SharedViewModel", "initialized");
     }
+
 
     public Track getSong() {
         return s;
@@ -38,13 +38,11 @@ public class Explore_Review_SharedViewModel extends ViewModel {
 
     }
 
-    public void songSelected(String songTitle) {
-        selectedSong.setValue(songTitle);
-//        s = new Song(songTitle);
-//        sharedViewModel.setSong(song);
+    public LiveData<String> getTrackId(){
+        return trackId;
     }
 
-    public LiveData<String> getSelectedSong() {
-        return selectedSong;
+    public void setTrackId(String id){
+        trackId.setValue(id);
     }
 }
