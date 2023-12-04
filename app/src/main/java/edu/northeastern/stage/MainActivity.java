@@ -2,6 +2,7 @@ package edu.northeastern.stage;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -10,6 +11,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -19,10 +22,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.northeastern.stage.databinding.ActivityMainBinding;
+import edu.northeastern.stage.model.Location;
+import edu.northeastern.stage.ui.authentication.Login;
+import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private boolean isUserInteraction = false;
+    private SharedDataViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
