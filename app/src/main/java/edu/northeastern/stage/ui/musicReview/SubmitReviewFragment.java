@@ -4,6 +4,9 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,10 +70,17 @@ public class SubmitReviewFragment extends Fragment {
         } else {
             Review newReview = new Review(userID,content,rating,timestamp,trackID);
             mViewModel.addReview(newReview);
+            Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
             // Clear the fields after submission
             reviewContentEditText.setText("");
             reviewRatingBar.setRating(0);
+
+            // Remove submit review page from the back stack then navigate back to music review page
+            NavOptions navOptions = new NavOptions.Builder()
+                    .setPopUpTo(R.id.navigation_music_review, true)
+                    .build();
+            NavController navController = NavHostFragment.findNavController(SubmitReviewFragment.this);
+            navController.navigate(R.id.action_navigation_submit_review_to_navigation_music_review, null, navOptions);
         }
-        // TODO: intent to MusicReview Page
     }
 }
