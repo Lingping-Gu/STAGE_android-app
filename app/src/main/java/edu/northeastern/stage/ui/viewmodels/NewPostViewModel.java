@@ -35,7 +35,7 @@ public class NewPostViewModel extends ViewModel {
     private Track track;
 
     // Method to handle post submission logic
-    public void createPost(String postContent) {
+    public void createPost(String postContent, String visibilityState) {
         // get instance of Firebase DB
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         if (getUserID() != null) {
@@ -55,6 +55,7 @@ public class NewPostViewModel extends ViewModel {
                 String content = postContent;
                 Long timestamp = System.currentTimeMillis();
                 String imageURL = "";
+                String spotifyURL = track.getSpotifyUrl();
 
                 // get all artists
                 if (track.getArtists().size() > 0) {
@@ -71,8 +72,9 @@ public class NewPostViewModel extends ViewModel {
                     }
                 }
 
+                // TODO: add visibility state option
                 // Set Post object
-                Post post = new Post(trackName, trackID, artistName, content, timestamp, imageURL);
+                Post post = new Post(getUserID(),trackName, trackID, artistName, content, timestamp, imageURL, visibilityState, spotifyURL);
                 newPostRef.setValue(post, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {

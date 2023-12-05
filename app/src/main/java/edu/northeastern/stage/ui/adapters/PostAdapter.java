@@ -9,18 +9,23 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.northeastern.stage.API.Spotify;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.ui.profile.ProfileFragment;
+
+// TODO: check if I'm looking at Lingping's profile and the third post out of 5 posts
+//  is for herself only, how the recycler view looks
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
     private Context context;
@@ -28,18 +33,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     private String viewType;
     private String currentUserId;
     private String postOwnerId;
+    private Spotify spotify = new Spotify();
 
-    public PostAdapter(Context context, List<Post> postList) {
+    public PostAdapter(Context context, List<Post> postList, String currentUserId) {
         this.context = context;
         this.postList = postList;
-
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            currentUserId = currentUser.getUid();
-        } else {
-            currentUserId = "TEST";
-        }
+        this.currentUserId = currentUserId;
     }
 
     @Override
@@ -49,29 +48,33 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     @Override
-
     public void onBindViewHolder(PostViewHolder holder, int position) {
         Post post = postList.get(position);
 
-        postOwnerId = post.getUser();
-        if (isOwner()) viewType = "owner";
-        else if (isFriend()) viewType = "friend";
-        else viewType = "stranger";
+        postOwnerId = post.getOwnerID();
 
-        // set post Visibility
+        if (isOwner()) {
+            viewType = "owner";
+        } else if (isFriend()) {
+            viewType = "friend";
+        } else {
+            viewType = "stranger";
+        }
+
+        // set post visibility
         // friend
-        if ("friend".equals(viewType)) {
+        if (viewType.equals("friend")) {
             String visibilityState = post.getVisibilityState();
-            if ("private".equals(visibilityState)) {
+            if (viewType.equals("private")) {
                 holder.itemView.setVisibility(View.GONE);
             } else {
                 holder.itemView.setVisibility(View.VISIBLE);
             }
         }
         // stranger
-        if ("stranger".equals(viewType)) {
+        if (viewType.equals("stranger")) {
             String visibilityState = post.getVisibilityState();
-            if (!"public".equals(visibilityState)) {
+            if (!viewType.equals("public")) {
                 holder.itemView.setVisibility(View.GONE);
             } else {
                 holder.itemView.setVisibility(View.VISIBLE);
@@ -81,9 +84,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         // set Visibility State Icon
         if (viewType == "owner") {
             switch (post.getVisibilityState()) {
-                case "public":
-                    holder.visibleState.setImageResource(R.drawable.profile_public);
-                    break;
                 case "friends":
                     holder.visibleState.setImageResource(R.drawable.profile_friends);
                     break;
@@ -96,10 +96,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         }
 
         // set post content
-        holder.tvPostContent.setText(post.getPostContent());
+        holder.tvPostContent.setText(post.getContent());
 
         //open music link
-        String url = postList.get(position).getMusicLink();
+        String url = post.getSpotifyURL();
         holder.songCard.setOnClickListener(v -> {
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
@@ -109,12 +109,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         //display artist and track name
         holder.tvTrackName.setText(post.getTrackName());
         holder.tvArtistName.setText(post.getArtistName());
+
         //display song image
         Picasso.get()
-                .load(post.getMusicImageUrl())
+                .load(post.getImageURL())
                 .error(R.drawable.profile_recent_listened_error)
                 .into(holder.tvMusicImage);
 
+
+
+        // TODO: liked status
         // Set the like status on the ivLike ImageView
         holder.ivLike.setOnClickListener(v -> {
             ArrayList<String> likes = post.getLikes();
@@ -134,15 +138,24 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 .error(R.drawable.default_pfp)
                 .into(holder.ivUserAvatar);
 
+        // TODO: think about how to navigate to certain profile
         // When click on the user avatar in the post, it goes to the profile of this user.
         holder.ivUserAvatar.setOnClickListener(v -> {
             Intent intent = new Intent(context, ProfileFragment.class);
             context.startActivity(intent);
-            intent.putExtra("PROFILE_OWNER_ID", post.getUser());
+            intent.putExtra("PROFILE_OWNER_ID", post.getOwnerID());
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             v.getContext().startActivity(i);
         });
+    }
+
+    private boolean isLiked() {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(UID);
     }
 
     private boolean isOwner() {
