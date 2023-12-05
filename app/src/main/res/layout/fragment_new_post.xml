@@ -6,12 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- ImageView for album cover -->
-
-    <!-- AutoCompleteTextView for song -->
-
-    <!-- Text input bar for post content -->
-
     <ImageView
         android:id="@+id/ivAlbumCover"
         android:layout_width="200dp"
@@ -74,5 +68,39 @@
         app:layout_constraintTop_toBottomOf="@+id/ivAlbumCover"
         android:dropDownHeight="wrap_content"
         android:completionThreshold="1"/>
+
+    <RadioGroup
+        android:id="@+id/rgPostVisibility"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etPostContent"
+        app:layout_constraintBottom_toTopOf="@+id/btnSubmitPost">
+
+        <RadioButton
+            android:id="@+id/rbOnlyMe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Private" />
+
+        <RadioButton
+            android:id="@+id/rbFriends"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Only Friends" />
+
+        <RadioButton
+            android:id="@+id/rbEveryone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Everyone" />
+    </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
