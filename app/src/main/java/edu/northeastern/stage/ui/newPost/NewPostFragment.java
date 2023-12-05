@@ -7,12 +7,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -20,8 +24,10 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
+import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
+import edu.northeastern.stage.ui.musicReview.SubmitReviewFragment;
 import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
@@ -51,7 +57,22 @@ public class NewPostFragment extends Fragment {
         // Set up the interactions for the new post elements
         binding.btnSubmitPost.setOnClickListener(v -> {
             String postContent = binding.etPostContent.getText().toString();
-            viewModel.createPost(selectedTrack, postContent);
+            if (postContent.equalsIgnoreCase("")) {
+                Toast.makeText(getActivity(), "Please enter post content.", Toast.LENGTH_SHORT).show();
+            } else if (selectedTrack == null) {
+                Toast.makeText(getActivity(), "Please search for a song to post.", Toast.LENGTH_SHORT).show();
+            } else {
+                viewModel.createPost(selectedTrack, postContent);
+                Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
+
+                NavOptions navOptions = new NavOptions.Builder()
+                        .setPopUpTo(R.id.navigation_new_post, true)
+                        .build();
+
+                // Navigate using the configured NavOptions
+                NavController navController = NavHostFragment.findNavController(NewPostFragment.this);
+                navController.navigate(R.id.action_navigation_new_post_to_navigation_home, null, navOptions);
+            }
         });
 
         // Setup AutoCompleteTextView for song search
