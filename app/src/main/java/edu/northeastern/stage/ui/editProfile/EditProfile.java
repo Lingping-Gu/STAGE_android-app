@@ -1,47 +1,54 @@
 package edu.northeastern.stage.ui.editProfile;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.List;
-import edu.northeastern.stage.R;
-import edu.northeastern.stage.ui.adapters.TagsAdapter_EditProfile;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import edu.northeastern.stage.R;
+import edu.northeastern.stage.ui.adapters.ImageAdapter;
+import edu.northeastern.stage.ui.adapters.TagsAdapter_EditProfile;
+import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 public class EditProfile extends AppCompatActivity {
-    private EditText editUsername;
     private EditText editDescription;
     private AutoCompleteTextView editTags;
     private Button buttonSave;
-    private ImageView profilePicture;
-    private List<String> selectedTags = new ArrayList<>();
+    private Spinner profilePicSpinner;
+    private ImageView profilePic;
     private TagsAdapter_EditProfile tagsAdapter;
     private RecyclerView tagsRecyclerView;
-    public static final String EXTRA_USERNAME = "extra_username";
-    public static final String EXTRA_DESCRIPTION = "extra_description";
-    public static final String EXTRA_TAGS = "extra_tags";
-    public static final int REQUEST_IMAGE_GET = 1;
-
-    public static void start(Context context) {
-        Intent intent = new Intent(context, EditProfile.class);
-        context.startActivity(intent);
-    }
+    private SharedDataViewModel sharedDataViewModel;
+    private String currentUserID;
+    private List<String> selectedTags = new ArrayList<>();
+    private Integer profilePictureResource;
+    private String description;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,48 +61,58 @@ public class EditProfile extends AppCompatActivity {
             decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
 
-        editUsername = findViewById(R.id.editUsername);
+        // get shared view model
+        sharedDataViewModel = new ViewModelProvider(this).get(SharedDataViewModel.class);
+
+        // get current user ID
+        sharedDataViewModel.getUserID().observe(this, userID -> {
+            if (userID != null) {
+                currentUserID = userID;
+            }
+        });
+
+        // find all views needed and set adapters for recycler views
         editDescription = findViewById(R.id.editDescription);
         editTags = findViewById(R.id.editTags);
         buttonSave = findViewById(R.id.buttonSaveProfile);
-        profilePicture = findViewById(R.id.profilePicture);
+        profilePic = findViewById(R.id.profilePicture);
+        profilePicSpinner = findViewById(R.id.editProfilePicSpinner);
+        tagsRecyclerView = findViewById(R.id.tagsRecyclerView);
+        tagsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        tagsAdapter = new TagsAdapter_EditProfile(this, selectedTags);
+        tagsRecyclerView.setAdapter(tagsAdapter);
 
-        profilePicture.setOnClickListener(new View.OnClickListener() {
+        // set spinner to images
+        Integer[] images = {R.drawable.anger, R.drawable.sad, R.drawable.sob, R.drawable.shock, R.drawable.blush};
+
+        ImageAdapter adapter = new ImageAdapter(this, images);
+        profilePicSpinner.setAdapter(adapter);
+
+        // update profile picture resource
+        profilePicSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(intent, REQUEST_IMAGE_GET);
-                }
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                profilePictureResource = images[position];
+                profilePic.setImageResource(profilePictureResource);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
 
-        editTags.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selectedTag = "#" + parent.getItemAtPosition(position);
-                addTag(selectedTag);
-            }
-        });
+        // get selected tags, profile picture, description from database
+        retrieveInitialData();
 
+        // edit tags on text change listener to submit tags to tags recycler view
         editTags.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Detect if backspace was pressed and a item_tag_edit.xml is being deleted
-                if (before > count && !selectedTags.isEmpty()) {
-                    String text = s.toString();
-                    if (text.endsWith(" ")) {
-                        addTag("#" + text.trim());
-                        editTags.setText("");
-                    }
-                }
             }
-
             @Override
             public void afterTextChanged(Editable s) {
                 // Logic for Enter key to add item_tag_edit.xml
@@ -109,28 +126,15 @@ public class EditProfile extends AppCompatActivity {
             }
         });
 
-        for (String tag : selectedTags) {
-            addTag(tag);
-        }
-        tagsAdapter = new TagsAdapter_EditProfile(this, selectedTags);
-
+        // button save on click set
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent data = new Intent();
-                data.putExtra(EXTRA_USERNAME, editUsername.getText().toString());
-                data.putExtra(EXTRA_DESCRIPTION, editDescription.getText().toString());
-                data.putExtra(EXTRA_TAGS, editTags.getText().toString());
-                setResult(RESULT_OK, data);
-                finish();
+                updateDatabase();
             }
         });
 
-        tagsRecyclerView = findViewById(R.id.tagsRecyclerView);
-        tagsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        tagsAdapter = new TagsAdapter_EditProfile(this, selectedTags);
-        tagsRecyclerView.setAdapter(tagsAdapter);
-
+        // when tag is selected, remove it
         tagsAdapter.setOnItemClickListener(new TagsAdapter_EditProfile.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -140,6 +144,10 @@ public class EditProfile extends AppCompatActivity {
 
     }
 
+    /**
+     * Helper method to add tag to selected tags
+     * @param tag - tag to add as String
+     */
     private void addTag(String tag) {
         if (!selectedTags.contains(tag)) {
             selectedTags.add(tag);
@@ -147,6 +155,10 @@ public class EditProfile extends AppCompatActivity {
         }
     }
 
+    /**
+     * Helper method to remove tag from selected tags
+     * @param tag - tag to add as String
+     */
     private void removeTag(String tag) {
         int position = selectedTags.indexOf(tag);
         if (position >= 0) {
@@ -155,16 +167,68 @@ public class EditProfile extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    /**
+     * Helper method to retrieve all initial data required from the database about the user
+     */
+    private void retrieveInitialData() {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference rootRef = mDatabase.getReference();
+        DatabaseReference userRef = rootRef.child("users").child(currentUserID);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()) {
+                    if(snapshot.hasChild("imageResource")) {
+                        profilePictureResource = snapshot.child("imageResource").getValue(Integer.class);
+                    }
+                    if(snapshot.hasChild("description")) {
+                        description = snapshot.child("description").getValue(String.class);
+                    }
+                    if(snapshot.hasChild("tags")) {
+                        for (DataSnapshot tagsSnapshot : snapshot.child("tags").getChildren()) {
+                            String tag = tagsSnapshot.getValue(String.class);
+                            selectedTags.add(tag);
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
 
-        if (requestCode == REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
-            Uri fullPhotoUri = data.getData();
-            // Use the URI to load the image
-            profilePicture.setImageURI(fullPhotoUri);
-            // TODO: upload to the database
-        }
+        // initially set profile picture + description to be what exists in the database
+        editDescription.setText(description);
+        profilePic.setImageResource(profilePictureResource);
+    }
+
+    /**
+     * Helper method to update database with updated fields for profile page
+     */
+    private void updateDatabase() {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(currentUserID);
+
+        Map<String, Object> updates = new HashMap<>();
+
+        description = editDescription.getText().toString();
+
+        updates.put("imageResource",profilePictureResource);
+        updates.put("description",description);
+        updates.put("tags",selectedTags);
+
+        reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if (error == null) {
+                    Log.d("UpdateUser", "User update successful");
+                } else {
+                    Log.e("UpdateUser","Update user failed: " + error.getMessage());
+                }
+            }
+        });
     }
 
 }

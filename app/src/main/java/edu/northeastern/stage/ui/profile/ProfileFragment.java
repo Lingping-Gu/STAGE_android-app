@@ -29,6 +29,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -44,6 +46,8 @@ public class ProfileFragment extends Fragment {
     private PostAdapter postsAdapter;
     private RecentListenedAdapter recentListenedAdapter;
     private static final int REQUEST_EDIT_PROFILE = 1;
+    private String currentUserId;
+    private String profileOwnerId; // TODO: how to implement looking up other users
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -55,6 +59,16 @@ public class ProfileFragment extends Fragment {
     }
 
     private void initUI() {
+        // Get Ids from database
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            currentUserId = currentUser.getUid();
+        } else {
+            currentUserId = "TEST";
+        }
+        if (profileOwnerId != null) profileOwnerId = currentUserId;
+
         //set view
         viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
@@ -63,8 +77,8 @@ public class ProfileFragment extends Fragment {
         binding.tags.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.tags.setAdapter(tagsAdapter);
 
-        // Set up Posts Adapter
-        postsAdapter = new PostAdapter(new ArrayList<>());
+        // set posts
+        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>());
         binding.activities.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.activities.setAdapter(postsAdapter);
 
@@ -73,16 +87,27 @@ public class ProfileFragment extends Fragment {
         binding.recentListened.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.recentListened.setAdapter(recentListenedAdapter);
 
-        // Edit Button
-        binding.editProfileButton.setVisibility(checkIfOwner() ? View.VISIBLE : View.GONE);
-        binding.editProfileButton.setOnClickListener(v -> launchEditProfile());
-        Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.profile_edit).mutate();
-        drawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.profile_edit_button_tint), PorterDuff.Mode.SRC_IN);
-        binding.editProfileButton.setBackground(drawable);
+        // Set up Edit Profile Button or Follow Button
+        if (isOwner()) {
+            // User is viewing their own profile, show Edit Profile Button
+            binding.editProfileButton.setVisibility(View.VISIBLE);
+            binding.followButton.setVisibility(View.GONE);
 
-        // If the fragment is not for the profile owner, the edit button should not be shown
-        if (!checkIfOwner()) {
+            binding.editProfileButton.setOnClickListener(v -> launchEditProfile());
+            Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.profile_edit).mutate();
+            drawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.profile_edit_button_tint), PorterDuff.Mode.SRC_IN);
+            binding.editProfileButton.setBackground(drawable);
+        } else {
+            // User is viewing someone else's profile, show Follow Button
+            binding.followButton.setVisibility(View.VISIBLE);
             binding.editProfileButton.setVisibility(View.GONE);
+            binding.followButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FirebaseExample firebaseExample = new FirebaseExample();
+                    firebaseExample.follow(currentUserId, profileOwnerId);
+                }
+            });
         }
     }
 
@@ -135,13 +160,11 @@ public class ProfileFragment extends Fragment {
 
     }
 
-    private boolean checkIfOwner() {
-        // TODO: use firebase function to finish the userId check.
-        return true;
+    private boolean isOwner() {
+        return currentUserId.equals(profileOwnerId);
     }
 
     private void launchEditProfile() {
-        // TODO: Refactor for ActivityResultLauncher if using
         Intent intent = new Intent(getActivity(), EditProfile.class);
         startActivityForResult(intent, REQUEST_EDIT_PROFILE);
     }
