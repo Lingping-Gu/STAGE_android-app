@@ -32,6 +32,8 @@ public class CircleView extends View {
     private float lastTouchY;
     private boolean isDragging = false;
     Integer countDraw = 0;
+    private float[] velocities;
+
     Map<Circle, String> circleTextMap = new HashMap<>();
 
 
@@ -76,6 +78,7 @@ public class CircleView extends View {
         paint.setColor(Color.WHITE);
         paint.setStrokeWidth(2);
         paint.setStyle(Paint.Style.STROKE);
+
     }
 
     @Override
@@ -115,6 +118,10 @@ public class CircleView extends View {
             }
         }
 
+        velocities = new float[circles.length * 2]; // x and y velocities for each circle
+        // Update circle positions based on velocities
+        updateCirclePositions(canvas);
+
         canvas.save();
         canvas.concat(matrix);
         canvas.restore();
@@ -131,6 +138,81 @@ public class CircleView extends View {
             invalidate();
         }
 //        postInvalidate();
+    }
+
+    private void updateCirclePositions(Canvas canvas) {
+
+        // if moving while going right through each other is fine, then these lines of code
+//        for(Circle c : circles){
+//            //Move first
+//            c.move(canvas);
+//            //Draw them
+//            canvas.drawCircle(c.getX(), c.getY(), c.getRadius(), c.paint);
+//        }
+//        invalidate();
+
+        //moving and also bouncing off of each other
+        for (int i = 0; i < circles.length; i++) {
+            Circle c1 = circles[i];
+            //Move first
+            c1.move(canvas);
+            //Draw them
+//            canvas.drawCircle(c1.getX(), c1.getY(), c1.getRadius(), c1.paint);
+
+            // Update circle position based on velocity
+//            c1.setX(c1.getX() + velocities[i * 2]);
+//            c1.setY(c1.getY() + velocities[i * 2 + 1]);
+//
+//            // Check for collisions with other circles
+//            for (int j = i + 1; j < circles.length; j++) {
+//                Circle c2 = circles[j];
+//                handleCollision(c1, c2, i, j, canvas);
+//            }
+        }
+        invalidate();
+    }
+
+    private void handleCollision(Circle c1, Circle c2, int index1, int index2, Canvas canvas) {
+        float dx = c2.getX() - c1.getX();
+        float dy = c2.getY() - c1.getY();
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < c1.getRadius() + c2.getRadius()) {
+            // Circles are colliding, adjust their velocities for bouncing effect
+            float angle = (float) Math.atan2(dy, dx);
+            float cosAngle = (float) Math.cos(angle);
+            float sinAngle = (float) Math.sin(angle);
+
+            // Calculate new velocities for both circles
+            float v1n = velocities[index1 * 2] * cosAngle + velocities[index1 * 2 + 1] * sinAngle;
+            float v1t = -velocities[index1 * 2] * sinAngle + velocities[index1 * 2 + 1] * cosAngle;
+
+            float v2n = velocities[index2 * 2] * cosAngle + velocities[index2 * 2 + 1] * sinAngle;
+            float v2t = -velocities[index2 * 2] * sinAngle + velocities[index2 * 2 + 1] * cosAngle;
+
+            // Swap normal velocities (bounce off each other)
+            velocities[index1 * 2] = v2n * cosAngle - v1t * sinAngle;
+            velocities[index1 * 2 + 1] = v2n * sinAngle + v1t * cosAngle;
+
+            velocities[index2 * 2] = v1n * cosAngle - v2t * sinAngle;
+            velocities[index2 * 2 + 1] = v1n * sinAngle + v2t * cosAngle;
+
+            // Move circles slightly away to avoid continuous collisions
+            float overlap = (c1.getRadius() + c2.getRadius() - distance) / 2;
+            c1.setX(c1.getX() - overlap * cosAngle);
+            c1.setY(c1.getY() - overlap * sinAngle);
+            //Move again
+//            c1.move(canvas);
+//            //Draw again
+//            canvas.drawCircle(c1.getX(), c1.getY(), c1.getRadius(), c1.paint);
+
+            c2.setX(c2.getX() + overlap * cosAngle);
+            c2.setY(c2.getY() + overlap * sinAngle);
+//            //Move again
+//            c2.move(canvas);
+//            //Draw again
+//            canvas.drawCircle(c2.getX(), c2.getY(), c2.getRadius(), c2.paint);
+        }
     }
 
     public void setCircles(List<Circle> circles, HashMap<Circle, String> circleTextMap) {

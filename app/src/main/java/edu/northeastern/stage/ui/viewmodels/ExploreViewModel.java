@@ -100,6 +100,7 @@ public class ExploreViewModel extends ViewModel {
 
     public void setTrack(String track) {
         this.track = track;
+
     }
 
     public MutableLiveData<List<JsonObject>> getRecommendations() {
@@ -119,7 +120,7 @@ public class ExploreViewModel extends ViewModel {
         int maxAttempts = 100000; // Limit the number of attempts to avoid infinite loop
         int MIN_DISTANCE_THRESHOLD = 10;
 
-        while (circles.size() < 100 && attempts < maxAttempts) {
+        while (circles.size() < 20 && attempts < maxAttempts) {
             float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
             float y = rand.nextFloat() * 2000 - 1000;
             float radius = rand.nextFloat() * 200 + 100;
