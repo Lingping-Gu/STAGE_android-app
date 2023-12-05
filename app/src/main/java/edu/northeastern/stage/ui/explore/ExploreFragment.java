@@ -48,6 +48,8 @@ public class ExploreFragment extends Fragment {
     private SeekBar geoSlider;
     private TextView progressTextView;
     private SharedDataViewModel sharedDataViewModel;
+    private ArrayAdapter<JsonObject> adapter;
+    TrackSearchAdapter searchAdapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,6 +67,8 @@ public class ExploreFragment extends Fragment {
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
         viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
 
+        searchAdapter = new TrackSearchAdapter(getContext(), actv);
+        actv.setAdapter(searchAdapter);
         //setup search
         setupSearch();
 
@@ -130,30 +134,47 @@ public class ExploreFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                viewModel.performSearch(s.toString())
-                        .observe(getViewLifecycleOwner(), searchResults -> {
-                            searchAdapter.clear();
-                            ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
-                            searchAdapter.addAll(newResults);
-                            searchAdapter.notifyDataSetChanged();
-                        });
+
+                try {
+                    Log.d("ExploreFragment", "afterTextChanged - Performing search for: " + s.toString());
+                    viewModel.performSearch(s.toString())
+                            .observe(getViewLifecycleOwner(), searchResults -> {
+                                searchAdapter.clear();
+                                Log.d("ExploreFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
+
+                                ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
+                                for(int i = 0; i < newResults.size(); i++) {
+                                    Log.d("ExploreFragment", "afterTextChanged - newResults ->  " + newResults.get(i).get("name").getAsString());
+                                }
+                                searchAdapter.addAll(newResults);
+                                searchAdapter.notifyDataSetChanged();
+                            });
+                } catch (Exception e) {
+                    Log.e("ExploreFragment", "afterTextChanged - Error performing search", e);
+                }
             }
         });
 
         actv.setOnItemClickListener((parent, view, position, id) -> {
             selectedTrack = searchAdapter.getItem(position);
             if (selectedTrack != null) {
-                String artists = "";
-                JsonArray artistsArray = selectedTrack.getAsJsonArray("artists");
-                if (artistsArray != null && artistsArray.size() > 0) {
-                    for (JsonElement artist : artistsArray) {
-                        artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
+                try {
+                    Log.d("ExploreFragment", "onItemClick - Selected track: " + selectedTrack);
+                    String artists = "";
+                    JsonArray artistsArray = selectedTrack.getAsJsonArray("artists");
+                    if (artistsArray != null && artistsArray.size() > 0) {
+                        for (JsonElement artist : artistsArray) {
+                            artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
+                        }
                     }
+                    actv.setText(selectedTrack.get("name").getAsString() + " by " + artists);
+                    Track trackToStore = viewModel.createTrack(selectedTrack); // create track in view model
+                    sharedDataViewModel.setTrack(trackToStore); // set track in shared data view model
+                    buttonToMusicReview.setEnabled(true);
+                } catch (Exception e) {
+                    Log.e("ExploreFragment", "onItemClick - Error processing selected track", e);
                 }
-                actv.setText(selectedTrack.get("name").getAsString() + " by " + artists);
-                Track trackToStore = viewModel.createTrack(selectedTrack); // create track in view model
-                sharedDataViewModel.setTrack(trackToStore); // set track in shared data view model
-                buttonToMusicReview.setEnabled(true);
+
             }
         });
     }

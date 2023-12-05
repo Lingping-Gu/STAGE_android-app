@@ -53,13 +53,27 @@ public class ExploreViewModel extends ViewModel {
         CompletableFuture<ArrayList<JsonObject>> trackSearchFuture = spotify.trackSearch(query, 10);
         trackSearchFuture.thenAccept(searchResult -> {
             searchResults.postValue(searchResult);
+            Log.d("ExploreViewModel", "performSearch - searchResult in trackSearchFuture: " + searchResult);
         }).exceptionally(e -> {
-            Log.e("TrackSearchError", e.getMessage());
+            Log.e("ExploreViewModel", "performSearch - TrackSearchError", e);
             return null;
         });
+
+        if (searchResults.getValue() != null) {
+            Log.d("ExploreViewModel", "performSearch - LiveData NOT NULL");
+        } else {
+            Log.d("ExploreViewModel", "performSearch - LiveData IS NULL");
+        }
+
+        if (searchResults.getValue() != null) {
+            for (Integer i = 0; i < searchResults.getValue().size(); i++) {
+                Log.d("ExploreViewModel", "performSearch - searchResults " + searchResults.getValue().get(i));
+            }
+        }
+
+
         return searchResults;
     }
-
     // method to create Track object based on the selectedTrack JsonObject from Spotify API
     public Track createTrack(JsonObject selectedTrack) {
         // album variables

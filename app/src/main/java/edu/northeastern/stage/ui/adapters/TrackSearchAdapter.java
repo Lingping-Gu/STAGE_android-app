@@ -49,7 +49,10 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
 
         JsonObject result = getItem(position);
         if(result != null) {
+            Log.d("TrackSearchAdapter", "getView - RESULT NOT NULL");
             viewHolder.bind(convertView.getContext(),result);
+        } else {
+            Log.d("TrackSearchAdapter", "getView - RESULT NULL");
         }
 
         return convertView;
@@ -76,35 +79,41 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
 
         void bind(Context context, JsonObject result) {
 
-            String artists = "";
-            String imageURL = "";
-            trackTitleTV.setText("");
-            artistNameTV.setText("");
-            albumIV.setImageDrawable(null);
+            try {
+                Log.d("TrackSearchAdapter", "bind - Binding result: " + result);
+                String artists = "";
+                String imageURL = "";
+                trackTitleTV.setText("");
+                artistNameTV.setText("");
+                albumIV.setImageDrawable(null);
 
-            trackTitleTV.setText(result.get("name").getAsString());
+                trackTitleTV.setText(result.get("name").getAsString());
 
-            JsonArray artistsArray = result.getAsJsonArray("artists");
-            if (artistsArray != null && artistsArray.size() > 0) {
-                for (JsonElement artist : artistsArray) {
-                    artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
+                JsonArray artistsArray = result.getAsJsonArray("artists");
+                if (artistsArray != null && artistsArray.size() > 0) {
+                    for (JsonElement artist : artistsArray) {
+                        artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
+                    }
                 }
-            }
-            artistNameTV.setText(artists);
+                artistNameTV.setText(artists);
 
-            JsonObject albumObject = result.getAsJsonObject("album");
-            if (albumObject != null) {
-                JsonArray imagesArray = albumObject.getAsJsonArray("images");
-                if (imagesArray != null && imagesArray.size() > 0) {
-                    imageURL = imagesArray.get(0).getAsJsonObject().get("url").getAsString();
+                JsonObject albumObject = result.getAsJsonObject("album");
+                if (albumObject != null) {
+                    JsonArray imagesArray = albumObject.getAsJsonArray("images");
+                    if (imagesArray != null && imagesArray.size() > 0) {
+                        imageURL = imagesArray.get(0).getAsJsonObject().get("url").getAsString();
+                    }
                 }
-            }
 
-            Glide.with(context)
-                    .load(imageURL)
+                Glide.with(context)
+                        .load(imageURL)
 //                  .placeholder(R.drawable.placeholder_image) // Set a placeholder image
 //                  .error(R.drawable.error_image) // Set an error image
-                    .into(albumIV);
+                        .into(albumIV);
+            } catch (Exception e) {
+                Log.e("TrackSearchAdapter", "bind - Error binding result", e);
+            }
+
         }
     }
 }

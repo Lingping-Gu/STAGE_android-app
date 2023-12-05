@@ -120,7 +120,7 @@ public class CircleView extends View {
 
         velocities = new float[circles.length * 2]; // x and y velocities for each circle
         // Update circle positions based on velocities
-        updateCirclePositions(canvas);
+//        updateCirclePositions(canvas);
 
         canvas.save();
         canvas.concat(matrix);
