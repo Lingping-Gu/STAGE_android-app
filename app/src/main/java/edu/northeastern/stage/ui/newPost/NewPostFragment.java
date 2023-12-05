@@ -21,6 +21,7 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
+import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
@@ -48,10 +49,17 @@ public class NewPostFragment extends Fragment {
             }
         });
 
+        // get track if it exists
+        sharedDataViewModel.getTrackPost().observe(getViewLifecycleOwner(), track -> {
+            if (track != null) {
+                viewModel.setTrack(track);
+            }
+        });
+
         // Set up the interactions for the new post elements
         binding.btnSubmitPost.setOnClickListener(v -> {
             String postContent = binding.etPostContent.getText().toString();
-            viewModel.createPost(selectedTrack, postContent);
+            viewModel.createPost(postContent);
         });
 
         // Setup AutoCompleteTextView for song search
@@ -105,6 +113,8 @@ public class NewPostFragment extends Fragment {
                         }
                     }
                     artists = artists.trim();
+                    Track trackToStore = viewModel.createTrack(selectedTrack);
+                    sharedDataViewModel.setTrackPost(trackToStore);
                     binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
                 }
             });
