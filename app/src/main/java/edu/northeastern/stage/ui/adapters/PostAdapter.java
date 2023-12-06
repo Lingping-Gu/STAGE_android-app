@@ -126,10 +126,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.ivLike.setOnClickListener(v -> {
             ArrayList<String> likes = post.getLikes();
             // get current isLiked state
-            boolean isLiked = likes.contains(post.getUser());
-            // database update
-            FirebaseExample firebaseExample = new FirebaseEaxmple();
-            firebaseExample.likePost(isLiked);
+            boolean isLiked = likes.contains(post.getOwnerID());
+            // TODO: database update
             isLiked = !isLiked;
             // show the like icon
             holder.ivLike.setSelected(isLiked);

@@ -19,6 +19,7 @@ import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.databinding.FragmentProfileBinding;
 import edu.northeastern.stage.ui.adapters.RecentListenedAdapter;
 import edu.northeastern.stage.ui.adapters.TagsAdapter;
+import edu.northeastern.stage.ui.authentication.Login;
 import edu.northeastern.stage.ui.editProfile.EditProfile;
 import edu.northeastern.stage.ui.viewmodels.ProfileViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
@@ -170,16 +171,25 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showEditProfileButtonOrFollowButton() {
-        // Set up Edit Profile Button or Follow Button
+        // Set up LogOut Button & Edit Profile Button, or Follow Button
         if (currentUserId.equals(profileOwnerId)) {
-            // User is viewing their own profile, show Edit Profile Button
-            binding.editProfileButton.setVisibility(View.VISIBLE);
             binding.followButton.setVisibility(View.GONE);
 
+            // User is viewing their own profile, show Edit Profile Button
+            binding.editProfileButton.setVisibility(View.VISIBLE);
             binding.editProfileButton.setOnClickListener(v -> launchEditProfile());
             Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.profile_edit).mutate();
             drawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.profile_edit_button_tint), PorterDuff.Mode.SRC_IN);
             binding.editProfileButton.setBackground(drawable);
+            // User is viewing their own profile, show Edit Profile Button
+            binding.LogOutButton.setVisibility(View.VISIBLE);
+            binding.editProfileButton.setOnClickListener(v -> {
+                performLogout();
+                // Navigate to Login screen after logout
+                Intent intent = new Intent(getActivity(), Login.class);
+                startActivity(intent);
+                getActivity().finish();
+            });
         } else {
             // User is viewing someone else's profile, show Follow Button
             binding.followButton.setVisibility(View.VISIBLE);
@@ -196,6 +206,10 @@ public class ProfileFragment extends Fragment {
     private void launchEditProfile() {
         Intent intent = new Intent(getActivity(), EditProfile.class);
         startActivity(intent);
+    }
+
+    private void performLogout() {
+        // TODO: implement LogOut function
     }
 
     private void follow() {
