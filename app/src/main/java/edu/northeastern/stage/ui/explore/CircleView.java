@@ -85,6 +85,8 @@ public class CircleView extends View {
     protected void onDraw(@NonNull Canvas canvas) {
 
         countDraw ++;
+//        canvas.clipRect(0, 0, getWidth(), getHeight());
+
 
         super.onDraw(canvas);
         Log.d("CIRCLEVIEW", "on draw count " + countDraw);
@@ -142,15 +144,6 @@ public class CircleView extends View {
 
     private void updateCirclePositions(Canvas canvas) {
 
-        // if moving while going right through each other is fine, then these lines of code
-//        for(Circle c : circles){
-//            //Move first
-//            c.move(canvas);
-//            //Draw them
-//            canvas.drawCircle(c.getX(), c.getY(), c.getRadius(), c.paint);
-//        }
-//        invalidate();
-
         //moving and also bouncing off of each other
         for (int i = 0; i < circles.length; i++) {
             Circle c1 = circles[i];
@@ -159,15 +152,28 @@ public class CircleView extends View {
             //Draw them
 //            canvas.drawCircle(c1.getX(), c1.getY(), c1.getRadius(), c1.paint);
 
-            // Update circle position based on velocity
-//            c1.setX(c1.getX() + velocities[i * 2]);
-//            c1.setY(c1.getY() + velocities[i * 2 + 1]);
-//
-//            // Check for collisions with other circles
-//            for (int j = i + 1; j < circles.length; j++) {
-//                Circle c2 = circles[j];
-//                handleCollision(c1, c2, i, j, canvas);
-//            }
+//            Update circle position based on velocity
+            c1.setX(c1.getX() + velocities[i * 2]);
+            c1.setY(c1.getY() + velocities[i * 2 + 1]);
+
+            // Boundary check
+            if(c1.getX() - c1.getRadius() < 0 ||
+                    c1.getX() + c1.getRadius() > getWidth()) {
+                // Flip x velocity
+                velocities[i*2] *= -1;
+            }
+
+            if(c1.getY() - c1.getRadius() < 0 ||
+                    c1.getY() + c1.getRadius() > getHeight()) {
+                // Flip y velocity
+                velocities[i*2 + 1] *= -1;
+            }
+
+            // Check for collisions with other circles
+            for (int j = i + 1; j < circles.length; j++) {
+                Circle c2 = circles[j];
+                handleCollision(c1, c2, i, j, canvas);
+            }
         }
         invalidate();
     }
@@ -201,17 +207,9 @@ public class CircleView extends View {
             float overlap = (c1.getRadius() + c2.getRadius() - distance) / 2;
             c1.setX(c1.getX() - overlap * cosAngle);
             c1.setY(c1.getY() - overlap * sinAngle);
-            //Move again
-//            c1.move(canvas);
-//            //Draw again
-//            canvas.drawCircle(c1.getX(), c1.getY(), c1.getRadius(), c1.paint);
 
             c2.setX(c2.getX() + overlap * cosAngle);
             c2.setY(c2.getY() + overlap * sinAngle);
-//            //Move again
-//            c2.move(canvas);
-//            //Draw again
-//            canvas.drawCircle(c2.getX(), c2.getY(), c2.getRadius(), c2.paint);
         }
     }
 
