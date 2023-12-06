@@ -1,6 +1,5 @@
 package edu.northeastern.stage.ui.profile;
 
-import android.app.Activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -22,19 +21,22 @@ import edu.northeastern.stage.ui.adapters.RecentListenedAdapter;
 import edu.northeastern.stage.ui.adapters.TagsAdapter;
 import edu.northeastern.stage.ui.editProfile.EditProfile;
 import edu.northeastern.stage.ui.viewmodels.ProfileViewModel;
+import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 import android.content.Intent;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.squareup.picasso.Picasso;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -42,53 +44,134 @@ public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
     private ProfileViewModel viewModel;
+    private SharedDataViewModel sharedDataViewModel;
     private TagsAdapter tagsAdapter;
     private PostAdapter postsAdapter;
     private RecentListenedAdapter recentListenedAdapter;
-    private static final int REQUEST_EDIT_PROFILE = 1;
     private String currentUserId;
     private String profileOwnerId;
+    private Integer profilePictureResource;
+    private String email;
+    private String description;
+    private List<Post> posts;
+    private List<String> tags;
+    private List<String> recentlyListenedToImageURLs;
+
+    // TODO: think about how to store or get profileOwnerID
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
-        initUI();
-        observeViewModel();
+
+        // initialize view models
+        viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        sharedDataViewModel = new ViewModelProvider(this).get(SharedDataViewModel.class);
+
+        // get current user ID
+        sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
+            if (userID != null) {
+                currentUserId = userID;
+            }
+        });
+
+        // set up adapters
+        setUpAdapters();
+
+        // show edit button or follow button depending on profile owner and current user
+        showEditProfileButtonOrFollowButton();
+
+        // initialize variables
+        tags = new ArrayList<>();
+        posts = new ArrayList<>();
+        recentlyListenedToImageURLs = new ArrayList<>();
+
+        // retrieve all values from database first
+        retrieveDataFromDatabase();
+
+        // set values to UI
+        setUIValues();
+
         return binding.getRoot();
     }
 
-    private void initUI() {
-        // Get Ids from database
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            currentUserId = currentUser.getUid();
-        } else {
-            currentUserId = "TEST";
+    private void retrieveDataFromDatabase() {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference rootRef = mDatabase.getReference();
+        DatabaseReference userRef = rootRef.child("users").child(currentUserId);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()) {
+                    if(snapshot.hasChild("imageResource")) {
+                        profilePictureResource = snapshot.child("imageResource").getValue(Integer.class);
+                    }
+                    if(snapshot.hasChild("description")) {
+                        description = snapshot.child("description").getValue(String.class);
+                    }
+                    if(snapshot.hasChild("email")) {
+                        email = snapshot.child("email").getValue(String.class);
+                    }
+                    if(snapshot.hasChild("tags")) {
+                        for (DataSnapshot tagsSnapshot : snapshot.child("tags").getChildren()) {
+                            String tag = tagsSnapshot.getValue(String.class);
+                            tags.add(tag);
+                        }
+                    }
+                    if(snapshot.hasChild("posts")) {
+                        for (DataSnapshot postsSnapshot : snapshot.child("posts").getChildren()) {
+                            Post post = new Post(postsSnapshot.child("trackName").toString(),
+                                    postsSnapshot.child("trackID").toString(),
+                                    postsSnapshot.child("artistName").toString(),
+                                    postsSnapshot.child("content").toString(),
+                                    Long.parseLong(postsSnapshot.child("timestamp").toString()),
+                                    postsSnapshot.child("imageURL").toString());
+                            posts.add(post);
+                        }
+                        Collections.sort(posts,new Comparator<Post>() {
+                            @Override
+                            public int compare(Post o1, Post o2) {
+                                return Long.compare(o2.getTimestamp(), o1.getTimestamp());
+                            }
+                        });
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void setUIValues() {
+        binding.description.setText(description);
+        binding.profileImage.setImageResource(profilePictureResource);
+        binding.userName.setText(email);
+        for(Post post : posts) {
+            recentlyListenedToImageURLs.add(post.getImageURL());
         }
-        if (profileOwnerId != null) profileOwnerId = currentUserId;
+    }
 
-        //set view
-        viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-
-        // Tags
+    private void setUpAdapters() {
+        // Set up TagsAdapter and connect to view
         tagsAdapter = new TagsAdapter(new ArrayList<>());
         binding.tags.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.tags.setAdapter(tagsAdapter);
 
-        // set posts
-        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>());
+        // Set up PostAdapter and connect to view
+        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>(), currentUserId);
         binding.activities.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.activities.setAdapter(postsAdapter);
 
-        // Set up RecentListened Adapter
+        // Set up RecentListenedAdapter and connect to view
         recentListenedAdapter = new RecentListenedAdapter(new ArrayList<>());
         binding.recentListened.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.recentListened.setAdapter(recentListenedAdapter);
+    }
 
+    private void showEditProfileButtonOrFollowButton() {
         // Set up Edit Profile Button or Follow Button
-        if (isOwner()) {
+        if (currentUserId.equals(profileOwnerId)) {
             // User is viewing their own profile, show Edit Profile Button
             binding.editProfileButton.setVisibility(View.VISIBLE);
             binding.followButton.setVisibility(View.GONE);
@@ -104,87 +187,24 @@ public class ProfileFragment extends Fragment {
             binding.followButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    FirebaseExample firebaseExample = new FirebaseExample();
-                    firebaseExample.follow(currentUserId, profileOwnerId);
+                    follow();
                 }
             });
         }
     }
 
-    private void observeViewModel() {
-        //get user avatar
-        viewModel.getUserAvatarUrl().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(String url) {
-                if (url != null) {
-                    if (url != null) {
-                        Picasso.get()
-                                .load(url)
-                                .error(R.drawable.default_pfp)
-                                .into(binding.profileImage);
-                    }
-                }
-            }
-        });
-
-        // Observe the LiveData for posts
-        viewModel.getPosts().observe(getViewLifecycleOwner(), new Observer<List<Post>>() {
-            @Override
-            public void onChanged(List<Post> posts) {
-                postsAdapter.setPosts(posts);
-            }
-        });
-
-        // Observe the LiveData for image URLs
-        viewModel.getImageUrls().observe(getViewLifecycleOwner(), new Observer<List<String>>() {
-            @Override
-            public void onChanged(List<String> imageUrls) {
-                if (imageUrls.isEmpty()) {
-                    binding.textNoImages.setVisibility(View.VISIBLE);
-                    binding.recentListened.setVisibility(View.GONE);
-                } else {
-                    binding.textNoImages.setVisibility(View.GONE);
-                    binding.recentListened.setVisibility(View.VISIBLE);
-                    recentListenedAdapter.setImageUrls(imageUrls);
-                }
-            }
-        });
-
-        // Observe the LiveData for tags
-        viewModel.getTags().observe(getViewLifecycleOwner(), new Observer<List<String>>() {
-            @Override
-            public void onChanged(List<String> tags) {
-                tagsAdapter.setTags(tags);
-            }
-        });
-
-    }
-
-    private boolean isOwner() {
-        return currentUserId.equals(profileOwnerId);
-    }
-
     private void launchEditProfile() {
         Intent intent = new Intent(getActivity(), EditProfile.class);
-        startActivityForResult(intent, REQUEST_EDIT_PROFILE);
+        startActivity(intent);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_EDIT_PROFILE && resultCode == Activity.RESULT_OK && data != null) {
-            // Retrieve the data from the result intent
-            String username = data.getStringExtra(EditProfile.EXTRA_USERNAME);
-            String description = data.getStringExtra(EditProfile.EXTRA_DESCRIPTION);
-            String tagsString = data.getStringExtra(EditProfile.EXTRA_TAGS);
+    private void follow() {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference rootRef = mDatabase.getReference();
+        DatabaseReference currentUserRef = rootRef.child("users").child(currentUserId).child("following").child(profileOwnerId);
+        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerId).child("followers").child(currentUserId);
 
-            // Update your views using binding
-            binding.userName.setText(username);
-            binding.description.setText(description);
-            // Split by the delimiter used when setting the tags
-            List<String> updatedTags = Arrays.asList(tagsString.split("#(?=[^#])")); // Ensure this regex correctly matches your format
-            viewModel.setTags(updatedTags);
-        }
+        currentUserRef.setValue(true);
+        profileOwnerRef.setValue(true);
     }
-
 }

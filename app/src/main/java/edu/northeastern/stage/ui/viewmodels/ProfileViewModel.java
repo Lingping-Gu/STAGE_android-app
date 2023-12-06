@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,67 +14,40 @@ import java.util.List;
 import edu.northeastern.stage.model.Post;
 
 public class ProfileViewModel extends ViewModel {
-    private MutableLiveData<String> userAvatarUrl;
-    private MutableLiveData<List<Post>> posts;
-    private MutableLiveData<List<String>> recentListenedUrls;
-    private MutableLiveData<List<String>> tags;
+    private String profilePicResource;
+    private List<Post> posts;
+    private List<String> recentlyListenedToImageURLs;
+    private List<String> tags;
 
-    public ProfileViewModel() {
-        recentListenedUrls = new MutableLiveData<>();
-        loadImageUrls();
-        posts = new MutableLiveData<>();
-        loadPosts();
-        tags = new MutableLiveData<>();
-        loadTags();
-        userAvatarUrl = new MutableLiveData<>();
+    public String getProfilePicResource() {
+        return profilePicResource;
     }
 
-    public LiveData<List<String>> getImageUrls() {
-        return recentListenedUrls;
+    public void setProfilePicResource(String profilePicResource) {
+        this.profilePicResource = profilePicResource;
     }
 
-    public LiveData<List<Post>> getPosts() {
+    public List<Post> getPosts() {
         return posts;
     }
-    public LiveData<List<String>> getTags() {
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public List<String> getRecentlyListenedToImageURLs() {
+        return recentlyListenedToImageURLs;
+    }
+
+    public void setRecentlyListenedToImageURLs(List<String> recentlyListenedToImageURLs) {
+        this.recentlyListenedToImageURLs = recentlyListenedToImageURLs;
+    }
+
+    public List<String> getTags() {
         return tags;
     }
 
-    public MutableLiveData<String> getUserAvatarUrl() {
-        return userAvatarUrl;
-    }
-
-    private void loadPosts() {
-        // Load posts here
-        MutableLiveData<List<Post>> exampleData = new MutableLiveData<>();
-        String musicLink = "http://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6";
-        String musicImageUrl = "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228";
-        Post examplePost = new Post("userId","userAvatarUrl", musicLink, "Speak to me by Pink Floyd is amazing!", new ArrayList<>(),
-                "public", musicImageUrl, "Speak to me", "Pink Floyd");
-        exampleData.setValue(Arrays.asList(examplePost, examplePost, examplePost));
-        this.posts = exampleData;
-    }
-
-    private void loadImageUrls() {
-        MutableLiveData<List<String>> exampleData = new MutableLiveData<>();
-        String exampleUrl = "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228";
-        exampleData.setValue(Arrays.asList(exampleUrl, exampleUrl));
-        this.recentListenedUrls = exampleData;
-    }
-
-    private void loadTags() {
-        MutableLiveData<List<String>> exampleData = new MutableLiveData<>();
-        exampleData.setValue(Arrays.asList("#IndiePop", "#AlternativeRock"));
-        this.tags = exampleData;
-    }
-
-    private void loadUserAvatarUrl() {
-        MutableLiveData<String> exampleData = new MutableLiveData<>();
-        this.userAvatarUrl = exampleData;
-    }
-
     public void setTags(List<String> tags) {
-        this.tags.setValue(tags);
+        this.tags = tags;
     }
-
 }

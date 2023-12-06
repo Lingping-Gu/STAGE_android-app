@@ -1,92 +1,27 @@
 package edu.northeastern.stage.model;
 
-import java.util.ArrayList;
-
 public class Post {
-    private String user;
-    private String userAvatarUrl;
-    private String musicLink;
-    private String musicImageUrl;
+    private String ownerID;
     private String trackName;
+    private String trackID;
     private String artistName;
-    private String postContent;
-    private ArrayList<String> likes;
+    private String content;
+    private Long timestamp;
+    private String imageURL;
     private String visibilityState;
+    private String spotifyURL;
 
-    // TODO: Simplify the Post constructor
-    public Post(String userId, String userAvatarUrl, String musicLink, String postContent, ArrayList<String> likes, String visibilityState,
-                String musicImageUrl, String trackName, String artistName) {
-        this.user = userId;
-        // user avatar, can get from usedId
-        // & get user name by userId
-        this.userAvatarUrl = userAvatarUrl;
-        // included
-        this.postContent = postContent;
-        this.likes = likes;
-        // need visible state
-        this.visibilityState = visibilityState;
-        // have track info, can get from track Id
-        this.musicLink = musicLink;
-        this.musicImageUrl = musicImageUrl;
+    public Post(String ownerID, String trackName, String trackID, String artistName, String content,
+                Long timestamp, String imageURL, String visibilityState, String spotifyURL) {
+        this.ownerID = ownerID;
         this.trackName = trackName;
+        this.trackID = trackID;
         this.artistName = artistName;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    // Getters and Setters
-    public String getUserAvatarUrl() {
-        return userAvatarUrl;
-    }
-
-    public void setUserAvatarUrl(String userAvatarUrl) {
-        this.userAvatarUrl = userAvatarUrl;
-    }
-
-    public String getMusicLink() {
-        return musicLink;
-    }
-
-    public void setMusicLink(String musicLink) {
-        this.musicLink = musicLink;
-    }
-
-    public String getPostContent() {
-        return postContent;
-    }
-
-    public void setPostContent(String postContent) {
-        this.postContent = postContent;
-    }
-
-    public ArrayList<String> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(ArrayList<String> likes) {
-        this.likes = likes;
-    }
-
-    public String getVisibilityState() {
-        return visibilityState;
-    }
-
-    public void setVisibilityState(String visibilityState) {
+        this.content = content;
+        this.timestamp = timestamp;
+        this.imageURL = imageURL;
         this.visibilityState = visibilityState;
-    }
-
-    public String getMusicImageUrl() {
-        return musicImageUrl;
-    }
-
-    public void setMusicImageUrl(String musicImageUrl) {
-        this.musicImageUrl = musicImageUrl;
+        this.spotifyURL = spotifyURL;
     }
 
     public String getTrackName() {
@@ -97,6 +32,14 @@ public class Post {
         this.trackName = trackName;
     }
 
+    public String getTrackID() {
+        return trackID;
+    }
+
+    public void setTrackID(String trackID) {
+        this.trackID = trackID;
+    }
+
     public String getArtistName() {
         return artistName;
     }
@@ -105,4 +48,51 @@ public class Post {
         this.artistName = artistName;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
+    public String getOwnerID() {
+        return ownerID;
+    }
+
+    public void setOwnerID(String ownerID) {
+        this.ownerID = ownerID;
+    }
+
+    public String getVisibilityState() {
+        return visibilityState;
+    }
+
+    public void setVisibilityState(String visibilityState) {
+        this.visibilityState = visibilityState;
+    }
+
+    public String getSpotifyURL() {
+        return spotifyURL;
+    }
+
+    public void setSpotifyURL(String spotifyURL) {
+        this.spotifyURL = spotifyURL;
+    }
 }
