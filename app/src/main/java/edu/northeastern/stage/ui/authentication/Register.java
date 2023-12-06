@@ -134,7 +134,7 @@ public class Register extends AppCompatActivity {
     }
 
     private void createUserAccount(String email, String password, String confirmPassword) {
-        if (email == null || password == null || confirmPassword == null || email == "" || password == "" || confirmPassword == "" || profilePicSelected == null) {
+        if (email == null || password == null || confirmPassword == null || email.equals("") || password.equals("") || confirmPassword.equals("") || profilePicSelected == null) {
             Toast.makeText(Register.this, "Register failed. Please make sure to enter an email and password.", Toast.LENGTH_SHORT).show();
         } else {
             mAuth.createUserWithEmailAndPassword(email, password)
