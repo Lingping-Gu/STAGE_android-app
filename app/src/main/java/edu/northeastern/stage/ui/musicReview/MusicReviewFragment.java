@@ -1,10 +1,13 @@
 package edu.northeastern.stage.ui.musicReview;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -59,7 +62,7 @@ public class MusicReviewFragment extends Fragment {
         });
 
         // set track
-        sharedDataViewModel.getTrackReview().observe(getViewLifecycleOwner(), track -> {
+        sharedDataViewModel.getTrack().observe(getViewLifecycleOwner(), track -> {
             if (track != null) {
                 mViewModel.setTrack(track);
                 Glide.with(this)
