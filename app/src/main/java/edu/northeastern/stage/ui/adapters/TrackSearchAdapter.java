@@ -19,7 +19,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.northeastern.stage.R;
 
@@ -28,9 +30,13 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
     private LayoutInflater inflater;
     private AutoCompleteTextView songSearchACTV;
     private JsonObject selectedResult;
+    Context context;
+    private ArrayList<JsonObject> recommendations = new ArrayList<>();
 
-    public TrackSearchAdapter(@NonNull Context context, AutoCompleteTextView songSearchACTV) {
+    public TrackSearchAdapter(Context context, AutoCompleteTextView songSearchACTV) {
         super(context, 0);
+        Log.d("TrackSearchAdapter", "Constructor called");
+        this.context = context;
         inflater = LayoutInflater.from(context);
         this.songSearchACTV = songSearchACTV;
     }
@@ -46,9 +52,13 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+        Log.d("TrackSearchAdapter", "Processing item at position: " + position);
 
         JsonObject result = getItem(position);
+        Log.d("TrackSearchAdapter", "Result size: " + result.size());
+
         if(result != null) {
+            Log.d("TrackSearchAdapter", "Processing item at position: " + position);
             Log.d("TrackSearchAdapter", "getView - RESULT NOT NULL");
             viewHolder.bind(convertView.getContext(),result);
         } else {
@@ -58,12 +68,41 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
         return convertView;
     }
 
+//    @Override
+//    public View getView(int position, View convertView, ViewGroup parent) {
+//
+//        TextView textView = new TextView(context);
+//        textView.setText("Row " + position);
+//
+//        return textView;
+//
+//    }
+
     public JsonObject getSelectedResult() {
         return selectedResult;
     }
 
     public void setSelectedResult(JsonObject selectedResult) {
         this.selectedResult = selectedResult;
+    }
+
+    // addAll will take care of adding all the results in one go as well as clearing
+    // previous recommendations and notifying dataset changes
+    public void addAll(ArrayList<JsonObject> results) {
+        Log.d("TrackSearchAdapter", "in addAll");
+
+        clear();
+        if(results != null) {
+            Log.d("TrackSearchAdapter", "in addAll - if not null");
+
+            for(JsonObject result : results) {
+                add(result);
+                Log.d("TrackSearchAdapter", "in addAll - in loop result -> " + result);
+                recommendations.add(result);
+
+            }
+        }
+        notifyDataSetChanged();
     }
 
     private static class ViewHolder {
@@ -90,6 +129,8 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
                 trackTitleTV.setText(result.get("name").getAsString());
 
                 JsonArray artistsArray = result.getAsJsonArray("artists");
+                Log.d("TrackSearchAdapter", "bind - Binding result: " + artistsArray.size());
+
                 if (artistsArray != null && artistsArray.size() > 0) {
                     for (JsonElement artist : artistsArray) {
                         artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";

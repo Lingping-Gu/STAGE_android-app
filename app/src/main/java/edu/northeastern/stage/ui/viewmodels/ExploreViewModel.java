@@ -71,6 +71,12 @@ public class ExploreViewModel extends ViewModel {
             }
         }
 
+//        if (trackSearchFuture.isDone()) {
+//            if (searchResults.getValue() != null) {
+//                Log.d("ExploreViewModel", "performSearch IS DONE - LiveData NOT NULL");
+//            }
+//        }
+
 
         return searchResults;
     }

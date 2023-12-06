@@ -25,8 +25,10 @@ import android.widget.TextView;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentExploreBinding;
@@ -48,8 +50,9 @@ public class ExploreFragment extends Fragment {
     private SeekBar geoSlider;
     private TextView progressTextView;
     private SharedDataViewModel sharedDataViewModel;
-    private ArrayAdapter<JsonObject> adapter;
     TrackSearchAdapter searchAdapter;
+    private static final int SEARCH_DELAY = 500;
+    private long lastSearchTime = 0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,6 +63,7 @@ public class ExploreFragment extends Fragment {
         buttonToMusicReview = binding.reviewButton;
         circleView = binding.circleView;
         actv = binding.autoCompleteTextView;
+        actv.setThreshold(1);
         geoSlider = binding.locationSeekBar;
         progressTextView = binding.textView;
 
@@ -68,7 +72,7 @@ public class ExploreFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
 
         searchAdapter = new TrackSearchAdapter(getContext(), actv);
-        actv.setAdapter(searchAdapter);
+
         //setup search
         setupSearch();
 
@@ -114,8 +118,6 @@ public class ExploreFragment extends Fragment {
     }
 
     private void setupSearch() {
-        TrackSearchAdapter searchAdapter = new TrackSearchAdapter(getContext(), actv);
-
         actv.setAdapter(searchAdapter);
 
         actv.addTextChangedListener(new TextWatcher() {
@@ -135,20 +137,38 @@ public class ExploreFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                try {
-                    Log.d("ExploreFragment", "afterTextChanged - Performing search for: " + s.toString());
-                    viewModel.performSearch(s.toString())
-                            .observe(getViewLifecycleOwner(), searchResults -> {
-                                searchAdapter.clear();
-                                Log.d("ExploreFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
 
-                                ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
-                                for(int i = 0; i < newResults.size(); i++) {
-                                    Log.d("ExploreFragment", "afterTextChanged - newResults ->  " + newResults.get(i).get("name").getAsString());
-                                }
-                                searchAdapter.addAll(newResults);
-                                searchAdapter.notifyDataSetChanged();
-                            });
+                try {
+                    long currentTime = System.currentTimeMillis();
+                    if(currentTime - lastSearchTime > SEARCH_DELAY && s.length() != 0) {
+                        // Perform search
+                        lastSearchTime = currentTime;
+
+
+                        Log.d("ExploreFragment", "afterTextChanged - Performing search for: " + s.toString());
+                        viewModel.performSearch(s.toString())
+                                .observe(getViewLifecycleOwner(), searchResults -> {
+                                    searchAdapter.clear();
+                                    Log.d("ExploreFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
+
+//                                    ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
+//                                    Log.d("ExploreFragment", "afterTextChanged - newResults size ->  " + newResults.size());
+
+                                    for (int i = 0; i < searchResults.size(); i++) {
+                                        Log.d("ExploreFragment", "afterTextChanged - newResults ->  " + searchResults.get(i).get("name").getAsString());
+                                        searchAdapter.add(searchResults.get(i).getAsJsonObject());
+
+                                    }
+
+                                    searchAdapter.notifyDataSetChanged();
+
+//                                    actv.setAdapter(searchAdapter);
+//                                    searchAdapter.notifyDataSetChanged();
+//                                    searchAdapter.getFilter().filter(actv.getText(), null);
+
+
+                                });
+                    }
                 } catch (Exception e) {
                     Log.e("ExploreFragment", "afterTextChanged - Error performing search", e);
                 }
