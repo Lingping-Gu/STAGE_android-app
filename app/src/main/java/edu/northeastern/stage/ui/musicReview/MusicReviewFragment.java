@@ -39,6 +39,7 @@ public class MusicReviewFragment extends Fragment {
     private ReviewAdapter reviewAdapter;
     private TextView overallScoreTextView;
     private TextView noReviewsTextView;
+    private TextView musicAttributesTextView;
     private Button addReviewButton;
 
     @Override
@@ -69,11 +70,14 @@ public class MusicReviewFragment extends Fragment {
             }
         });
 
+        musicAttributesTextView = binding.musicAttributesTextView;
         reviewsRecyclerView = binding.reviewsRecyclerView;
         overallScoreTextView = binding.overallScoreTextView;
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         noReviewsTextView = binding.noReviewsTextView;
         addReviewButton = binding.addReviewButton;
+
+        updateMusicAttributes("Desire", "November 1975", "Classic Rock, Folk Rock, Protest Song");
 
         addReviewButton.setOnClickListener(v -> {
             // Use the NavController to navigate to the MusicReviewFragment
@@ -103,6 +107,14 @@ public class MusicReviewFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mViewModel.fetchReviews(); // fetch all reviews
+    }
+
+    private void updateMusicAttributes(String album, String releaseDate, String genre) {
+        String attributesText = String.format(Locale.getDefault(),
+                "Album: %s\nReleased: %s\nGenre: %s",
+                album, releaseDate, genre);
+
+        musicAttributesTextView.setText(attributesText);
     }
 
     private void updateOverallScore() {

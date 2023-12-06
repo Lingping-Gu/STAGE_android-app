@@ -1,22 +1,20 @@
 package edu.northeastern.stage.ui.musicReview;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
-
-import com.google.gson.JsonObject;
+import android.widget.Toast;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Review;
@@ -59,18 +57,30 @@ public class SubmitReviewFragment extends Fragment {
     }
 
     private void submitReview() {
-        // TODO: hide keyboard after button press; handle empty rating or content
         String userID = mViewModel.getUserID();
-        String content = reviewContentEditText.getText().toString();
         float rating = reviewRatingBar.getRating();
         Long timestamp = System.currentTimeMillis();
         String trackID = mViewModel.getTrack().getId();
+        String content = reviewContentEditText.getText().toString();
 
-        Review newReview = new Review(userID,content,rating,timestamp,trackID);
-        mViewModel.addReview(newReview);
-        // Clear the fields after submission
-        reviewContentEditText.setText("");
-        reviewRatingBar.setRating(0);
-        // TODO: intent to MusicReview Page
+        if (content.equalsIgnoreCase("")) {
+            Toast.makeText(getActivity(), "Please enter your rating content.", Toast.LENGTH_SHORT).show();
+        } else if (rating == 0.0f) {
+            Toast.makeText(getActivity(), "Please select a rating in stars.", Toast.LENGTH_SHORT).show();
+        } else {
+            Review newReview = new Review(userID,content,rating,timestamp,trackID);
+            mViewModel.addReview(newReview);
+            Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
+            // Clear the fields after submission
+            reviewContentEditText.setText("");
+            reviewRatingBar.setRating(0);
+
+            // Remove submit review page from the back stack then navigate back to music review page
+            NavOptions navOptions = new NavOptions.Builder()
+                    .setPopUpTo(R.id.navigation_music_review, true)
+                    .build();
+            NavController navController = NavHostFragment.findNavController(SubmitReviewFragment.this);
+            navController.navigate(R.id.action_navigation_submit_review_to_navigation_music_review, null, navOptions);
+        }
     }
 }
