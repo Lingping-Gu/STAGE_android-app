@@ -10,15 +10,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -155,38 +150,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         });
     }
 
-    private boolean isLiked(Long timestamp) {
+    private boolean isLiked() {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
         DatabaseReference reference = mDatabase
                 .getReference("users")
-                .child(postOwnerId)
-                .child("posts");
-
-        Query postQuery = reference.orderByChild("timestamp").equalTo(timestamp);
-
-        postQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()) {
-                    for(DataSnapshot postSnapshot : snapshot.getChildren()) {
-                        ArrayList<String> likes = postSnapshot.child("likes");
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        // get the correct post reference by timestamp
-        // get list of users that likes the post
-        // if currentUser is in the list of users, then show red heart
-        // if currentUser is not in the list of users, then show blank heart
-        // if currentUser is in the list of users and the user clicks, then remove user from list
-        // if currentUser is not in the list of users and the user clicks, then add user
+                .child(UID);
     }
 
     private boolean isOwner() {

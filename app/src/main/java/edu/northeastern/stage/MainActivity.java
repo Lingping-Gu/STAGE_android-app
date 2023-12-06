@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                 .child(UID);
 
         Map<String, Object> updates = new HashMap<>();
-        updates.put("lastLocation",new Location(100.0,100.0)); // TODO: need to edit this
+        updates.put("lastLocation",new Location(100.0,100.0)); // need to edit this
         updates.put("lastLoggedInTimeStamp",System.currentTimeMillis());
 
         reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
