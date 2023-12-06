@@ -136,16 +136,13 @@ public class ExploreFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-
                 try {
                     long currentTime = System.currentTimeMillis();
-                    // add delay of 500 ms between currentime and last search time for efficiency
+                    // add delay of 500 ms between current time and last search time for efficiency
                     // search length should be more than 0
                     if(currentTime - lastSearchTime > SEARCH_DELAY && s.length() != 0) {
-                        // Perform search
                         lastSearchTime = currentTime;
                         actv.showDropDown();
-
 
                         Log.d("ExploreFragment", "afterTextChanged - Performing search for: " + s.toString());
                         viewModel.performSearch(s.toString())
@@ -153,19 +150,12 @@ public class ExploreFragment extends Fragment {
                                     searchAdapter.clear();
                                     Log.d("ExploreFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
 
-//                                    ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
-//                                    Log.d("ExploreFragment", "afterTextChanged - newResults size ->  " + newResults.size());
-
                                     for (int i = 0; i < searchResults.size(); i++) {
                                         Log.d("ExploreFragment", "afterTextChanged - LOOP " + searchResults.get(i).get("name").getAsString() + " BY " + searchResults.get(i).getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString());
                                         searchAdapter.add(searchResults.get(i).getAsJsonObject());
                                     }
-
-//                                    actv.setAdapter(searchAdapter);
                                     searchAdapter.notifyDataSetChanged();
 //                                    searchAdapter.getFilter().filter(actv.getText(), null);
-
-
                                 });
                     }
                 } catch (Exception e) {

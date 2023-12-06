@@ -68,16 +68,6 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
         return convertView;
     }
 
-//    @Override
-//    public View getView(int position, View convertView, ViewGroup parent) {
-//
-//        TextView textView = new TextView(context);
-//        textView.setText("Row " + position);
-//
-//        return textView;
-//
-//    }
-
     public JsonObject getSelectedResult() {
         return selectedResult;
     }
