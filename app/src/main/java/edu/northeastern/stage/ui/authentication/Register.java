@@ -61,6 +61,7 @@ public class Register extends AppCompatActivity {
         if (user != null) {
             // change intent
             Intent intent = new Intent(Register.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
 
@@ -133,7 +134,7 @@ public class Register extends AppCompatActivity {
     }
 
     private void createUserAccount(String email, String password, String confirmPassword) {
-        if (email == null || password == null || confirmPassword == null || email == "" || password == "" || confirmPassword == "" || profilePicSelected == null) {
+        if (email == null || password == null || confirmPassword == null || email.equals("") || password.equals("") || confirmPassword.equals("") || profilePicSelected == null) {
             Toast.makeText(Register.this, "Register failed. Please make sure to enter an email and password.", Toast.LENGTH_SHORT).show();
         } else {
             mAuth.createUserWithEmailAndPassword(email, password)
@@ -163,6 +164,7 @@ public class Register extends AppCompatActivity {
 
                                 // change intent
                                 Intent intent = new Intent(Register.this, MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                             } else {
                                 // register fail, check which exception

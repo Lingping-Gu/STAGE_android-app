@@ -19,6 +19,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Objects;
+
 import edu.northeastern.stage.API.ResetPWDialogFragment;
 import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.R;
@@ -94,7 +96,7 @@ public class Login extends AppCompatActivity {
 
     private void signIn(String email, String password) {
         // if email or password is empty
-        if(email == "" || password == "" || email == null || password == null) {
+        if(Objects.equals(email, "") || Objects.equals(password, "") || email == null || password == null) {
             Toast.makeText(Login.this, "Login failed. Please make sure to enter an email and password.", Toast.LENGTH_SHORT).show();
         } else {
             mAuth.signInWithEmailAndPassword(email, password)
@@ -121,6 +123,7 @@ public class Login extends AppCompatActivity {
     private void loginSuccessIntent() {
         //  change this intent
         Intent intent = new Intent(Login.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 }

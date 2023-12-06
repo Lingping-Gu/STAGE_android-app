@@ -9,14 +9,18 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="edu.northeastern.stage.ui.home.HomeFragment"
-        android:label="Home"
+        android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_new_post"
         android:name="edu.northeastern.stage.ui.newPost.NewPostFragment"
         android:label="@string/title_new_post"
-        tools:layout="@layout/fragment_new_post" />
+        tools:layout="@layout/fragment_new_post" >
+        <action
+            android:id="@+id/action_navigation_new_post_to_navigation_home"
+            app:destination="@id/navigation_home" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_explore"
@@ -38,7 +42,11 @@
         android:id="@+id/navigation_submit_review"
         android:name="edu.northeastern.stage.ui.musicReview.SubmitReviewFragment"
         android:label="Submit Review"
-        tools:layout="@layout/fragment_submit_review" />
+        tools:layout="@layout/fragment_submit_review" >
+        <action
+            android:id="@+id/action_navigation_submit_review_to_navigation_music_review"
+            app:destination="@id/navigation_music_review" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_music_review"
