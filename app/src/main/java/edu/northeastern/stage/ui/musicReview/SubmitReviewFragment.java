@@ -47,7 +47,7 @@ public class SubmitReviewFragment extends Fragment {
             }
         });
 
-        sharedDataViewModel.getTrack().observe(getViewLifecycleOwner(), track -> {
+        sharedDataViewModel.getTrackReview().observe(getViewLifecycleOwner(), track -> {
             if(track != null) {
                 mViewModel.setTrack(track);
             }
