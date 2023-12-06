@@ -9,8 +9,9 @@ android {
 
     defaultConfig {
         applicationId = "edu.northeastern.stage"
-        minSdk = 33
-        targetSdk = 33
+        minSdk = 27
+        targetSdk = 34
+
         versionCode = 1
         versionName = "1.0"
 
@@ -36,6 +37,26 @@ android {
 }
 
 dependencies {
+
+    // firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
+    // firebase analytics library
+    implementation("com.google.firebase:firebase-analytics")
+    // firebase authentication library
+    implementation("com.google.firebase:firebase-auth")
+
+    // firebase DB
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
+    implementation ("com.google.firebase:firebase-messaging")
+
+    // http request library
+    implementation("com.squareup.okhttp3:okhttp:4.9.1");
+
+    // parsing JSONs
+    implementation("com.google.code.gson:gson:2.8.9")
+
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")

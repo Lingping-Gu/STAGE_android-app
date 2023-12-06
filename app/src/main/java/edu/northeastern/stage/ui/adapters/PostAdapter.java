@@ -120,9 +120,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 .load(post.getImageURL())
                 .error(R.drawable.profile_recent_listened_error)
                 .into(holder.tvMusicImage);
-
-
-
+      
         // TODO: liked status
         // Set the like status on the ivLike ImageView
         holder.ivLike.setOnClickListener(v -> {
