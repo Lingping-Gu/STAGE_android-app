@@ -183,7 +183,10 @@ public class ExploreFragment extends Fragment {
                 } catch (Exception e) {
                     Log.e("ExploreFragment", "onItemClick - Error processing selected track", e);
                 }
-
+                actv.setText(selectedTrack.get("name").getAsString() + " by " + artists);
+                Track trackToStore = viewModel.createTrack(selectedTrack); // create track in view model
+                sharedDataViewModel.setTrackReview(trackToStore); // set track in shared data view model
+                buttonToMusicReview.setEnabled(true);
             }
         });
     }

@@ -1,21 +1,27 @@
 package edu.northeastern.stage.model;
 
 public class Post {
-    // no need for userID or postID because Firebase DB is set up to identify these
+    private String ownerID;
     private String trackName;
     private String trackID;
     private String artistName;
     private String content;
     private Long timestamp;
     private String imageURL;
+    private String visibilityState;
+    private String spotifyURL;
 
-    public Post(String trackName, String trackID, String artistName, String content, Long timestamp, String imageURL) {
+    public Post(String ownerID, String trackName, String trackID, String artistName, String content,
+                Long timestamp, String imageURL, String visibilityState, String spotifyURL) {
+        this.ownerID = ownerID;
         this.trackName = trackName;
         this.trackID = trackID;
         this.artistName = artistName;
         this.content = content;
         this.timestamp = timestamp;
         this.imageURL = imageURL;
+        this.visibilityState = visibilityState;
+        this.spotifyURL = spotifyURL;
     }
 
     public String getTrackName() {
@@ -64,5 +70,29 @@ public class Post {
 
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
+    }
+
+    public String getOwnerID() {
+        return ownerID;
+    }
+
+    public void setOwnerID(String ownerID) {
+        this.ownerID = ownerID;
+    }
+
+    public String getVisibilityState() {
+        return visibilityState;
+    }
+
+    public void setVisibilityState(String visibilityState) {
+        this.visibilityState = visibilityState;
+    }
+
+    public String getSpotifyURL() {
+        return spotifyURL;
+    }
+
+    public void setSpotifyURL(String spotifyURL) {
+        this.spotifyURL = spotifyURL;
     }
 }
