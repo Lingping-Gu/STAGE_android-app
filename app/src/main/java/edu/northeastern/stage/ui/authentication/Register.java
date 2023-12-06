@@ -150,14 +150,15 @@ public class Register extends AppCompatActivity {
 
                                 Map<String, Object> updates = new HashMap<>();
                                 updates.put("profilePicResource",profilePicSelected);
+                                updates.put("email",user.getEmail());
 
                                 reference.child(user.getUid()).updateChildren(updates, new DatabaseReference.CompletionListener() {
                                     @Override
                                     public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
                                         if (error == null) {
-                                            Log.d(TAG, "Profile picture resource updated successfully");
+                                            Log.d(TAG, "User profile updated on database");
                                         } else {
-                                            Log.e(TAG, "Failed to update profile picture resource: " + error.getMessage());
+                                            Log.e(TAG, "Failed to update profile on database: " + error.getMessage());
                                         }
                                     }
                                 });
