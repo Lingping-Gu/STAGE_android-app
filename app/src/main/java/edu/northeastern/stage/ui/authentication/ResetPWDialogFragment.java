@@ -1,4 +1,4 @@
-package edu.northeastern.stage.API;
+package edu.northeastern.stage.ui.authentication;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
