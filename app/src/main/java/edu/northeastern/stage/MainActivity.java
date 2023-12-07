@@ -11,11 +11,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 
@@ -25,12 +30,20 @@ import java.util.Map;
 import edu.northeastern.stage.databinding.ActivityMainBinding;
 import edu.northeastern.stage.model.Location;
 import edu.northeastern.stage.ui.authentication.Login;
+import edu.northeastern.stage.ui.explore.ExploreFragment;
+import edu.northeastern.stage.ui.home.HomeFragment;
+import edu.northeastern.stage.ui.musicReview.MusicReviewFragment;
+import edu.northeastern.stage.ui.musicReview.SubmitReviewFragment;
+import edu.northeastern.stage.ui.newPost.NewPostFragment;
+import edu.northeastern.stage.ui.profile.ProfileFragment;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private boolean isUserInteraction = false;
+    private boolean isProgrammaticSelection = false;
     private SharedDataViewModel viewModel;
+    private CustomBackStack customBackStack = new CustomBackStack();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        getOnBackPressedDispatcher().addCallback(this, backPressedCallback);
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
 
@@ -56,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
+
+        customBackStack.pushOrBringToFront("HOME_FRAGMENT");
+        Log.d("BackStackStatus", "Stack after push: " + customBackStack.getStackStatus());
 
         // This is for the appbar/actionbar/toolbar at the top of the screen if we are to implement it.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -94,36 +112,141 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Handle navigation through bottom nav bar
         binding.navView.setOnItemSelectedListener(item -> {
-            isUserInteraction = true;
-            int itemId = item.getItemId();
-            if (navController.getCurrentDestination().getId() != itemId) {
-                navController.navigate(itemId);
+            if (!isProgrammaticSelection) {
+                isUserInteraction = true;
+                int itemId = item.getItemId();
+                Log.d("NavigationAttempt", "Attempting to navigate to item ID: " + itemId);
+                navigateToFragment(getFragmentTag(itemId), true); // Ensure this is calling navigateToFragment
+                isUserInteraction = false;
             }
-            isUserInteraction = false;
             return true;
         });
 
         // used to handle the scenario where the user re-selects the Explore button while on the Music Review fragment
         binding.navView.setOnItemReselectedListener(item -> {
-            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review
-                    && item.getItemId() == R.id.navigation_explore) {
-                // Navigate back to Explore fragment
-                navController.popBackStack(R.id.navigation_explore, false);
-            } else if (navController.getCurrentDestination().getId() == R.id.navigation_submit_review
-                    && item.getItemId() == R.id.navigation_explore) {
-                // Navigate back to music review page
-                navController.popBackStack(R.id.navigation_music_review, false);
-            }
+            // Directly handle reselection without NavController
+            int itemId = item.getItemId();
+            handleReselection(itemId);
         });
+    }
 
-        // DO NOT USE: it hinders normal backstack operation.
-        // Binds the BottomNavigationView to the NavController.
-        // Sets up listeners on the bottom navigation items such that when the user tap an item,
-        // the NavController receives a callback and takes the appropriate action defined in the navigation graph (mobile_navigation.xml).
-        // The NavHostFragment then inflates the appropriate fragment.
-//        NavigationUI.setupWithNavController(binding.navView, navController);
+    public void navigateToFragment(String tag, boolean addToStack) {
+        if (addToStack) {
+            customBackStack.pushOrBringToFront(tag);
+        }
+
+        int itemId = getItemIdFromTag(tag);
+        isProgrammaticSelection = true;
+        if ((tag.equalsIgnoreCase("MUSIC_REVIEW_FRAGMENT") && (binding.navView.getSelectedItemId() != R.id.navigation_explore))
+                || (tag.equalsIgnoreCase("SUBMIT_REVIEW_FRAGMENT")) && (binding.navView.getSelectedItemId() != R.id.navigation_explore)) {
+            binding.navView.setSelectedItemId(R.id.navigation_explore);
+        } else {
+            binding.navView.setSelectedItemId(itemId);
+        }
+        isProgrammaticSelection = false;
+
+        switchFragment(itemId);
+        Log.d("NavigateToFragment", "Navigating to: " + tag + ", addToStack: " + addToStack);
+
+    }
+
+    private void handleReselection(int itemId) {
+        if (itemId == R.id.navigation_explore) {
+            if (customBackStack.peekFirst().equalsIgnoreCase("MUSIC_REVIEW_FRAGMENT")) {
+                customBackStack.pop();
+                navigateToFragment("EXPLORE_FRAGMENT", true);
+            } else if (customBackStack.peekFirst().equalsIgnoreCase("SUBMIT_REVIEW_FRAGMENT")) {
+                customBackStack.pop();
+                navigateToFragment("MUSIC_REVIEW_FRAGMENT", true);
+            }
+        }
+    }
+
+    private void switchFragment(int itemId) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        String tag = getFragmentTag(itemId);
+
+//        Fragment currentFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main);
+//        if (currentFragment != null && tag.equals(customBackStack.peekFirst())) {
+//            return;
+//        }
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        Fragment newFragment = createFragmentForItem(itemId);
+        transaction.replace(R.id.nav_host_fragment_activity_main, newFragment, tag);
+        transaction.commit();
+
+        Log.d("SwitchFragment", "Switched to fragment with tag: " + tag);
+        Log.d("BackStackStatus", "Stack after push: " + customBackStack.getStackStatus());
+    }
+
+    OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            if (customBackStack.isEmpty()
+                    || (customBackStack.size() == 1 && customBackStack.peekFirst().equalsIgnoreCase("HOME_FRAGMENT"))) {
+                finish(); // Finish the activity instead of calling onBackPressed()
+            } else {
+                if (customBackStack.size() == 2 && !customBackStack.peekLast().equalsIgnoreCase("HOME_FRAGMENT")) {
+                    customBackStack.pushLast("HOME_FRAGMENT");
+                }
+                customBackStack.pop(); // Remove current fragment from custom stack
+                String newTopFragmentTag = customBackStack.peekFirst();
+                navigateToFragment(newTopFragmentTag, false);
+            }
+        }
+    };
+
+    private int getItemIdFromTag(String tag) {
+        if ("HOME_FRAGMENT".equalsIgnoreCase(tag)) {
+            return R.id.navigation_home;
+        } else if ("EXPLORE_FRAGMENT".equalsIgnoreCase(tag)) {
+            return R.id.navigation_explore;
+        } else if ("NEW_POST_FRAGMENT".equalsIgnoreCase(tag)) {
+            return R.id.navigation_new_post;
+        } else if ("PROFILE_FRAGMENT".equalsIgnoreCase(tag)) {
+            return R.id.navigation_profile;
+        } else if ("MUSIC_REVIEW_FRAGMENT".equalsIgnoreCase(tag)) {
+            return R.id.navigation_music_review;
+        } else if ("SUBMIT_REVIEW_FRAGMENT".equalsIgnoreCase(tag)) {
+            return R.id.navigation_submit_review;
+        }
+        return -1; // Indicates error
+    }
+
+    private String getFragmentTag(int itemId) {
+        if (itemId == R.id.navigation_home) {
+            return "HOME_FRAGMENT";
+        } else if (itemId == R.id.navigation_explore) {
+            return "EXPLORE_FRAGMENT";
+        } else if (itemId == R.id.navigation_new_post) {
+            return "NEW_POST_FRAGMENT";
+        } else if (itemId == R.id.navigation_profile) {
+            return "PROFILE_FRAGMENT";
+        } else if (itemId == R.id.navigation_music_review) {
+            return "MUSIC_REVIEW_FRAGMENT";
+        } else if (itemId == R.id.navigation_submit_review) {
+            return "SUBMIT_REVIEW_FRAGMENT";
+        }
+        return null;
+    }
+    private Fragment createFragmentForItem(int itemId) {
+        if (itemId == R.id.navigation_home) {
+            return new HomeFragment();
+        } else if (itemId == R.id.navigation_explore) {
+            return new ExploreFragment();
+        } else if (itemId == R.id.navigation_new_post) {
+            return new NewPostFragment();
+        } else if (itemId == R.id.navigation_profile) {
+            return new ProfileFragment();
+        } else if (itemId == R.id.navigation_music_review) {
+            return new MusicReviewFragment();
+        } else if (itemId == R.id.navigation_submit_review) {
+            return new SubmitReviewFragment();
+        } else {
+            return null;
+        }
     }
 
     private void updateUser(String UID) {
