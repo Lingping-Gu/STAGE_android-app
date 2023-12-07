@@ -46,6 +46,19 @@ public class ExploreViewModel extends ViewModel {
     Map<Circle, String> circleTextMap = new HashMap<>();
     List<Circle> circles;
 
+    public Map<String,Integer> getTracksNearby(Integer radius) {
+        Map<String,Integer> tracksFrequency = new HashMap<>();
+        // query all users that are within a x mile radius
+        // among those users compile a whole list of all songs they posted about
+        // create a map of all these songs to keep track of frequency Key trackID Value frequency
+        // return this map
+
+        // in the fragment, when a circle is clicked, get entire track JsonElement by API call
+        // then, store this in the shared view model and convert the jsonelement to Track object and store that in shared view model
+
+        return tracksFrequency;
+    }
+
     public LiveData<List<JsonObject>> performSearch(String query) {
         MutableLiveData<List<JsonObject>> searchResults = new MutableLiveData<>();
 
@@ -106,7 +119,6 @@ public class ExploreViewModel extends ViewModel {
         return recommendations;
     }
 
-    // TODO: maybe make circles a separate viewmodel
     public void setCircles(CircleView circleView) {
         // Process the circles as needed in the ViewModel
         this.circleView = circleView;
