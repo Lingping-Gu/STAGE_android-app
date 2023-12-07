@@ -197,9 +197,9 @@ public class ProfileFragment extends Fragment {
             // User is viewing their own profile, show Edit Profile Button
             binding.LogOutButton.setVisibility(View.VISIBLE);
             binding.editProfileButton.setOnClickListener(v -> {
-                performLogout();
                 // Navigate to Login screen after logout
                 Intent intent = new Intent(getActivity(), Login.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 getActivity().finish();
             });
@@ -219,10 +219,6 @@ public class ProfileFragment extends Fragment {
     private void launchEditProfile() {
         Intent intent = new Intent(getActivity(), EditProfile.class);
         startActivity(intent);
-    }
-
-    private void performLogout() {
-        // TODO: implement LogOut function
     }
 
     private void follow() {

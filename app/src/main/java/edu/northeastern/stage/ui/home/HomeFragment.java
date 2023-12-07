@@ -20,44 +20,44 @@ import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 public class HomeFragment extends Fragment {
 
-    private RecyclerView recyclerView;
-    private PostAdapter adapter;
-    private HomeViewModel viewModel;
-    private SharedDataViewModel sharedDataViewModel;
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-
-        // initialize view models
-        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        sharedDataViewModel = new ViewModelProvider(this).get(SharedDataViewModel.class);
-
-        // get current user ID
-        sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
-            if (userID != null) {
-                viewModel.setCurrentUserId(userID);
-            }
-        });
-
-        // initialize views + adapter
-        recyclerView = view.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new PostAdapter(getActivity(),new ArrayList<>(),viewModel.getCurrentUserId()); // Initialize with empty list
-        recyclerView.setAdapter(adapter);
-
-        // set view model observe
-        observeViewModel();
-
-        return view;
-    }
-
-    private void observeViewModel() {
-        viewModel.getPosts().observe(getViewLifecycleOwner(), posts -> {
-            // Update the UI when the data changes
-            adapter.setPosts(posts);
-            adapter.notifyDataSetChanged();
-        });
-    }
+//    private RecyclerView recyclerView;
+//    private PostAdapter adapter;
+//    private HomeViewModel viewModel;
+//    private SharedDataViewModel sharedDataViewModel;
+//
+//
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//        View view = inflater.inflate(R.layout.fragment_home, container, false);
+//
+//        // initialize view models
+//        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+//        sharedDataViewModel = new ViewModelProvider(this).get(SharedDataViewModel.class);
+//
+//        // get current user ID
+//        sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
+//            if (userID != null) {
+//                viewModel.setCurrentUserId(userID);
+//            }
+//        });
+//
+//        // initialize views + adapter
+//        recyclerView = view.findViewById(R.id.recycler_view);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//        adapter = new PostAdapter(getActivity(),new ArrayList<>(),viewModel.getCurrentUserId()); // Initialize with empty list
+//        recyclerView.setAdapter(adapter);
+//
+//        // set view model observe
+//        observeViewModel();
+//
+//        return view;
+//    }
+//
+//    private void observeViewModel() {
+//        viewModel.getPosts().observe(getViewLifecycleOwner(), posts -> {
+//            // Update the UI when the data changes
+//            adapter.setPosts(posts);
+//            adapter.notifyDataSetChanged();
+//        });
+//    }
 }
