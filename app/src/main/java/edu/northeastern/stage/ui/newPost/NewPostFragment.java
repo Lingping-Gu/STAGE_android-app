@@ -19,6 +19,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -129,6 +130,17 @@ public class NewPostFragment extends Fragment {
                     }
                     artists = artists.trim();
                     binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
+
+                    JsonObject albumObject = selectedTrack.getAsJsonObject("album");
+                    if (albumObject != null) {
+                        JsonArray imagesArray = albumObject.getAsJsonArray("images");
+                        if (imagesArray != null && imagesArray.size() > 0) {
+                            String imageURL = imagesArray.get(0).getAsJsonObject().get("url").getAsString();
+                            Glide.with(this)
+                                    .load(imageURL)
+                                    .into(binding.ivAlbumCover);
+                        }
+                    }
                 }
             });
     }
