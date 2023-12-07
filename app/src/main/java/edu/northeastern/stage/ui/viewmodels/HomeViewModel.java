@@ -12,6 +12,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import edu.northeastern.stage.model.Post;
@@ -30,35 +32,32 @@ public class HomeViewModel extends ViewModel {
         return posts;
     }
 
+    // TODO: check if it's sufficient to filter posts in PostAdapter
     private void loadPosts() {
 
-        List<Post> userPosts = new ArrayList<>();
+        List<Post> homePosts = new ArrayList<>();
 
         if(currentUserId != null && !currentUserId.isEmpty()) {
             // if currentUserId is not empty and not null
-        } else {
-            // currentUserId exists
             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
-            DatabaseReference reference = mDatabase
-                    .getReference("users")
-                    .child(currentUserId)
-                    .child("posts");
+            DatabaseReference reference = mDatabase.getReference("users");
+            // get us
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for(DataSnapshot postSnapshot : snapshot.getChildren()) {
-                        Post post = new Post(postSnapshot.child("postID").toString(),
-                                postSnapshot.child("ownerID").toString(),
-                                postSnapshot.child("trackName").toString(),
-                                postSnapshot.child("trackID").toString(),
-                                postSnapshot.child("artistName").toString(),
-                                postSnapshot.child("content").toString(),
-                                Long.parseLong(postSnapshot.child("timestamp").toString()),
-                                postSnapshot.child("imageURL").toString(),
-                                postSnapshot.child("visibilityState").toString(),
-                                postSnapshot.child("spotifyURL").toString());
-                        userPosts.add(post);
+                    for(DataSnapshot postSnapshot : snapshot.child("posts").getChildren()) {
+                        Post post = new Post(postSnapshot.child("postID").getValue(String.class),
+                                postSnapshot.child("ownerID").getValue(String.class),
+                                postSnapshot.child("trackName").getValue(String.class),
+                                postSnapshot.child("trackID").getValue(String.class),
+                                postSnapshot.child("artistName").getValue(String.class),
+                                postSnapshot.child("content").getValue(String.class),
+                                Long.parseLong(postSnapshot.child("timestamp").getValue(String.class)),
+                                postSnapshot.child("imageURL").getValue(String.class),
+                                postSnapshot.child("visibilityState").getValue(String.class),
+                                postSnapshot.child("spotifyURL").getValue(String.class));
+                        homePosts.add(post);
                     }
                 }
 
@@ -67,7 +66,15 @@ public class HomeViewModel extends ViewModel {
 
                 }
             });
-            posts.setValue(userPosts);
+            Collections.sort(homePosts,new Comparator<Post>() {
+                @Override
+                public int compare(Post o1, Post o2) {
+                    return Long.compare(o2.getTimestamp(), o1.getTimestamp());
+                }
+            });
+            posts.setValue(homePosts);
+        } else {
+            // currentUser does not exist
         }
     }
 
