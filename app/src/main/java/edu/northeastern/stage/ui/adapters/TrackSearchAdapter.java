@@ -77,25 +77,6 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
         this.selectedResult = selectedResult;
     }
 
-    // addAll will take care of adding all the results in one go as well as clearing
-    // previous recommendations and notifying dataset changes
-    public void addAll(ArrayList<JsonObject> results) {
-        Log.d("TrackSearchAdapter", "in addAll");
-
-        clear();
-        if(results != null) {
-            Log.d("TrackSearchAdapter", "in addAll - if not null");
-
-            for(JsonObject result : results) {
-                add(result);
-                Log.d("TrackSearchAdapter", "in addAll - in loop result -> " + result);
-                recommendations.add(result);
-
-            }
-        }
-        notifyDataSetChanged();
-    }
-
     private static class ViewHolder {
         TextView trackTitleTV;
         TextView artistNameTV;
