@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
-import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.musicReview.SubmitReviewFragment;
 import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
@@ -40,7 +39,6 @@ public class NewPostFragment extends Fragment {
     private NewPostViewModel viewModel;
     private SharedDataViewModel sharedDataViewModel;
     private JsonObject selectedTrack;
-    private String visibilityState;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNewPostBinding.inflate(inflater, container, false);
@@ -56,27 +54,6 @@ public class NewPostFragment extends Fragment {
                 viewModel.setUserID(userID);
             }
         });
-
-        // get track if it exists
-        sharedDataViewModel.getTrackPost().observe(getViewLifecycleOwner(), track -> {
-            if (track != null) {
-                viewModel.setTrack(track);
-            }
-        });
-
-        // get visibility state
-        int selectedId = binding.rgPostVisibility.getCheckedRadioButtonId();
-        if (selectedId != -1) {
-            RadioButton selectedRadioButton = getView().findViewById(selectedId);
-            visibilityState = selectedRadioButton.getText().toString();
-            if(visibilityState.equals("Private")) {
-                visibilityState = "private";
-            } else if (visibilityState.equals("Only Friends")) {
-                visibilityState = "friends";
-            } else if (visibilityState.equals("Everyone")) {
-                visibilityState = "public";
-            }
-        }
 
         // Set up the interactions for the new post elements
         binding.btnSubmitPost.setOnClickListener(v -> {
@@ -151,8 +128,6 @@ public class NewPostFragment extends Fragment {
                         }
                     }
                     artists = artists.trim();
-                    Track trackToStore = viewModel.createTrack(selectedTrack);
-                    sharedDataViewModel.setTrackPost(trackToStore);
                     binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
                 }
             });
