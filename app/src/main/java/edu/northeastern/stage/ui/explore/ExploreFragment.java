@@ -155,7 +155,6 @@ public class ExploreFragment extends Fragment {
                                         searchAdapter.add(searchResults.get(i).getAsJsonObject());
                                     }
                                     searchAdapter.notifyDataSetChanged();
-//                                    searchAdapter.getFilter().filter(actv.getText(), null);
                                 });
                     }
                 } catch (Exception e) {
@@ -167,9 +166,10 @@ public class ExploreFragment extends Fragment {
         actv.setOnItemClickListener((parent, view, position, id) -> {
             selectedTrack = searchAdapter.getItem(position);
             if (selectedTrack != null) {
+                String artists = "";
+
                 try {
                     Log.d("ExploreFragment", "onItemClick - Selected track: " + selectedTrack);
-                    String artists = "";
                     JsonArray artistsArray = selectedTrack.getAsJsonArray("artists");
                     if (artistsArray != null && artistsArray.size() > 0) {
                         for (JsonElement artist : artistsArray) {

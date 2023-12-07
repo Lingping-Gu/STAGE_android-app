@@ -53,7 +53,7 @@ public class ExploreViewModel extends ViewModel {
         CompletableFuture<ArrayList<JsonObject>> trackSearchFuture = spotify.trackSearch(query, 10);
         trackSearchFuture.thenAccept(searchResult -> {
             searchResults.postValue(searchResult);
-            Log.d("ExploreViewModel", "performSearch - searchResult in trackSearchFuture: " + searchResult);
+            Log.d("ExploreViewModel", "performSearch - searchResult in trackSearchFuture: " + searchResult.get(0));
         }).exceptionally(e -> {
             Log.e("ExploreViewModel", "performSearch - TrackSearchError", e);
             return null;
