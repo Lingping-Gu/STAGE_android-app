@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import edu.northeastern.stage.R;
 
 public class EditProfile extends AppCompatActivity {
-    private EditText editUsername;
+    // private EditText editUsername;
     private EditText editDescription;
     private EditText editTags;
     private Button buttonSave;
@@ -35,7 +35,7 @@ public class EditProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_profile);
 
-        editUsername = findViewById(R.id.editUsername);
+        // editUsername = findViewById(R.id.editUsername);
         editDescription = findViewById(R.id.editDescription);
         editTags = findViewById(R.id.editTags);
         buttonSave = findViewById(R.id.buttonSaveProfile);
@@ -56,7 +56,7 @@ public class EditProfile extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent data = new Intent();
-                data.putExtra(EXTRA_USERNAME, editUsername.getText().toString());
+                // data.putExtra(EXTRA_USERNAME, editUsername.getText().toString());
                 data.putExtra(EXTRA_DESCRIPTION, editDescription.getText().toString());
                 data.putExtra(EXTRA_TAGS, editTags.getText().toString());
 

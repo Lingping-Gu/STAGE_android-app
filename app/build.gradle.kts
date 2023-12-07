@@ -97,7 +97,6 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     // for location
-    implementation("com.google.android.gms:play-services-location:x.y.z")
-
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
 }

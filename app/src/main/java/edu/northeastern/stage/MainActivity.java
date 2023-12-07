@@ -7,12 +7,10 @@ import android.util.Log;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -23,27 +21,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.northeastern.stage.databinding.ActivityMainBinding;
-//import edu.northeastern.stage.model.Location;
 import edu.northeastern.stage.ui.authentication.Login;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.widget.Toast;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.ui.NavigationUI;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
-    private boolean isUserInteraction = false;
     private SharedDataViewModel viewModel;
     private FusedLocationProviderClient fusedLocationClient;
-    private static final int YOUR_PERMISSIONS_REQUEST_LOCATION = 101;
+    private Integer LOCATION_PERMISSION_REQUEST_CODE = 101;
     private String UID;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser != null) {
             UID = currentUser.getUid();
             viewModel.setUserID(UID);
-            updateUser();
         } else {
             Intent intent = new Intent(MainActivity.this, Login.class);
             startActivity(intent);
@@ -82,54 +80,45 @@ public class MainActivity extends AppCompatActivity {
         // the NavController is responsible for switching fragments using res.navigation.mobile_navigation.xml
         NavController navController = navHostFragment.getNavController();
 
-        // Handle bottom nav bar display
+        // Set up a NavController listener to handle menu item selection
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (!isUserInteraction) { // Check if change is not due to user interaction
-                int destinationId = destination.getId();
-                if (destinationId == R.id.navigation_home) {
-                    binding.navView.setSelectedItemId(R.id.navigation_home);
-                } else if (destinationId == R.id.navigation_explore) {
-                    binding.navView.setSelectedItemId(R.id.navigation_explore);
-                } else if (destinationId == R.id.navigation_new_post) {
-                    binding.navView.setSelectedItemId(R.id.navigation_new_post);
-                } else if (destinationId == R.id.navigation_profile) {
-                    binding.navView.setSelectedItemId(R.id.navigation_profile);
-                }
-            }
-            if (destination.getId() == R.id.navigation_music_review
-                    || destination.getId() == R.id.navigation_submit_review) {
+            if (destination.getId() == R.id.navigation_music_review) {
                 // Only set the selected item if it's not already selected
                 if (binding.navView.getSelectedItemId() != R.id.navigation_explore) {
                     binding.navView.getMenu().findItem(R.id.navigation_explore).setChecked(true);
                 }
+            } else {
+                // Handle other destinations if needed
             }
         });
 
-        // Handle navigation through bottom nav bar
+        // used for handling selections of different items in the BottomNavigationView
         binding.navView.setOnItemSelectedListener(item -> {
-            isUserInteraction = true;
-            int itemId = item.getItemId();
-            if (navController.getCurrentDestination().getId() != itemId) {
-                navController.navigate(itemId);
+            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review && item.getItemId() == R.id.navigation_explore) {
+                // Navigate back to Explore fragment
+                navController.popBackStack(R.id.navigation_explore, false);
+                return true; // Event handled
             }
-            isUserInteraction = false;
-            return true;
+            // Default navigation behavior
+            return NavigationUI.onNavDestinationSelected(item, navController);
         });
 
         // used to handle the scenario where the user re-selects the Explore button while on the Music Review fragment
         binding.navView.setOnItemReselectedListener(item -> {
-            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review
-                    && item.getItemId() == R.id.navigation_explore) {
+            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review && item.getItemId() == R.id.navigation_explore) {
                 // Navigate back to Explore fragment
                 navController.popBackStack(R.id.navigation_explore, false);
-            } else if (navController.getCurrentDestination().getId() == R.id.navigation_submit_review
-                    && item.getItemId() == R.id.navigation_explore) {
-                // Navigate back to music review page
-                navController.popBackStack(R.id.navigation_music_review, false);
             }
         });
 
+        // Binds the BottomNavigationView to the NavController.
+        // Sets up listeners on the bottom navigation items such that when the user tap an item,
+        // the NavController receives a callback and takes the appropriate action defined in the navigation graph (mobile_navigation.xml).
+        // The NavHostFragment then inflates the appropriate fragment.
+        NavigationUI.setupWithNavController(binding.navView, navController);
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        checkAndRequestLocationPermission();
 
         // DO NOT USE: it hinders normal backstack operation.
         // Binds the BottomNavigationView to the NavController.
@@ -139,6 +128,28 @@ public class MainActivity extends AppCompatActivity {
 //        NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
+    // ask if the user hasn't give location permission
+    private void checkAndRequestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    // user permission
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                updateUser();
+            } else {
+                Toast.makeText(this, "Location permission is needed.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 
     @Override
     protected void onResume() {
@@ -146,25 +157,19 @@ public class MainActivity extends AppCompatActivity {
         updateUser();
     }
 
+    // update user information
     private void updateUser() {
-        // Check for location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            // Get the last known location
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                         @Override
                         public void onSuccess(Location location) {
                             if (location != null) {
-                                // Update location in Firebase
                                 updateUserHelper(location);
                             }
                         }
                     });
-        } else {
-            // Request location permission
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    YOUR_PERMISSIONS_REQUEST_LOCATION);
         }
     }
 

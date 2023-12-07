@@ -54,7 +54,6 @@ public class Register extends AppCompatActivity {
     private Button registerBT;
     private Spinner imageSpinner;
     private Integer profilePicSelected;
-    private Integer LOCATION_PERMISSION_REQUEST_CODE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +124,6 @@ public class Register extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 createUserAccount(emailET.getText().toString(), pwET.getText().toString(), pwConfirmET.getText().toString());
-                askPositionPermission();
             }
         });
     }
@@ -191,38 +189,5 @@ public class Register extends AppCompatActivity {
         }
     }
 
-    private void askPositionPermission() {
 
-        registerBT.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Before creating the account, check for location permission
-                if (ContextCompat.checkSelfPermission(Register.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    // Permission is not granted, request for permission
-                    ActivityCompat.requestPermissions(Register.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            LOCATION_PERMISSION_REQUEST_CODE);
-                } else {
-                    // Permission already granted, proceed with account creation
-                    createUserAccount(emailET.getText().toString(), pwET.getText().toString(), pwConfirmET.getText().toString());
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            // If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission was granted, proceed with account creation
-                createUserAccount(emailET.getText().toString(), pwET.getText().toString(), pwConfirmET.getText().toString());
-            } else {
-                // Permission denied, show an explanation to the user
-                Toast.makeText(this, "Location permission is needed for registration.", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
 }
