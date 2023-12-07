@@ -39,6 +39,7 @@ public class HomeViewModel extends ViewModel {
             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
             DatabaseReference reference = mDatabase.getReference("users");
+            // get us
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {

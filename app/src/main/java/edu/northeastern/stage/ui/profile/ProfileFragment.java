@@ -140,7 +140,7 @@ public class ProfileFragment extends Fragment {
             binding.followButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    follow();
+                    viewModel.follow();
                 }
             });
         }
@@ -151,43 +151,4 @@ public class ProfileFragment extends Fragment {
         startActivity(intent);
     }
 
-    private void follow() {
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference rootRef = mDatabase.getReference();
-        DatabaseReference currentUserRef = rootRef.child("users").child(viewModel.getCurrentID()).child("following").child(profileOwnerId);
-        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerId).child("followers").child(viewModel.getCurrentID());
-
-        currentUserRef.setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Log.d("ProfileFragment","Follow success!");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("ProfileFragment","Follow unsuccessful!");
-            }
-        });
-        profileOwnerRef.setValue(true);
-    }
-
-    private void unfollow() {
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference rootRef = mDatabase.getReference();
-        DatabaseReference currentUserRef = rootRef.child("users").child(viewModel.getCurrentID()).child("following").child(profileOwnerId);
-        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerId).child("followers").child(viewModel.getCurrentID());
-
-        currentUserRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Log.d("ProfileFragment","Unfollow success!");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("ProfileFragment","Unfollow unsuccessful!");
-            }
-        });
-        profileOwnerRef.setValue(true);
-    }
 }

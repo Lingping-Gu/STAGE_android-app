@@ -1,10 +1,14 @@
 package edu.northeastern.stage.ui.viewmodels;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -81,7 +85,45 @@ public class ProfileViewModel extends ViewModel {
         });
     }
 
+    public void follow() {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference rootRef = mDatabase.getReference();
+        DatabaseReference currentUserRef = rootRef.child("users").child(currentID).child("following").child(profileOwnerID);
+        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerID).child("followers").child(currentID);
 
+        currentUserRef.setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("ProfileFragment","Follow success!");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("ProfileFragment","Follow unsuccessful!");
+            }
+        });
+        profileOwnerRef.setValue(true);
+    }
+
+    public void unfollow() {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference rootRef = mDatabase.getReference();
+        DatabaseReference currentUserRef = rootRef.child("users").child(currentID).child("following").child(profileOwnerID);
+        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerID).child("followers").child(currentID);
+
+        currentUserRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("ProfileFragment","Unfollow success!");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("ProfileFragment","Unfollow unsuccessful!");
+            }
+        });
+        profileOwnerRef.setValue(true);
+    }
 
     public Integer getProfilePicResource() {
         return profilePicResource;
