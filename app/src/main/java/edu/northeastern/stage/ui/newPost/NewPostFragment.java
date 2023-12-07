@@ -39,6 +39,9 @@ public class NewPostFragment extends Fragment {
     private NewPostViewModel viewModel;
     private SharedDataViewModel sharedDataViewModel;
     private JsonObject selectedTrack;
+    private TrackSearchAdapter searchAdapter;
+    private static final int SEARCH_DELAY = 500;
+    private long lastSearchTime = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNewPostBinding.inflate(inflater, container, false);
@@ -47,6 +50,8 @@ public class NewPostFragment extends Fragment {
         // share data between models
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
         viewModel = new ViewModelProvider(this).get(NewPostViewModel.class);
+
+        searchAdapter = new TrackSearchAdapter(getContext(), binding.actvSongSearch);
 
         // get user ID
         sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
@@ -91,9 +96,6 @@ public class NewPostFragment extends Fragment {
     // TODO: it seems like the autocomplete/search doesn't work until you delete something from the search string
     // TODO: API is getting 10 songs but the view is not being updated
     private void setupSearch() {
-
-            TrackSearchAdapter searchAdapter = new TrackSearchAdapter(getContext(), binding.actvSongSearch);
-
             binding.actvSongSearch.setAdapter(searchAdapter);
             binding.actvSongSearch.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -107,13 +109,38 @@ public class NewPostFragment extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    viewModel.performSearch(s.toString())
-                            .observe(getViewLifecycleOwner(), searchResults -> {
-                                searchAdapter.clear();
-                                ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
-                                searchAdapter.addAll(newResults);
-                                searchAdapter.notifyDataSetChanged();
-                            });
+//                    viewModel.performSearch(s.toString())
+//                            .observe(getViewLifecycleOwner(), searchResults -> {
+//                                searchAdapter.clear();
+//                                ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
+//                                searchAdapter.addAll(newResults);
+//                                searchAdapter.notifyDataSetChanged();
+//                            });
+
+                    try {
+                        long currentTime = System.currentTimeMillis();
+                        // add delay of 500 ms between current time and last search time for efficiency
+                        // search length should be more than 0
+                        if(currentTime - lastSearchTime > SEARCH_DELAY && s.length() != 0) {
+                            lastSearchTime = currentTime;
+                            binding.actvSongSearch.showDropDown();
+
+                            Log.d("NewPostFragment", "afterTextChanged - Performing search for: " + s.toString());
+                            viewModel.performSearch(s.toString())
+                                    .observe(getViewLifecycleOwner(), searchResults -> {
+                                        searchAdapter.clear();
+                                        Log.d("NewPostFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
+
+                                        for (int i = 0; i < searchResults.size(); i++) {
+                                            Log.d("NewPostFragment", "afterTextChanged - LOOP " + searchResults.get(i).get("name").getAsString() + " BY " + searchResults.get(i).getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString());
+                                            searchAdapter.add(searchResults.get(i).getAsJsonObject());
+                                        }
+                                        searchAdapter.notifyDataSetChanged();
+                                    });
+                        }
+                    } catch (Exception e) {
+                        Log.e("NewPostFragment", "afterTextChanged - Error performing search", e);
+                    }
                 }
             });
 

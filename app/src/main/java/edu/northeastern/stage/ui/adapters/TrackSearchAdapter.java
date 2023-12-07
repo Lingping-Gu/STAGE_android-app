@@ -32,7 +32,6 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
     private AutoCompleteTextView songSearchACTV;
     private JsonObject selectedResult;
     Context context;
-    private ArrayList<JsonObject> recommendations = new ArrayList<>();
 
     public TrackSearchAdapter(Context context, AutoCompleteTextView songSearchACTV) {
         super(context, 0);
@@ -53,13 +52,11 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        Log.d("TrackSearchAdapter", "Processing item at position: " + position);
 
         JsonObject result = getItem(position);
         Log.d("TrackSearchAdapter", "Result size: " + result.size());
 
         if(result != null) {
-            Log.d("TrackSearchAdapter", "Processing item at position: " + position);
             Log.d("TrackSearchAdapter", "getView - RESULT NOT NULL");
             viewHolder.bind(convertView.getContext(),result);
         } else {
