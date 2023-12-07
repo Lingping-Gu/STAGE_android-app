@@ -89,8 +89,6 @@ public class ExploreViewModel extends ViewModel {
 
             }
         });
-        // in the fragment, when a circle is clicked, get entire track JsonElement by API call
-        // then, store this in the shared view model and convert the jsonelement to Track object and store that in shared view model
         return tracksFrequency;
     }
 

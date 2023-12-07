@@ -56,23 +56,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public void onBindViewHolder(PostViewHolder holder, int position) {
         Post post = postList.get(position);
 
-        Spotify spotify = new Spotify();
         String viewType;
-        String postOwnerId = post.getOwnerID();
 
         if (isOwner(post)) {
             viewType = "owner";
-        } else if (isFriend()) {
+        } else if (isFriend(post)) {
             viewType = "friend";
         } else {
             viewType = "stranger";
         }
 
         // set post visibility
+        String visibilityState = post.getVisibilityState();
         // friend
         if (viewType.equals("friend")) {
-            String visibilityState = post.getVisibilityState();
-            if (viewType.equals("private")) {
+            if (visibilityState.equals("private")) {
                 holder.itemView.setVisibility(View.GONE);
             } else {
                 holder.itemView.setVisibility(View.VISIBLE);
@@ -80,8 +78,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         }
         // stranger
         if (viewType.equals("stranger")) {
-            String visibilityState = post.getVisibilityState();
-            if (!viewType.equals("public")) {
+            if (!visibilityState.equals("public")) {
                 holder.itemView.setVisibility(View.GONE);
             } else {
                 holder.itemView.setVisibility(View.VISIBLE);
@@ -89,8 +86,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         }
 
         // set Visibility State Icon
-        if (viewType == "owner") {
-            switch (post.getVisibilityState()) {
+        if (viewType.equals("owner")) {
+            switch (visibilityState) {
                 case "friends":
                     holder.visibleState.setImageResource(R.drawable.profile_friends);
                     break;
@@ -236,9 +233,33 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         return currentUserId.equals(post.getOwnerID());
     }
 
-    // TODO: Implement in DataBaseExample
-    private boolean isFriend() {
-        return true;
+    private boolean isFriend(Post post) {
+
+        final boolean[] isFriend = {false};
+
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(currentUserId);
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.child("following").hasChild(post.getOwnerID()) &&
+                        snapshot.child("followers").hasChild(post.getOwnerID())) {
+                    isFriend[0] = true;
+                } else {
+                    isFriend[0] = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
+        return isFriend[0];
     }
 
     @Override
