@@ -32,18 +32,13 @@ public class HomeViewModel extends ViewModel {
 
     private void loadPosts() {
 
-        List<Post> userPosts = new ArrayList<>();
+        List<Post> homePosts = new ArrayList<>();
 
         if(currentUserId != null && !currentUserId.isEmpty()) {
             // if currentUserId is not empty and not null
-        } else {
-            // currentUserId exists
             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
-            DatabaseReference reference = mDatabase
-                    .getReference("users")
-                    .child(currentUserId)
-                    .child("posts");
+            DatabaseReference reference = mDatabase.getReference("users");
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -58,7 +53,7 @@ public class HomeViewModel extends ViewModel {
                                 postSnapshot.child("imageURL").toString(),
                                 postSnapshot.child("visibilityState").toString(),
                                 postSnapshot.child("spotifyURL").toString());
-                        userPosts.add(post);
+                        homePosts.add(post);
                     }
                 }
 
@@ -67,7 +62,9 @@ public class HomeViewModel extends ViewModel {
 
                 }
             });
-            posts.setValue(userPosts);
+            posts.setValue(homePosts);
+        } else {
+            // currentUser does not exist
         }
     }
 

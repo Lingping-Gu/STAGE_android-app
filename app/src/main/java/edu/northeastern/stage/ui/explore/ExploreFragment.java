@@ -65,6 +65,13 @@ public class ExploreFragment extends Fragment {
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
         viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
 
+        // set current user
+        sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
+            if (userID != null) {
+                viewModel.setUserID(userID);
+            }
+        });
+
         //setup search
         setupSearch();
 

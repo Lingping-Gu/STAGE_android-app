@@ -31,15 +31,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class ProfileFragment extends Fragment {
@@ -50,13 +45,8 @@ public class ProfileFragment extends Fragment {
     private TagsAdapter tagsAdapter;
     private PostAdapter postsAdapter;
     private RecentListenedAdapter recentListenedAdapter;
-    private String currentUserId;
     private String profileOwnerId;
-    private Integer profilePictureResource;
-    private String email;
-    private String description;
     private List<Post> posts;
-    private List<String> tags;
     private List<String> recentlyListenedToImageURLs;
 
     @Override
@@ -71,7 +61,7 @@ public class ProfileFragment extends Fragment {
         // get current user ID
         sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
             if (userID != null) {
-                currentUserId = userID;
+                viewModel.setCurrentID(userID);
             }
         });
 
@@ -79,8 +69,11 @@ public class ProfileFragment extends Fragment {
         if(getArguments().getString("PROFILE_OWNER_ID") != null && !getArguments().getString("PROFILE_OWNER_URL").isEmpty()) {
             profileOwnerId = getArguments().getString("PROFILE_OWNER_ID");
         } else {
-            profileOwnerId = currentUserId;
+            profileOwnerId = viewModel.getCurrentID();
         }
+
+        // set profile owner ID in the viewmodel
+        viewModel.setProfileOwnerID(profileOwnerId);
 
         // set up adapters
         setUpAdapters();
@@ -91,12 +84,11 @@ public class ProfileFragment extends Fragment {
         // TODO: need to set onClick for follow/unfollow button
 
         // initialize variables
-        tags = new ArrayList<>();
         posts = new ArrayList<>();
         recentlyListenedToImageURLs = new ArrayList<>();
 
         // retrieve all values from database first
-        retrieveDataFromDatabase();
+        viewModel.retrieveDataFromDatabase();
 
         // set values to UI
         setUIValues();
@@ -104,62 +96,10 @@ public class ProfileFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private void retrieveDataFromDatabase() {
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference rootRef = mDatabase.getReference();
-        DatabaseReference userRef = rootRef.child("users").child(profileOwnerId);
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()) {
-                    if(snapshot.hasChild("imageResource")) {
-                        profilePictureResource = snapshot.child("imageResource").getValue(Integer.class);
-                    }
-                    if(snapshot.hasChild("description")) {
-                        description = snapshot.child("description").getValue(String.class);
-                    }
-                    if(snapshot.hasChild("email")) {
-                        email = snapshot.child("email").getValue(String.class);
-                    }
-                    if(snapshot.hasChild("tags")) {
-                        for (DataSnapshot tagsSnapshot : snapshot.child("tags").getChildren()) {
-                            String tag = tagsSnapshot.getValue(String.class);
-                            tags.add(tag);
-                        }
-                    }
-                    if(snapshot.hasChild("posts")) {
-                        for (DataSnapshot postsSnapshot : snapshot.child("posts").getChildren()) {
-                            Post post = new Post(postsSnapshot.child("postID").toString(),
-                                    postsSnapshot.child("ownerID").toString(),
-                                    postsSnapshot.child("trackName").toString(),
-                                    postsSnapshot.child("trackID").toString(),
-                                    postsSnapshot.child("artistName").toString(),
-                                    postsSnapshot.child("content").toString(),
-                                    Long.parseLong(postsSnapshot.child("timestamp").toString()),
-                                    postsSnapshot.child("imageURL").toString(),
-                                    postsSnapshot.child("visibilityState").toString(),
-                                    postsSnapshot.child("spotifyURL").toString());
-                            posts.add(post);
-                        }
-                        Collections.sort(posts,new Comparator<Post>() {
-                            @Override
-                            public int compare(Post o1, Post o2) {
-                                return Long.compare(o2.getTimestamp(), o1.getTimestamp());
-                            }
-                        });
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-    }
-
     private void setUIValues() {
-        binding.description.setText(description);
-        binding.profileImage.setImageResource(profilePictureResource);
-        binding.userName.setText(email);
+        binding.description.setText(viewModel.getDescription());
+        binding.profileImage.setImageResource(viewModel.getProfilePicResource());
+        binding.userName.setText(viewModel.getEmail());
         for(Post post : posts) {
             recentlyListenedToImageURLs.add(post.getImageURL());
         }
@@ -172,7 +112,7 @@ public class ProfileFragment extends Fragment {
         binding.tags.setAdapter(tagsAdapter);
 
         // Set up PostAdapter and connect to view
-        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>(), currentUserId);
+        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>(), viewModel.getCurrentID());
         binding.activities.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.activities.setAdapter(postsAdapter);
 
@@ -184,7 +124,7 @@ public class ProfileFragment extends Fragment {
 
     private void showEditProfileButtonOrFollowButton() {
         // Set up Edit Profile Button or Follow Button
-        if (currentUserId.equals(profileOwnerId)) {
+        if (viewModel.getCurrentID().equals(profileOwnerId)) {
             // User is viewing their own profile, show Edit Profile Button
             binding.editProfileButton.setVisibility(View.VISIBLE);
             binding.followButton.setVisibility(View.GONE);
@@ -214,8 +154,8 @@ public class ProfileFragment extends Fragment {
     private void follow() {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference rootRef = mDatabase.getReference();
-        DatabaseReference currentUserRef = rootRef.child("users").child(currentUserId).child("following").child(profileOwnerId);
-        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerId).child("followers").child(currentUserId);
+        DatabaseReference currentUserRef = rootRef.child("users").child(viewModel.getCurrentID()).child("following").child(profileOwnerId);
+        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerId).child("followers").child(viewModel.getCurrentID());
 
         currentUserRef.setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -234,8 +174,8 @@ public class ProfileFragment extends Fragment {
     private void unfollow() {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference rootRef = mDatabase.getReference();
-        DatabaseReference currentUserRef = rootRef.child("users").child(currentUserId).child("following").child(profileOwnerId);
-        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerId).child("followers").child(currentUserId);
+        DatabaseReference currentUserRef = rootRef.child("users").child(viewModel.getCurrentID()).child("following").child(profileOwnerId);
+        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerId).child("followers").child(viewModel.getCurrentID());
 
         currentUserRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
