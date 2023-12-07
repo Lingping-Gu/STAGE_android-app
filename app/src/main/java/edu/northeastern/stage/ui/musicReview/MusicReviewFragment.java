@@ -43,7 +43,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class MusicReviewFragment extends Fragment {
     private FragmentMusicReviewBinding binding;
@@ -161,17 +163,13 @@ public class MusicReviewFragment extends Fragment {
         musicAttributesTextView.setText(attributesText);
     }
 
-    private void updateMusicTitle(String trackName, ArrayList<Artist> artistsArray){
+    private void updateMusicTitle(String trackName, List<Artist> artists) {
 
-        String artists = "";
+        String artistNames = artists.stream()
+                .map(Artist::getName)
+                .collect(Collectors.joining(", "));
 
-        if (artistsArray != null && artistsArray.size() > 0) {
-            for (Artist artist : artistsArray) {
-                artists = artists + artist.getName() + " ";
-            }
-        }
-
-        String titleText = trackName + " by " + artists;
+        String titleText = trackName + " by " + artistNames;
 
         musicTitleTextView.setText(titleText);
     }

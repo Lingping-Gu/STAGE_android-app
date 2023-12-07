@@ -21,6 +21,7 @@ import com.google.gson.JsonObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import edu.northeastern.stage.R;
@@ -121,12 +122,21 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
                 JsonArray artistsArray = result.getAsJsonArray("artists");
                 Log.d("TrackSearchAdapter", "bind - Binding result: " + artistsArray.size());
 
-                if (artistsArray != null && artistsArray.size() > 0) {
-                    for (JsonElement artist : artistsArray) {
-                        artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
+                if (artistsArray != null && !artistsArray.isJsonNull() && artistsArray.size() > 0) {
+                    StringBuilder artistsSB = new StringBuilder();
+                    Iterator<JsonElement> iterator = artistsArray.iterator();
+
+                    while (iterator.hasNext()) {
+                        artistsSB.append(iterator.next().getAsJsonObject().get("name").getAsString());
+
+                        if (iterator.hasNext()) {
+                            artistsSB.append(", ");
+                        }
                     }
+
+                    artistNameTV.setText(artistsSB.toString());
                 }
-                artistNameTV.setText(artists);
+
 
                 JsonObject albumObject = result.getAsJsonObject("album");
                 if (albumObject != null) {
