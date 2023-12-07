@@ -38,6 +38,7 @@ import edu.northeastern.stage.ui.newPost.NewPostFragment;
 import edu.northeastern.stage.ui.profile.ProfileFragment;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
+// TODO: Add comments for newly added navigation methods.
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private boolean isUserInteraction = false;
