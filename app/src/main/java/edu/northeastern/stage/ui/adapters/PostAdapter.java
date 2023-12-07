@@ -3,6 +3,7 @@ package edu.northeastern.stage.ui.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +14,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -35,10 +38,7 @@ import edu.northeastern.stage.ui.profile.ProfileFragment;
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
     private Context context;
     private List<Post> postList;
-    private String viewType;
     private String currentUserId;
-    private String postOwnerId;
-    private Spotify spotify = new Spotify();
 
     public PostAdapter(Context context, List<Post> postList, String currentUserId) {
         this.context = context;
@@ -56,9 +56,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public void onBindViewHolder(PostViewHolder holder, int position) {
         Post post = postList.get(position);
 
-        postOwnerId = post.getOwnerID();
+        Spotify spotify = new Spotify();
+        String viewType;
+        String postOwnerId = post.getOwnerID();
 
-        if (isOwner()) {
+        if (isOwner(post)) {
             viewType = "owner";
         } else if (isFriend()) {
             viewType = "friend";
@@ -121,26 +123,23 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 .error(R.drawable.profile_recent_listened_error)
                 .into(holder.tvMusicImage);
 
-
-
-        // TODO: liked status
+        // TODO: add logic to change heart based on like/not liked
         // Set the like status on the ivLike ImageView
         holder.ivLike.setOnClickListener(v -> {
-            ArrayList<String> likes = post.getLikes();
-            // get current isLiked state
-            boolean isLiked = likes.contains(post.getUser());
-            // database update
-            FirebaseExample firebaseExample = new FirebaseEaxmple();
-            firebaseExample.likePost(isLiked);
-            isLiked = !isLiked;
-            // show the like icon
-            holder.ivLike.setSelected(isLiked);
+            if (isLiked(post)) {
+                // liked
+                removeLikeFBDB(post);
+            } else {
+                // not liked
+                addLikeFDBD(post);
+            }
         });
 
         //display user avatar
-        Picasso.get()
-                .load(post.getUserAvatarUrl())
-                .error(R.drawable.default_pfp)
+        Glide.with(context)
+                .load(post.getPostID())
+                .placeholder(R.drawable.default_pfp) // Set a placeholder image
+                .error(R.drawable.default_pfp) // Set an error image
                 .into(holder.ivUserAvatar);
 
         // TODO: think about how to navigate to certain profile
@@ -149,48 +148,92 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             Intent intent = new Intent(context, ProfileFragment.class);
             context.startActivity(intent);
             intent.putExtra("PROFILE_OWNER_ID", post.getOwnerID());
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
-            v.getContext().startActivity(i);
         });
     }
 
-    private boolean isLiked(Long timestamp) {
+    private void addLikeFDBD(Post post) {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
         DatabaseReference reference = mDatabase
                 .getReference("users")
-                .child(postOwnerId)
-                .child("posts");
+                .child(post.getOwnerID())
+                .child("posts")
+                .child(post.getPostID())
+                .child("likes")
+                .child(currentUserId);
 
-        Query postQuery = reference.orderByChild("timestamp").equalTo(timestamp);
+        reference.setValue(true)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d("PostAdapter","Added like to database.");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("PostAdapter","Failed to add like to database.");
+                    }
+                });
+    }
 
-        postQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+    private void removeLikeFBDB(Post post) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(post.getOwnerID())
+                .child("posts")
+                .child(post.getPostID())
+                .child("likes")
+                .child(currentUserId);
+
+        reference.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d("PostAdapter","Removed like from database.");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("PostAdapter","Failed to remove like from database.");
+                    }
+                });
+    }
+
+    private boolean isLiked(Post post) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(post.getOwnerID())
+                .child("posts")
+                .child(post.getPostID())
+                .child("likes");
+
+        List<String> likedUserIDs = new ArrayList<>();
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()) {
-                    for(DataSnapshot postSnapshot : snapshot.getChildren()) {
-                        ArrayList<String> likes = postSnapshot.child("likes");
-                    }
+                List<String> likedUserIDs = new ArrayList<>();
+
+                for (DataSnapshot likeSnapshot : snapshot.getChildren()) {
+                    String likedUserID = likeSnapshot.getKey();
+                    likedUserIDs.add(likedUserID);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
-
-        // get the correct post reference by timestamp
-        // get list of users that likes the post
-        // if currentUser is in the list of users, then show red heart
-        // if currentUser is not in the list of users, then show blank heart
-        // if currentUser is in the list of users and the user clicks, then remove user from list
-        // if currentUser is not in the list of users and the user clicks, then add user
+        return likedUserIDs.contains(currentUserId);
     }
 
-    private boolean isOwner() {
-        return currentUserId.equals(postOwnerId);
+    private boolean isOwner(Post post) {
+        return currentUserId.equals(post.getOwnerID());
     }
 
     // TODO: Implement in DataBaseExample

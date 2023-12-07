@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,8 @@ import android.content.Intent;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 
 public class ProfileFragment extends Fragment {
 
@@ -57,8 +59,6 @@ public class ProfileFragment extends Fragment {
     private List<String> tags;
     private List<String> recentlyListenedToImageURLs;
 
-    // TODO: think about how to store or get profileOwnerID
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -75,11 +75,20 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        // if landed on fragment by clicking on another fragment, get profile owner
+        if(getArguments().getString("PROFILE_OWNER_ID") != null && !getArguments().getString("PROFILE_OWNER_URL").isEmpty()) {
+            profileOwnerId = getArguments().getString("PROFILE_OWNER_ID");
+        } else {
+            profileOwnerId = currentUserId;
+        }
+
         // set up adapters
         setUpAdapters();
 
         // show edit button or follow button depending on profile owner and current user
         showEditProfileButtonOrFollowButton();
+
+        // TODO: need to set onClick for follow/unfollow button
 
         // initialize variables
         tags = new ArrayList<>();
@@ -98,7 +107,7 @@ public class ProfileFragment extends Fragment {
     private void retrieveDataFromDatabase() {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference rootRef = mDatabase.getReference();
-        DatabaseReference userRef = rootRef.child("users").child(currentUserId);
+        DatabaseReference userRef = rootRef.child("users").child(profileOwnerId);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -120,12 +129,16 @@ public class ProfileFragment extends Fragment {
                     }
                     if(snapshot.hasChild("posts")) {
                         for (DataSnapshot postsSnapshot : snapshot.child("posts").getChildren()) {
-                            Post post = new Post(postsSnapshot.child("trackName").toString(),
+                            Post post = new Post(postsSnapshot.child("postID").toString(),
+                                    postsSnapshot.child("ownerID").toString(),
+                                    postsSnapshot.child("trackName").toString(),
                                     postsSnapshot.child("trackID").toString(),
                                     postsSnapshot.child("artistName").toString(),
                                     postsSnapshot.child("content").toString(),
                                     Long.parseLong(postsSnapshot.child("timestamp").toString()),
-                                    postsSnapshot.child("imageURL").toString());
+                                    postsSnapshot.child("imageURL").toString(),
+                                    postsSnapshot.child("visibilityState").toString(),
+                                    postsSnapshot.child("spotifyURL").toString());
                             posts.add(post);
                         }
                         Collections.sort(posts,new Comparator<Post>() {
@@ -204,7 +217,37 @@ public class ProfileFragment extends Fragment {
         DatabaseReference currentUserRef = rootRef.child("users").child(currentUserId).child("following").child(profileOwnerId);
         DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerId).child("followers").child(currentUserId);
 
-        currentUserRef.setValue(true);
+        currentUserRef.setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("ProfileFragment","Follow success!");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("ProfileFragment","Follow unsuccessful!");
+            }
+        });
+        profileOwnerRef.setValue(true);
+    }
+
+    private void unfollow() {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference rootRef = mDatabase.getReference();
+        DatabaseReference currentUserRef = rootRef.child("users").child(currentUserId).child("following").child(profileOwnerId);
+        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerId).child("followers").child(currentUserId);
+
+        currentUserRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d("ProfileFragment","Unfollow success!");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("ProfileFragment","Unfollow unsuccessful!");
+            }
+        });
         profileOwnerRef.setValue(true);
     }
 }

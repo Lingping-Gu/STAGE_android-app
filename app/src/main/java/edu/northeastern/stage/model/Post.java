@@ -1,6 +1,8 @@
 package edu.northeastern.stage.model;
 
 public class Post {
+
+    private String postID;
     private String ownerID;
     private String trackName;
     private String trackID;
@@ -11,8 +13,9 @@ public class Post {
     private String visibilityState;
     private String spotifyURL;
 
-    public Post(String ownerID, String trackName, String trackID, String artistName, String content,
+    public Post(String postID, String ownerID, String trackName, String trackID, String artistName, String content,
                 Long timestamp, String imageURL, String visibilityState, String spotifyURL) {
+        this.postID = postID;
         this.ownerID = ownerID;
         this.trackName = trackName;
         this.trackID = trackID;
@@ -22,6 +25,14 @@ public class Post {
         this.imageURL = imageURL;
         this.visibilityState = visibilityState;
         this.spotifyURL = spotifyURL;
+    }
+
+    public String getPostID() {
+        return postID;
+    }
+
+    public void setPostID(String postID) {
+        this.postID = postID;
     }
 
     public String getTrackName() {

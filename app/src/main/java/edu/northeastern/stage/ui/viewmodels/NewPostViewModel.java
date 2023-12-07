@@ -72,9 +72,8 @@ public class NewPostViewModel extends ViewModel {
                     }
                 }
 
-                // TODO: add visibility state option
                 // Set Post object
-                Post post = new Post(getUserID(),trackName, trackID, artistName, content, timestamp, imageURL, visibilityState, spotifyURL);
+                Post post = new Post(newPostRef.getKey(), getUserID(),trackName, trackID, artistName, content, timestamp, imageURL, visibilityState, spotifyURL);
                 newPostRef.setValue(post, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
