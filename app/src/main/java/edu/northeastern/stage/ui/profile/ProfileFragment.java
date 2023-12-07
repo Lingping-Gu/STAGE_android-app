@@ -1,5 +1,6 @@
 package edu.northeastern.stage.ui.profile;
 
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -59,6 +60,7 @@ public class ProfileFragment extends Fragment {
     private List<Post> posts;
     private List<String> tags;
     private List<String> recentlyListenedToImageURLs;
+    private boolean isFollowing;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -86,10 +88,9 @@ public class ProfileFragment extends Fragment {
         // set up adapters
         setUpAdapters();
 
-        // show edit button or follow button depending on profile owner and current user
+        // show edit button
+        // or follow/unFollow button depending on profile owner and current user
         showEditProfileButtonOrFollowButton();
-
-        // TODO: need to set onClick for follow/unfollow button
 
         // initialize variables
         tags = new ArrayList<>();
@@ -205,14 +206,29 @@ public class ProfileFragment extends Fragment {
             });
         } else {
             // User is viewing someone else's profile, show Follow Button
-            binding.followButton.setVisibility(View.VISIBLE);
             binding.editProfileButton.setVisibility(View.GONE);
-            binding.followButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    follow();
-                }
-            });
+            // TODO: database update
+            isFollowing = true;
+            if (!isFollowing) {
+                binding.followButton.setVisibility(View.VISIBLE);
+                binding.followButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        follow();
+                    }
+                });
+            } else {
+                binding.followButton.setVisibility(View.VISIBLE);
+                // Change the text of the button and the background color of the button
+                binding.followButton.setText("Unfollow");
+                binding.followButton.setBackgroundColor(Color.RED);
+                binding.followButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        unfollow();
+                    }
+                });
+            }
         }
     }
 
