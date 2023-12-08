@@ -1,11 +1,14 @@
 package edu.northeastern.stage.model.music;
 
+import com.google.gson.JsonArray;
+
 import java.util.ArrayList;
 
 public class Artist {
     private String spotifyUrl; // from external_urls
     private String id;
     private String name;
+    private JsonArray genreArray;
 
     public Artist(String spotifyUrl, String id, String name) {
         this.spotifyUrl = spotifyUrl;
@@ -36,4 +39,8 @@ public class Artist {
     public void setName(String name) {
         this.name = name;
     }
+
+    public JsonArray getGenres(){ return genreArray; }
+
+    public void setGenres(JsonArray genreArray) { this.genreArray = genreArray; }
 }

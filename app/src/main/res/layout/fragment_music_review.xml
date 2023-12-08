@@ -33,6 +33,12 @@
                 android:padding="16dp"
                 android:text="Hurricane by Bob Dylan" />
 
+            <ImageView
+                android:id="@+id/spotifyLogo"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                app:srcCompat="@drawable/spotifylogo"/>
+
             <TextView
                 android:id="@+id/musicAttributesTextView"
                 android:layout_width="match_parent"

@@ -165,7 +165,6 @@ public class ExploreFragment extends Fragment {
                                         searchAdapter.add(searchResults.get(i).getAsJsonObject());
                                     }
                                     searchAdapter.notifyDataSetChanged();
-//                                    searchAdapter.getFilter().filter(actv.getText(), null);
                                 });
                     }
                 } catch (Exception e) {
@@ -178,6 +177,7 @@ public class ExploreFragment extends Fragment {
             selectedTrack = searchAdapter.getItem(position);
             if (selectedTrack != null) {
                 String artists = "";
+
                 try {
                     Log.d("ExploreFragment", "onItemClick - Selected track: " + selectedTrack);
                     JsonArray artistsArray = selectedTrack.getAsJsonArray("artists");

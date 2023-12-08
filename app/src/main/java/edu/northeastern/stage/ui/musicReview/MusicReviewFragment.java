@@ -2,6 +2,9 @@ package edu.northeastern.stage.ui.musicReview;
 
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,12 +18,15 @@ import android.view.ViewGroup;
 import edu.northeastern.stage.R;
 
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import edu.northeastern.stage.databinding.FragmentMusicReviewBinding;
+import edu.northeastern.stage.model.music.Artist;
 import edu.northeastern.stage.ui.adapters.ReviewAdapter;
 import edu.northeastern.stage.ui.viewmodels.MusicReviewViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
@@ -29,7 +35,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class MusicReviewFragment extends Fragment {
     private FragmentMusicReviewBinding binding;
@@ -40,6 +53,10 @@ public class MusicReviewFragment extends Fragment {
     private TextView overallScoreTextView;
     private TextView noReviewsTextView;
     private Button addReviewButton;
+    private TextView musicTitleTextView;
+    private String dynamicLink;
+    private ImageView spotifyLogoImageView;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -60,7 +77,12 @@ public class MusicReviewFragment extends Fragment {
         // set track
         sharedDataViewModel.getTrackReview().observe(getViewLifecycleOwner(), track -> {
             if (track != null) {
-                mViewModel.setTrack(track);
+                updateMusicAttributes(track.getAlbum().getName(), track.getAlbum().getReleaseDate(), track.getArtists().get(0).getGenres() !=null ? String.valueOf(track.getArtists().get(0).getGenres()) : "N/A");
+
+                updateMusicTitle(track.getName(), track.getArtists());
+
+                dynamicLink = track.getSpotifyUrl();
+
                 Glide.with(this)
                         .load(track.getAlbum().getImageURL())
 //                  .placeholder(R.drawable.placeholder_image) // Set a placeholder image
@@ -74,6 +96,9 @@ public class MusicReviewFragment extends Fragment {
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         noReviewsTextView = binding.noReviewsTextView;
         addReviewButton = binding.addReviewButton;
+        musicTitleTextView = binding.musicTitleTextView;
+        spotifyLogoImageView = binding.spotifyLogo;
+
 
         addReviewButton.setOnClickListener(v -> {
             // Use the NavController to navigate to the MusicReviewFragment
@@ -96,13 +121,52 @@ public class MusicReviewFragment extends Fragment {
                 updateOverallScore();
             }
         });
+
+
+        spotifyLogoImageView.setOnClickListener(v -> {
+            if(dynamicLink != null){
+                gotoUrl(dynamicLink);
+            }
+        });
+
         return root;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mViewModel.fetchReviews(); // fetch all reviews
+//        mViewModel.fetchReviews(); // fetch all reviews
+    }
+
+    private void gotoUrl(String s) {
+        Uri uri = Uri.parse(s);
+        // Try to invoke the intent.
+        try {
+            getContext().startActivity(new Intent(Intent.ACTION_VIEW,uri));
+        } catch (ActivityNotFoundException e) {
+            // Show an error message using a toast if click doesn't launch the url
+            String msg = "Uh oh! Please try again.";
+            Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void updateMusicAttributes(String album, String releaseDate, String genre) {
+        String attributesText = String.format(Locale.getDefault(),
+                "Album: %s\nReleased: %s\nGenre: %s",
+                album, releaseDate, genre);
+
+        musicAttributesTextView.setText(attributesText);
+    }
+
+    private void updateMusicTitle(String trackName, List<Artist> artists) {
+
+        String artistNames = artists.stream()
+                .map(Artist::getName)
+                .collect(Collectors.joining(", "));
+
+        String titleText = trackName + " by " + artistNames;
+
+        musicTitleTextView.setText(titleText);
     }
 
     private void updateOverallScore() {
