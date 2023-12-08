@@ -4,15 +4,19 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -28,6 +32,8 @@ import java.util.List;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentExploreBinding;
+import edu.northeastern.stage.model.music.Album;
+import edu.northeastern.stage.model.music.Artist;
 import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.viewmodels.ExploreViewModel;
@@ -65,13 +71,7 @@ public class ExploreFragment extends Fragment {
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
         viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
 
-        // set current user
-        sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
-            if (userID != null) {
-                viewModel.setUserID(userID);
-            }
-        });
-
+        searchAdapter = new TrackSearchAdapter(getContext(), actv);
         //setup search
         setupSearch();
 
@@ -85,9 +85,6 @@ public class ExploreFragment extends Fragment {
         });
 
         viewModel.setCircles(circleView);
-
-        // in the fragment, when a circle is clicked, get entire track JsonElement by API call
-        // then, store this in the shared view model and convert the jsonelement to Track object and store that in shared view model
 
         // perform seek bar change listener event used for getting the progress value
         geoSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -115,6 +112,7 @@ public class ExploreFragment extends Fragment {
 //                        Toast.LENGTH_SHORT).show();
             }
         });
+
         return root;
     }
 
