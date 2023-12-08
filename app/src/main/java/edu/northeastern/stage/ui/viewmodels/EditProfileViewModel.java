@@ -37,10 +37,6 @@ public class EditProfileViewModel extends ViewModel {
         return dataRetrieved;
     }
 
-    public MutableLiveData<Boolean> getDataRetrieved() {
-        return dataRetrieved;
-    }
-
     public MutableLiveData<String> getUserID() {
         String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         currentUserID.setValue(UID);
@@ -48,27 +44,33 @@ public class EditProfileViewModel extends ViewModel {
     }
 
     public void updateDatabase() {
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference reference = mDatabase
-                .getReference("users")
-                .child(currentUserID.getValue());
+        if(dataRetrieved.getValue()) {
+            FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+            DatabaseReference reference = mDatabase
+                    .getReference("users")
+                    .child(currentUserID.getValue());
 
-        Map<String, Object> updates = new HashMap<>();
+            Map<String, Object> updates = new HashMap<>();
 
-        updates.put("imageResource",profilePictureResource);
-        updates.put("description",description);
-        updates.put("tags",selectedTags);
+            updates.put("imageResource", profilePictureResource);
+            updates.put("description", description);
 
-        reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                if (error == null) {
-                    Log.d("UpdateUser", "User update successful");
-                } else {
-                    Log.e("UpdateUser","Update user failed: " + error.getMessage());
+            reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                    if (error == null) {
+                        Log.d("UpdateUser", "User update successful");
+                    } else {
+                        Log.e("UpdateUser", "Update user failed: " + error.getMessage());
+                    }
                 }
+            });
+
+            for (String tag : selectedTags) {
+                DatabaseReference tagReference = reference.child("tags").child(tag);
+                tagReference.setValue(true);
             }
-        });
+        }
     }
 
     public void retrieveInitialData() {
@@ -91,12 +93,13 @@ public class EditProfileViewModel extends ViewModel {
                     }
                     if(snapshot.hasChild("tags")) {
                         for (DataSnapshot tagsSnapshot : snapshot.child("tags").getChildren()) {
-                            String tag = tagsSnapshot.getValue(String.class);
+                            String tag = tagsSnapshot.getKey();
                             selectedTags.add(tag);
                         }
                     } else {
                         selectedTags = new ArrayList<>();
                     }
+                    dataRetrieved.setValue(true);
                 }
             }
             @Override

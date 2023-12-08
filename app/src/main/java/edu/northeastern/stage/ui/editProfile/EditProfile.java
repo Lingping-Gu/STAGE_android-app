@@ -65,6 +65,15 @@ public class EditProfile extends AppCompatActivity {
             // set up observers
             setupObservers();
 
+            // button save
+            buttonSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewModel.updateDatabase();
+                    // TODO: need to intent back to profile page
+                }
+            });
+
             // set spinner to images
             Integer[] images = {R.drawable.anger, R.drawable.sad, R.drawable.sob, R.drawable.shock, R.drawable.blush};
             ImageAdapter adapter = new ImageAdapter(this, images);
@@ -84,6 +93,24 @@ public class EditProfile extends AppCompatActivity {
                 }
             });
 
+            // edit description text change listener
+            editDescription.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    viewModel.setDescription(s.toString());
+                }
+            });
+
             // edit tags on text change listener to submit tags to tags recycler view
             editTags.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -98,7 +125,7 @@ public class EditProfile extends AppCompatActivity {
                     if (s.toString().endsWith("\n")) {
                         String tag = s.toString().trim();
                         if (!tag.isEmpty()) {
-                            addTag("#" + tag.replace("\n", ""));
+                            addTag(tag.replace("\n", ""));
                             editTags.setText("");
                         }
                     }
@@ -129,7 +156,12 @@ public class EditProfile extends AppCompatActivity {
                         profilePic.setImageResource(viewModel.getProfilePictureResource());
 
                         // Set up button click listener after data retrieval
-                        buttonSave.setOnClickListener(view -> viewModel.updateDatabase());
+                        buttonSave.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                viewModel.updateDatabase();
+                            }
+                        });
                     });
                 }
             });

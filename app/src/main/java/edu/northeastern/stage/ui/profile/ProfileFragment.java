@@ -81,6 +81,9 @@ public class ProfileFragment extends Fragment {
 
                 // retrieve all values from database first
                 viewModel.retrieveDataFromDatabase();
+                tagsAdapter.setTags(viewModel.getTags());
+                postsAdapter.setPosts(viewModel.getPosts());
+                recentListenedAdapter.setImageUrls(viewModel.getRecentlyListenedToImageURLs());
 
             }
         });

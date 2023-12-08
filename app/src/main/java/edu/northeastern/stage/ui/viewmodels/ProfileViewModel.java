@@ -29,8 +29,8 @@ public class ProfileViewModel extends ViewModel {
     private String description;
     private String email;
     private List<Post> posts = new ArrayList<>();
-    private List<String> recentlyListenedToImageURLs;
-    private List<String> tags;
+    private List<String> recentlyListenedToImageURLs = new ArrayList<>();
+    private List<String> tags = new ArrayList<>();
     private String currentID;
     private String profileOwnerID;
 
@@ -56,8 +56,9 @@ public class ProfileViewModel extends ViewModel {
                         setEmail(snapshot.child("email").getValue(String.class));
                     }
                     if(snapshot.hasChild("tags")) {
-                        for (DataSnapshot tagsSnapshot : snapshot.child("tags").getChildren()) {
-                            String tag = tagsSnapshot.getValue(String.class);
+                        DataSnapshot tagsSnapshot = snapshot.child("tags");
+                        for (DataSnapshot tagDataSnapshot : tagsSnapshot.getChildren()) {
+                            String tag = tagDataSnapshot.getKey();
                             tags.add(tag);
                         }
                     }
