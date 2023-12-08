@@ -72,6 +72,13 @@ public class ExploreFragment extends Fragment {
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
         viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
 
+        // set current user
+        sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
+            if (userID != null) {
+                viewModel.setUserID(userID);
+            }
+        });
+
         searchAdapter = new TrackSearchAdapter(getContext(), actv);
         //setup search
         setupSearch();
@@ -87,6 +94,9 @@ public class ExploreFragment extends Fragment {
         });
 
         viewModel.setCircles(circleView);
+
+        // in the fragment, when a circle is clicked, get entire track JsonElement by API call
+        // then, store this in the shared view model and convert the jsonelement to Track object and store that in shared view model
 
         // perform seek bar change listener event used for getting the progress value
         geoSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -157,7 +167,6 @@ public class ExploreFragment extends Fragment {
                                         searchAdapter.add(searchResults.get(i).getAsJsonObject());
                                     }
                                     searchAdapter.notifyDataSetChanged();
-//                                    searchAdapter.getFilter().filter(actv.getText(), null);
                                 });
                     }
                 } catch (Exception e) {
@@ -180,15 +189,11 @@ public class ExploreFragment extends Fragment {
                     }
                     actv.setText(selectedTrack.get("name").getAsString() + " by " + artists);
                     Track trackToStore = viewModel.createTrack(selectedTrack); // create track in view model
-                    sharedDataViewModel.setTrack(trackToStore); // set track in shared data view model
+                    sharedDataViewModel.setTrackReview(trackToStore); // set track in shared data view model
                     buttonToMusicReview.setEnabled(true);
                 } catch (Exception e) {
                     Log.e("ExploreFragment", "onItemClick - Error processing selected track", e);
                 }
-                actv.setText(selectedTrack.get("name").getAsString() + " by " + artists);
-                Track trackToStore = viewModel.createTrack(selectedTrack); // create track in view model
-                sharedDataViewModel.setTrack(trackToStore); // set track in shared data view model
-                buttonToMusicReview.setEnabled(true);
             }
         });
     }

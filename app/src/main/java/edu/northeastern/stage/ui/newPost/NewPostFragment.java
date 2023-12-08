@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
+import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.musicReview.SubmitReviewFragment;
 import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
@@ -40,6 +41,11 @@ public class NewPostFragment extends Fragment {
     private NewPostViewModel viewModel;
     private SharedDataViewModel sharedDataViewModel;
     private JsonObject selectedTrack;
+    private String visibilityState;
+
+    private TrackSearchAdapter searchAdapter;
+    private static final int SEARCH_DELAY = 500;
+    private long lastSearchTime = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNewPostBinding.inflate(inflater, container, false);
@@ -49,6 +55,8 @@ public class NewPostFragment extends Fragment {
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
         viewModel = new ViewModelProvider(this).get(NewPostViewModel.class);
 
+        searchAdapter = new TrackSearchAdapter(getContext(), binding.actvSongSearch);
+
         // get user ID
         sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
             if (userID != null) {
@@ -56,16 +64,38 @@ public class NewPostFragment extends Fragment {
             }
         });
 
+        // get track if it exists
+        sharedDataViewModel.getTrackPost().observe(getViewLifecycleOwner(), track -> {
+            if (track != null) {
+                viewModel.setTrack(track);
+            }
+        });
+
+        // todo - add empty entry error messages
         // Set up the interactions for the new post elements
         binding.btnSubmitPost.setOnClickListener(v -> {
             String postContent = binding.etPostContent.getText().toString();
+
+            // get visibility state
+            int selectedId = binding.rgPostVisibility.getCheckedRadioButtonId();
+            if (selectedId != -1) {
+                RadioButton selectedRadioButton = getView().findViewById(selectedId);
+                visibilityState = selectedRadioButton.getText().toString();
+                if(visibilityState.equals("Private")) {
+                    visibilityState = "private";
+                } else if (visibilityState.equals("Only Friends")) {
+                    visibilityState = "friends";
+                } else if (visibilityState.equals("Everyone")) {
+                    visibilityState = "public";
+                }
+            }
 
             if (postContent.equalsIgnoreCase("")) {
                 Toast.makeText(getActivity(), "Please enter post content.", Toast.LENGTH_SHORT).show();
             } else if (selectedTrack == null) {
                 Toast.makeText(getActivity(), "Please search for a song to post.", Toast.LENGTH_SHORT).show();
             } else {
-                viewModel.createPost(selectedTrack, postContent);
+                viewModel.createPost(postContent, visibilityState);
                 Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
 
                 NavOptions navOptions = new NavOptions.Builder()
@@ -92,9 +122,6 @@ public class NewPostFragment extends Fragment {
     // TODO: it seems like the autocomplete/search doesn't work until you delete something from the search string
     // TODO: API is getting 10 songs but the view is not being updated
     private void setupSearch() {
-
-            TrackSearchAdapter searchAdapter = new TrackSearchAdapter(getContext(), binding.actvSongSearch);
-
             binding.actvSongSearch.setAdapter(searchAdapter);
             binding.actvSongSearch.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -108,13 +135,38 @@ public class NewPostFragment extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    viewModel.performSearch(s.toString())
-                            .observe(getViewLifecycleOwner(), searchResults -> {
-                                searchAdapter.clear();
-                                ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
-                                searchAdapter.addAll(newResults);
-                                searchAdapter.notifyDataSetChanged();
-                            });
+//                    viewModel.performSearch(s.toString())
+//                            .observe(getViewLifecycleOwner(), searchResults -> {
+//                                searchAdapter.clear();
+//                                ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
+//                                searchAdapter.addAll(newResults);
+//                                searchAdapter.notifyDataSetChanged();
+//                            });
+
+                    try {
+                        long currentTime = System.currentTimeMillis();
+                        // add delay of 500 ms between current time and last search time for efficiency
+                        // search length should be more than 0
+                        if(currentTime - lastSearchTime > SEARCH_DELAY && s.length() != 0) {
+                            lastSearchTime = currentTime;
+                            binding.actvSongSearch.showDropDown();
+
+                            Log.d("NewPostFragment", "afterTextChanged - Performing search for: " + s.toString());
+                            viewModel.performSearch(s.toString())
+                                    .observe(getViewLifecycleOwner(), searchResults -> {
+                                        searchAdapter.clear();
+                                        Log.d("NewPostFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
+
+                                        for (int i = 0; i < searchResults.size(); i++) {
+                                            Log.d("NewPostFragment", "afterTextChanged - LOOP " + searchResults.get(i).get("name").getAsString() + " BY " + searchResults.get(i).getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString());
+                                            searchAdapter.add(searchResults.get(i).getAsJsonObject());
+                                        }
+                                        searchAdapter.notifyDataSetChanged();
+                                    });
+                        }
+                    } catch (Exception e) {
+                        Log.e("NewPostFragment", "afterTextChanged - Error performing search", e);
+                    }
                 }
             });
 
@@ -129,6 +181,8 @@ public class NewPostFragment extends Fragment {
                         }
                     }
                     artists = artists.trim();
+                    Track trackToStore = viewModel.createTrack(selectedTrack);
+                    sharedDataViewModel.setTrackPost(trackToStore);
                     binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
 
                     JsonObject albumObject = selectedTrack.getAsJsonObject("album");
