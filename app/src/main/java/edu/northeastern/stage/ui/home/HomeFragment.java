@@ -1,6 +1,7 @@
 package edu.northeastern.stage.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,39 +26,34 @@ public class HomeFragment extends Fragment {
     private HomeViewModel viewModel;
     private SharedDataViewModel sharedDataViewModel;
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         // initialize view models
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        sharedDataViewModel = new ViewModelProvider(this).get(SharedDataViewModel.class);
+        sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
 
         // get current user ID
         sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
             if (userID != null) {
                 viewModel.setCurrentUserId(userID);
+                viewModel.loadPosts();
+                adapter = new PostAdapter(getActivity(),new ArrayList<>(),viewModel.getCurrentUserId()); // Initialize with empty list
+                recyclerView.setAdapter(adapter);
             }
         });
 
         // initialize views + adapter
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new PostAdapter(getActivity(),new ArrayList<>(),viewModel.getCurrentUserId()); // Initialize with empty list
-        recyclerView.setAdapter(adapter);
 
-        // set view model observe
-        observeViewModel();
-
-        return view;
-    }
-
-    private void observeViewModel() {
+        // observe changes in posts and update adapter
         viewModel.getPosts().observe(getViewLifecycleOwner(), posts -> {
             // Update the UI when the data changes
             adapter.setPosts(posts);
-            adapter.notifyDataSetChanged();
         });
+
+        return view;
     }
 }

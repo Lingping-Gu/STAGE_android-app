@@ -20,20 +20,15 @@ import edu.northeastern.stage.model.Post;
 
 public class HomeViewModel extends ViewModel {
 
-    private MutableLiveData<List<Post>> posts;
+    private MutableLiveData<List<Post>> posts = new MutableLiveData<>();
     private String currentUserId;
-
-    public HomeViewModel() {
-        posts = new MutableLiveData<>();
-        loadPosts();
-    }
 
     public LiveData<List<Post>> getPosts() {
         return posts;
     }
 
     // TODO: check if it's sufficient to filter posts in PostAdapter
-    private void loadPosts() {
+    public void loadPosts() {
 
         List<Post> homePosts = new ArrayList<>();
 
@@ -42,23 +37,38 @@ public class HomeViewModel extends ViewModel {
             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
             DatabaseReference reference = mDatabase.getReference("users");
-            // get us
+
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for(DataSnapshot postSnapshot : snapshot.child("posts").getChildren()) {
-                        Post post = new Post(postSnapshot.child("postID").getValue(String.class),
-                                postSnapshot.child("ownerID").getValue(String.class),
-                                postSnapshot.child("trackName").getValue(String.class),
-                                postSnapshot.child("trackID").getValue(String.class),
-                                postSnapshot.child("artistName").getValue(String.class),
-                                postSnapshot.child("content").getValue(String.class),
-                                Long.parseLong(postSnapshot.child("timestamp").getValue(String.class)),
-                                postSnapshot.child("imageURL").getValue(String.class),
-                                postSnapshot.child("visibilityState").getValue(String.class),
-                                postSnapshot.child("spotifyURL").getValue(String.class));
-                        homePosts.add(post);
+                    for(DataSnapshot userSnapshot : snapshot.getChildren()) {
+                        for(DataSnapshot postSnapshot : userSnapshot.child("posts").getChildren()) {
+                            if(postSnapshot.child("postID").getValue() != null && postSnapshot.child("ownerID").getValue() != null &&
+                                    postSnapshot.child("trackName").getValue() != null && postSnapshot.child("trackID").getValue() != null &&
+                                    postSnapshot.child("artistName").getValue() != null && postSnapshot.child("content").getValue() != null &&
+                                    postSnapshot.child("timestamp").getValue() != null && postSnapshot.child("imageURL").getValue() != null &&
+                                    postSnapshot.child("visibilityState").getValue() != null && postSnapshot.child("spotifyURL").getValue() != null) {
+                                Post post = new Post(postSnapshot.child("postID").getValue(String.class),
+                                        postSnapshot.child("ownerID").getValue(String.class),
+                                        postSnapshot.child("trackName").getValue(String.class),
+                                        postSnapshot.child("trackID").getValue(String.class),
+                                        postSnapshot.child("artistName").getValue(String.class),
+                                        postSnapshot.child("content").getValue(String.class),
+                                        postSnapshot.child("timestamp").getValue(Long.class),
+                                        postSnapshot.child("imageURL").getValue(String.class),
+                                        postSnapshot.child("visibilityState").getValue(String.class),
+                                        postSnapshot.child("spotifyURL").getValue(String.class));
+                                homePosts.add(post);
+                            }
+                        }
                     }
+                    Collections.sort(homePosts,new Comparator<Post>() {
+                        @Override
+                        public int compare(Post o1, Post o2) {
+                            return Long.compare(o2.getTimestamp(), o1.getTimestamp());
+                        }
+                    });
+                    posts.setValue(homePosts);
                 }
 
                 @Override
@@ -66,13 +76,6 @@ public class HomeViewModel extends ViewModel {
 
                 }
             });
-            Collections.sort(homePosts,new Comparator<Post>() {
-                @Override
-                public int compare(Post o1, Post o2) {
-                    return Long.compare(o2.getTimestamp(), o1.getTimestamp());
-                }
-            });
-            posts.setValue(homePosts);
         } else {
             // currentUser does not exist
         }

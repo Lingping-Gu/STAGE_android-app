@@ -118,6 +118,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.tvTrackName.setText(post.getTrackName());
         holder.tvArtistName.setText(post.getArtistName());
 
+        // set profile pic
+        setProfilePicResourceID(holder,post);
+
         //display song image
         Picasso.get()
                 .load(post.getImageURL())
@@ -136,19 +139,37 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             }
         });
 
-        //display user avatar
-        Glide.with(context)
-                .load(post.getPostID())
-//                .placeholder(R.drawable.default_pfp) // Set a placeholder image
-//                .error(R.drawable.default_pfp) // Set an error image
-                .into(holder.ivUserAvatar);
-
-        // TODO: think about how to navigate to certain profile
-        // When click on the user avatar in the post, it goes to the profile of this user.
         holder.ivUserAvatar.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ProfileFragment.class);
-            context.startActivity(intent);
-            intent.putExtra("PROFILE_OWNER_ID", post.getOwnerID());
+            // TODO: navigate to ProfileFragment and bundle PROFILE_OWNER_ID
+//            Intent intent = new Intent(context, ProfileFragment.class);
+//            intent.putExtra("PROFILE_OWNER_ID", post.getOwnerID());
+//            context.startActivity(intent);
+        });
+    }
+
+    private void setProfilePicResourceID(PostViewHolder holder, Post post) {
+
+        final Integer[] profilePicResourceID = new Integer[1];
+
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(currentUserId)
+                .child("imageURL");
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    holder.ivUserAvatar.setImageResource(Integer.parseInt(snapshot.getValue().toString()));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
         });
     }
 
@@ -268,7 +289,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     @Override
     public int getItemCount() {
-        return postList.size();
+        return postList != null ? postList.size() : 0;
     }
 
     public static class PostViewHolder extends RecyclerView.ViewHolder {
