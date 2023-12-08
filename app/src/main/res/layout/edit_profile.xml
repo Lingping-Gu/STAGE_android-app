@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:layout_width="match_parent"
+<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -9,24 +11,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:windowBackground="@color/beige"
-            android:windowSoftInputMode="adjustPan" >
+            android:windowSoftInputMode="adjustPan"
+            tools:layout_editor_absoluteX="-16dp"
+            tools:layout_editor_absoluteY="0dp">
 
             <TextView
                 android:id="@+id/textView_pfp"
+                style="@style/TextStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Profile Picture: "
-                style="@style/TextStyle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.2"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintHorizontal_bias="0.2"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.1" />
 
@@ -34,11 +36,9 @@
                 android:id="@+id/profilePicture"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
+                android:src="@drawable/default_pfp"
                 app:layout_constraintLeft_toLeftOf="@+id/textView_pfp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.15"
-                android:src="@drawable/default_pfp" />
+                app:layout_constraintTop_toBottomOf="@+id/textView_pfp" />
 
             <!--            <TextView-->
             <!--                android:id="@+id/textView_userName"-->
@@ -64,7 +64,6 @@
             <!--                app:layout_constraintTop_toTopOf="parent"-->
             <!--                app:layout_constraintVertical_bias="0.14" />-->
 
-
             <Spinner
                 android:id="@+id/editProfilePicSpinner"
                 android:layout_width="96dp"
@@ -75,37 +74,34 @@
                 app:layout_constraintBottom_toBottomOf="@id/profilePicture"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/profilePicture"
-                app:layout_constraintTop_toTopOf="@id/profilePicture"/>
+                app:layout_constraintTop_toTopOf="@id/profilePicture" />
 
             <TextView
                 android:id="@+id/textView_description"
+                style="@style/TextStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="Description: "
-                style="@style/TextStyle"
                 app:layout_constraintLeft_toLeftOf="@+id/textView_pfp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.3" />
+                app:layout_constraintTop_toBottomOf="@+id/profilePicture" />
 
             <EditText
                 android:id="@+id/editDescription"
+                style="@style/TextStyle"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:text="A music enthusiastic. Welcome to my home page, explore and enjoy my rhythms!. "
-                style="@style/TextStyle"
                 app:layout_constraintLeft_toLeftOf="@+id/textView_pfp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.35" />
+                app:layout_constraintTop_toBottomOf="@+id/textView_description" />
 
             <TextView
                 android:id="@+id/textView_tags"
+                style="@style/TextStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
                 android:text="Tags: "
-                style="@style/TextStyle"
                 app:layout_constraintLeft_toLeftOf="@+id/textView_pfp"
                 app:layout_constraintTop_toBottomOf="@+id/editDescription" />
 
@@ -113,8 +109,8 @@
                 android:id="@+id/tagsRecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
                 android:orientation="horizontal"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintLeft_toLeftOf="@+id/textView_pfp"
@@ -122,26 +118,23 @@
 
             <AutoCompleteTextView
                 android:id="@+id/editTags"
+                style="@style/TextStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="Type tags here"
-                style="@style/TextStyle"
                 app:layout_constraintLeft_toLeftOf="@+id/textView_pfp"
                 app:layout_constraintTop_toBottomOf="@+id/tagsRecyclerView"
-                app:layout_constraintVertical_bias="0.55">
-            </AutoCompleteTextView>
+                app:layout_constraintVertical_bias="0.55"></AutoCompleteTextView>
 
             <!--            use this to set the background color of the button-->
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/buttonSaveProfile"
+                style="@style/DarkButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Save"
-                style="@style/DarkButton"
-                app:layout_constraintRight_toRightOf="@+id/editDescription"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.7" />
+                app:layout_constraintRight_toRightOf="@+id/editProfilePicSpinner"
+                app:layout_constraintTop_toBottomOf="@+id/editTags" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
