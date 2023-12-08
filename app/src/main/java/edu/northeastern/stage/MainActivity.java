@@ -2,8 +2,12 @@ package edu.northeastern.stage;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -161,17 +165,23 @@ public class MainActivity extends AppCompatActivity {
     private void updateUser() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if (location != null) {
-                                updateUserHelper(location);
-                            }
+            fusedLocationClient.requestLocationUpdates(LocationRequest.create(), new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if (locationResult == null) {
+                        return;
+                    }
+                    for (Location location : locationResult.getLocations()) {
+                        if (location != null) {
+                            updateUserHelper(location);
+                            Log.i("location", location.toString());
                         }
-                    });
+                    }
+                }
+            }, Looper.getMainLooper());
         }
     }
+
 
     private void updateUserHelper(Location location) {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
