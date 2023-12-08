@@ -49,49 +49,44 @@ public class ProfileFragment extends Fragment {
     private List<Post> posts;
     private List<String> recentlyListenedToImageURLs;
 
+    // TODO: need to set onClick for follow/unfollow button
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
 
         // initialize view models
-        viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        sharedDataViewModel = new ViewModelProvider(this).get(SharedDataViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
+        sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
 
         // get current user ID
         sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
             if (userID != null) {
+                Bundle arguments = getArguments();
+                if(arguments != null && arguments.getString("PROFILE_OWNER_ID") != null) {
+                    profileOwnerId = arguments.getString("PROFILE_OWNER_ID");
+                } else {
+                    profileOwnerId = userID;
+                }
+
+                // set profile owner ID and current ID in the viewmodel
+                viewModel.setProfileOwnerID(profileOwnerId);
                 viewModel.setCurrentID(userID);
+
+                // set up adapters
+                setUpAdapters();
+
+                // show edit button or follow button depending on profile owner and current user
+                showEditProfileButtonOrFollowButton();
+
+                // retrieve all values from database first
+                viewModel.retrieveDataFromDatabase();
             }
         });
-
-        // if landed on fragment by clicking on another fragment, get profile owner
-        if(getArguments().getString("PROFILE_OWNER_ID") != null && !getArguments().getString("PROFILE_OWNER_URL").isEmpty()) {
-            profileOwnerId = getArguments().getString("PROFILE_OWNER_ID");
-        } else {
-            profileOwnerId = viewModel.getCurrentID();
-        }
-
-        // set profile owner ID in the viewmodel
-        viewModel.setProfileOwnerID(profileOwnerId);
-
-        // set up adapters
-        setUpAdapters();
-
-        // show edit button or follow button depending on profile owner and current user
-        showEditProfileButtonOrFollowButton();
-
-        // TODO: need to set onClick for follow/unfollow button
 
         // initialize variables
         posts = new ArrayList<>();
         recentlyListenedToImageURLs = new ArrayList<>();
-
-        // retrieve all values from database first
-        viewModel.retrieveDataFromDatabase();
-
-        // set values to UI
-        setUIValues();
 
         return binding.getRoot();
     }
@@ -103,6 +98,17 @@ public class ProfileFragment extends Fragment {
         for(Post post : posts) {
             recentlyListenedToImageURLs.add(post.getImageURL());
         }
+        tagsAdapter.setTags(viewModel.getTags());
+        postsAdapter.setPosts(posts);
+        recentListenedAdapter.setImageUrls(recentlyListenedToImageURLs);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // set values to UI
+        posts = viewModel.getPosts();
+        setUIValues();
     }
 
     private void setUpAdapters() {

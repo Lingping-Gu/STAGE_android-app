@@ -27,7 +27,7 @@ public class ProfileViewModel extends ViewModel {
     private Integer profilePicResource;
     private String description;
     private String email;
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();
     private List<String> recentlyListenedToImageURLs;
     private List<String> tags;
     private String currentID;
@@ -41,8 +41,8 @@ public class ProfileViewModel extends ViewModel {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
-                    if(snapshot.hasChild("imageResource")) {
-                         setProfilePicResource(snapshot.child("imageResource").getValue(Integer.class));
+                    if(snapshot.hasChild("profilePicResource")) {
+                         setProfilePicResource(snapshot.child("profilePicResource").getValue(Integer.class));
                     }
                     if(snapshot.hasChild("description")) {
                         setDescription(snapshot.child("description").getValue(String.class));
@@ -64,7 +64,7 @@ public class ProfileViewModel extends ViewModel {
                                     postsSnapshot.child("trackID").getValue(String.class),
                                     postsSnapshot.child("artistName").getValue(String.class),
                                     postsSnapshot.child("content").getValue(String.class),
-                                    Long.parseLong(postsSnapshot.child("timestamp").getValue(String.class)),
+                                    postsSnapshot.child("timestamp").getValue(Long.class),
                                     postsSnapshot.child("imageURL").getValue(String.class),
                                     postsSnapshot.child("visibilityState").getValue(String.class),
                                     postsSnapshot.child("spotifyURL").getValue(String.class));

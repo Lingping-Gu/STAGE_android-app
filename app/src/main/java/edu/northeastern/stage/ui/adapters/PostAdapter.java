@@ -56,7 +56,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public void onBindViewHolder(PostViewHolder holder, int position) {
         Post post = postList.get(position);
 
-        String viewType;
+        String viewType = "";
 
         if (isOwner(post)) {
             viewType = "owner";
@@ -68,6 +68,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
         // set post visibility
         String visibilityState = post.getVisibilityState();
+        if(visibilityState == null) {
+            visibilityState = "private";
+        }
+
         // friend
         if (viewType.equals("friend")) {
             if (visibilityState.equals("private")) {
@@ -135,8 +139,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         //display user avatar
         Glide.with(context)
                 .load(post.getPostID())
-                .placeholder(R.drawable.default_pfp) // Set a placeholder image
-                .error(R.drawable.default_pfp) // Set an error image
+//                .placeholder(R.drawable.default_pfp) // Set a placeholder image
+//                .error(R.drawable.default_pfp) // Set an error image
                 .into(holder.ivUserAvatar);
 
         // TODO: think about how to navigate to certain profile

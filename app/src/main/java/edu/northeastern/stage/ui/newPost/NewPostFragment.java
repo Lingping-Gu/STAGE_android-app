@@ -58,23 +58,22 @@ public class NewPostFragment extends Fragment {
             }
         });
 
-        // get visibility state
-        int selectedId = binding.rgPostVisibility.getCheckedRadioButtonId();
-        if (selectedId != -1) {
-            RadioButton selectedRadioButton = getView().findViewById(selectedId);
-            visibilityState = selectedRadioButton.getText().toString();
-            if(visibilityState.equals("Private")) {
-                visibilityState = "private";
-            } else if (visibilityState.equals("Only Friends")) {
-                visibilityState = "friends";
-            } else if (visibilityState.equals("Everyone")) {
-                visibilityState = "public";
-            }
-        }
-
         // Set up the interactions for the new post elements
         binding.btnSubmitPost.setOnClickListener(v -> {
             String postContent = binding.etPostContent.getText().toString();
+            // get visibility state
+            int selectedId = binding.rgPostVisibility.getCheckedRadioButtonId();
+            if (selectedId != -1) {
+                RadioButton selectedRadioButton = getView().findViewById(selectedId);
+                visibilityState = selectedRadioButton.getText().toString();
+                if(visibilityState.equals("Private")) {
+                    visibilityState = "private";
+                } else if (visibilityState.equals("Only Friends")) {
+                    visibilityState = "friends";
+                } else if (visibilityState.equals("Everyone")) {
+                    visibilityState = "public";
+                }
+            }
             viewModel.createPost(postContent, visibilityState);
         });
 
