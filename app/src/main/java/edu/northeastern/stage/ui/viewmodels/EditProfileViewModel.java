@@ -66,10 +66,33 @@ public class EditProfileViewModel extends ViewModel {
                 }
             });
 
+            Map<String, Object> tagsToUpdate = new HashMap<>();
+
             for (String tag : selectedTags) {
-                DatabaseReference tagReference = reference.child("tags").child(tag);
-                tagReference.setValue(true);
+                tagsToUpdate.put(tag,true);
             }
+
+            reference.child("tags").updateChildren(tagsToUpdate);
+
+            DatabaseReference existingTagsReference = reference.child("tags");
+
+            existingTagsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for(DataSnapshot tagSnapshot : snapshot.getChildren()) {
+                        String tag = tagSnapshot.getKey();
+                        if(!selectedTags.contains(tag)) {
+                            tagSnapshot.getRef().removeValue();
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
         }
     }
 

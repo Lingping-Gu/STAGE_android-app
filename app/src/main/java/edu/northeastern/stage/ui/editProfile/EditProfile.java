@@ -154,6 +154,7 @@ public class EditProfile extends AppCompatActivity {
                     runOnUiThread(() -> {
                         editDescription.setText(viewModel.getDescription());
                         profilePic.setImageResource(viewModel.getProfilePictureResource());
+                        tagsAdapter.setTags(viewModel.getSelectedTags());
 
                         // Set up button click listener after data retrieval
                         buttonSave.setOnClickListener(new View.OnClickListener() {
@@ -191,7 +192,7 @@ public class EditProfile extends AppCompatActivity {
                 List<String> tags = viewModel.getSelectedTags();
                 tags.remove(position);
                 viewModel.setSelectedTags(tags);
-                tagsAdapter.notifyItemRemoved(position);
+                tagsAdapter.notifyDataSetChanged();
             }
         }
 }
