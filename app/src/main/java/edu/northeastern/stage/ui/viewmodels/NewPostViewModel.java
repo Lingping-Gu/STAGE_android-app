@@ -71,7 +71,8 @@ public class NewPostViewModel extends ViewModel {
                 }
 
                 // Set Post object
-                Post post = new Post(trackName, trackID, artistName, content, timestamp, imageURL);
+                Post post = new Post(newPostRef.getKey(), getUserID(),trackName, trackID, artistName, content, timestamp, imageURL, visibilityState, spotifyURL);
+
                 newPostRef.setValue(post, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
