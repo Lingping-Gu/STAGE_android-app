@@ -29,11 +29,6 @@ import android.content.Intent;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,17 +76,22 @@ public class ProfileFragment extends Fragment {
 
                 // retrieve all values from database first
                 viewModel.retrieveDataFromDatabase();
-                tagsAdapter.setTags(viewModel.getTags());
-                postsAdapter.setPosts(viewModel.getPosts());
-                recentListenedAdapter.setImageUrls(viewModel.getRecentlyListenedToImageURLs());
 
-            }
-        });
-        // data retrieved status
-        viewModel.getDataRetrievedStatus().observe(getViewLifecycleOwner(),dataRetrieved -> {
-            if(dataRetrieved) {
-                posts = viewModel.getPosts();
-                setUIValues();
+                // data retrieved status
+                viewModel.getDataRetrievedStatus().observe(getViewLifecycleOwner(),dataRetrieved -> {
+                    if(dataRetrieved) {
+                        posts = viewModel.getPosts();
+                        setUIValues();
+                        tagsAdapter.setTags(viewModel.getTags());
+                        tagsAdapter.notifyDataSetChanged();
+                        postsAdapter.setPosts(viewModel.getPosts());
+                        postsAdapter.notifyDataSetChanged();
+                        recentListenedAdapter.setImageUrls(viewModel.getRecentlyListenedToImageURLs());
+                        recentListenedAdapter.notifyDataSetChanged();
+                    }
+                });
+
+
             }
         });
 
@@ -100,6 +100,12 @@ public class ProfileFragment extends Fragment {
         recentlyListenedToImageURLs = new ArrayList<>();
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        viewModel.reset();
     }
 
     private void setUIValues() {

@@ -82,6 +82,9 @@ public class ProfileViewModel extends ViewModel {
                                 return Long.compare(o2.getTimestamp(), o1.getTimestamp());
                             }
                         });
+                        for(Post post : posts) {
+                            recentlyListenedToImageURLs.add(post.getImageURL());
+                        }
                     }
                 }
                 dataRetrieved.setValue(true);
@@ -138,6 +141,13 @@ public class ProfileViewModel extends ViewModel {
 
     public void setProfilePicResource(Integer profilePicResource) {
         this.profilePicResource = profilePicResource;
+    }
+
+    public void reset() {
+        setPosts(new ArrayList<>());
+        setRecentlyListenedToImageURLs(new ArrayList<>());
+        setTags(new ArrayList<>());
+        dataRetrieved.setValue(false);
     }
 
     public List<Post> getPosts() {
