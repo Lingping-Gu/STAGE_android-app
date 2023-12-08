@@ -55,31 +55,26 @@ public class NewPostFragment extends Fragment {
             }
         });
 
-        // get track if it exists
-        sharedDataViewModel.getTrackPost().observe(getViewLifecycleOwner(), track -> {
-            if (track != null) {
-                viewModel.setTrack(track);
-            }
-        });
-
         // Set up the interactions for the new post elements
         binding.btnSubmitPost.setOnClickListener(v -> {
             String postContent = binding.etPostContent.getText().toString();
-            // get visibility state
-            int selectedId = binding.rgPostVisibility.getCheckedRadioButtonId();
-            if (selectedId != -1) {
-                RadioButton selectedRadioButton = getView().findViewById(selectedId);
-                visibilityState = selectedRadioButton.getText().toString();
-                if(visibilityState.equals("Private")) {
-                    visibilityState = "private";
-                } else if (visibilityState.equals("Only Friends")) {
-                    visibilityState = "friends";
-                } else if (visibilityState.equals("Everyone")) {
-                    visibilityState = "public";
-                }
-            }
-            viewModel.createPost(postContent, visibilityState);
 
+            if (postContent.equalsIgnoreCase("")) {
+                Toast.makeText(getActivity(), "Please enter post content.", Toast.LENGTH_SHORT).show();
+            } else if (selectedTrack == null) {
+                Toast.makeText(getActivity(), "Please search for a song to post.", Toast.LENGTH_SHORT).show();
+            } else {
+                viewModel.createPost(selectedTrack, postContent);
+                Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
+
+                NavOptions navOptions = new NavOptions.Builder()
+                        .setPopUpTo(R.id.navigation_new_post, true)
+                        .build();
+
+                // Navigate using the configured NavOptions
+                NavController navController = NavHostFragment.findNavController(NewPostFragment.this);
+                navController.navigate(R.id.action_navigation_new_post_to_navigation_home, null, navOptions);
+            }
         });
 
         // Setup AutoCompleteTextView for song search
