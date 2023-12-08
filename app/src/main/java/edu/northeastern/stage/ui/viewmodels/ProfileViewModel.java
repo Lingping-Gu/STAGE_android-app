@@ -24,6 +24,7 @@ import java.util.List;
 import edu.northeastern.stage.model.Post;
 
 public class ProfileViewModel extends ViewModel {
+    private MutableLiveData<Boolean> dataRetrieved = new MutableLiveData<>();
     private Integer profilePicResource;
     private String description;
     private String email;
@@ -32,6 +33,10 @@ public class ProfileViewModel extends ViewModel {
     private List<String> tags;
     private String currentID;
     private String profileOwnerID;
+
+    public LiveData<Boolean> getDataRetrievedStatus() {
+        return dataRetrieved;
+    }
 
     public void retrieveDataFromDatabase() {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
@@ -78,6 +83,7 @@ public class ProfileViewModel extends ViewModel {
                         });
                     }
                 }
+                dataRetrieved.setValue(true);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
