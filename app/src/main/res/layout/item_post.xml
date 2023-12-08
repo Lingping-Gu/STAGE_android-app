@@ -96,7 +96,8 @@
             android:id="@+id/visibleState"
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:color="@color/olive_green" />
+            android:color="@color/olive_green"
+            android:layout_marginStart="8dp" />
 
         <ImageView
             android:id="@+id/ivLike"
