@@ -81,6 +81,14 @@ public class ProfileFragment extends Fragment {
 
                 // retrieve all values from database first
                 viewModel.retrieveDataFromDatabase();
+
+            }
+        });
+        // data retrieved status
+        viewModel.getDataRetrievedStatus().observe(getViewLifecycleOwner(),dataRetrieved -> {
+            if(dataRetrieved) {
+                posts = viewModel.getPosts();
+                setUIValues();
             }
         });
 
@@ -101,14 +109,6 @@ public class ProfileFragment extends Fragment {
         tagsAdapter.setTags(viewModel.getTags());
         postsAdapter.setPosts(posts);
         recentListenedAdapter.setImageUrls(recentlyListenedToImageURLs);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // set values to UI
-        posts = viewModel.getPosts();
-        setUIValues();
     }
 
     private void setUpAdapters() {
@@ -156,5 +156,4 @@ public class ProfileFragment extends Fragment {
         Intent intent = new Intent(getActivity(), EditProfile.class);
         startActivity(intent);
     }
-
 }
