@@ -26,7 +26,6 @@ import edu.northeastern.stage.R;
 import edu.northeastern.stage.ui.adapters.ImageAdapter;
 import edu.northeastern.stage.ui.adapters.TagsAdapter_EditProfile;
 import edu.northeastern.stage.ui.viewmodels.EditProfileViewModel;
-import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 public class EditProfile extends AppCompatActivity {
     private EditText editDescription;
@@ -36,7 +35,6 @@ public class EditProfile extends AppCompatActivity {
     private ImageView profilePic;
     private TagsAdapter_EditProfile tagsAdapter;
     private RecyclerView tagsRecyclerView;
-    private SharedDataViewModel sharedDataViewModel;
     private EditProfileViewModel viewModel;
 
         @Override
@@ -50,8 +48,7 @@ public class EditProfile extends AppCompatActivity {
                 decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             }
 
-            // get shared view model
-            sharedDataViewModel = new ViewModelProvider(this).get(SharedDataViewModel.class);
+            // initiate view model
             viewModel = new ViewModelProvider(this).get(EditProfileViewModel.class);
 
             // find all views needed and set adapters for recycler views
@@ -115,27 +112,24 @@ public class EditProfile extends AppCompatActivity {
                     removeTag(viewModel.getSelectedTags().get(position));
                 }
             });
-
         }
 
         private void setupObservers() {
             // get current user ID
-            sharedDataViewModel.getUserID().observe(this, userID -> {
+            viewModel.getUserID().observe(this, userID -> {
                 if (userID != null) {
-                    viewModel.setCurrentUserID(userID);
                     // get selected tags, profile picture, description from database
                     viewModel.retrieveInitialData();
-                    viewModel.getDataRetrievedStatus().observe(this, dataRetrieved -> {
-                        Log.d("EditProfile", "Observer triggered. Data Retrieved: " + dataRetrieved);
-                        if (dataRetrieved) {
-                            runOnUiThread(() -> {
-                                editDescription.setText(viewModel.getDescription());
-                                profilePic.setImageResource(viewModel.getProfilePictureResource());
+                }
+            });
+            viewModel.getDataRetrievedStatus().observe(this, dataRetrieved -> {
+                if (dataRetrieved) {
+                    runOnUiThread(() -> {
+                        editDescription.setText(viewModel.getDescription());
+                        profilePic.setImageResource(viewModel.getProfilePictureResource());
 
-                                // Set up button click listener after data retrieval
-                                buttonSave.setOnClickListener(view -> viewModel.updateDatabase());
-                            });
-                        }
+                        // Set up button click listener after data retrieval
+                        buttonSave.setOnClickListener(view -> viewModel.updateDatabase());
                     });
                 }
             });
@@ -150,7 +144,8 @@ public class EditProfile extends AppCompatActivity {
                 List<String> tags = viewModel.getSelectedTags();
                 tags.add(tag);
                 viewModel.setSelectedTags(tags);
-                tagsAdapter.notifyItemInserted(viewModel.getSelectedTags().size() - 1);
+                tagsAdapter.setTags(tags);
+                tagsAdapter.notifyDataSetChanged();
             }
         }
 

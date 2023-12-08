@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,20 +28,30 @@ import edu.northeastern.stage.model.Post;
 
 public class EditProfileViewModel extends ViewModel {
     private MutableLiveData<Boolean> dataRetrieved = new MutableLiveData<>();
-    private String currentUserID;
+    private MutableLiveData<String> currentUserID = new MutableLiveData<>();
     private Integer profilePictureResource;
     private String description;
     private List<String> selectedTags = new ArrayList<>();
 
-    public LiveData<Boolean> getDataRetrievedStatus() {
+    public MutableLiveData<Boolean> getDataRetrievedStatus() {
         return dataRetrieved;
+    }
+
+    public MutableLiveData<Boolean> getDataRetrieved() {
+        return dataRetrieved;
+    }
+
+    public MutableLiveData<String> getUserID() {
+        String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        currentUserID.setValue(UID);
+        return currentUserID;
     }
 
     public void updateDatabase() {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference reference = mDatabase
                 .getReference("users")
-                .child(currentUserID);
+                .child(currentUserID.getValue());
 
         Map<String, Object> updates = new HashMap<>();
 
@@ -63,7 +74,7 @@ public class EditProfileViewModel extends ViewModel {
     public void retrieveInitialData() {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference rootRef = mDatabase.getReference();
-        DatabaseReference userRef = rootRef.child("users").child(currentUserID);
+        DatabaseReference userRef = rootRef.child("users").child(currentUserID.getValue());
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -92,14 +103,6 @@ public class EditProfileViewModel extends ViewModel {
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-    }
-
-    public String getCurrentUserID() {
-        return currentUserID;
-    }
-
-    public void setCurrentUserID(String currentUserID) {
-        this.currentUserID = currentUserID;
     }
 
     public Integer getProfilePictureResource() {
