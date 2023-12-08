@@ -21,6 +21,7 @@ import com.google.gson.JsonObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import edu.northeastern.stage.R;
@@ -31,7 +32,6 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
     private AutoCompleteTextView songSearchACTV;
     private JsonObject selectedResult;
     Context context;
-    private ArrayList<JsonObject> recommendations = new ArrayList<>();
 
     public TrackSearchAdapter(Context context, AutoCompleteTextView songSearchACTV) {
         super(context, 0);
@@ -52,13 +52,11 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        Log.d("TrackSearchAdapter", "Processing item at position: " + position);
 
         JsonObject result = getItem(position);
         Log.d("TrackSearchAdapter", "Result size: " + result.size());
 
         if(result != null) {
-            Log.d("TrackSearchAdapter", "Processing item at position: " + position);
             Log.d("TrackSearchAdapter", "getView - RESULT NOT NULL");
             viewHolder.bind(convertView.getContext(),result);
         } else {
@@ -74,25 +72,6 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
 
     public void setSelectedResult(JsonObject selectedResult) {
         this.selectedResult = selectedResult;
-    }
-
-    // addAll will take care of adding all the results in one go as well as clearing
-    // previous recommendations and notifying dataset changes
-    public void addAll(ArrayList<JsonObject> results) {
-        Log.d("TrackSearchAdapter", "in addAll");
-
-        clear();
-        if(results != null) {
-            Log.d("TrackSearchAdapter", "in addAll - if not null");
-
-            for(JsonObject result : results) {
-                add(result);
-                Log.d("TrackSearchAdapter", "in addAll - in loop result -> " + result);
-                recommendations.add(result);
-
-            }
-        }
-        notifyDataSetChanged();
     }
 
     private static class ViewHolder {
@@ -121,12 +100,21 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
                 JsonArray artistsArray = result.getAsJsonArray("artists");
                 Log.d("TrackSearchAdapter", "bind - Binding result: " + artistsArray.size());
 
-                if (artistsArray != null && artistsArray.size() > 0) {
-                    for (JsonElement artist : artistsArray) {
-                        artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
+                if (artistsArray != null && !artistsArray.isJsonNull() && artistsArray.size() > 0) {
+                    StringBuilder artistsSB = new StringBuilder();
+                    Iterator<JsonElement> iterator = artistsArray.iterator();
+
+                    while (iterator.hasNext()) {
+                        artistsSB.append(iterator.next().getAsJsonObject().get("name").getAsString());
+
+                        if (iterator.hasNext()) {
+                            artistsSB.append(", ");
+                        }
                     }
+
+                    artistNameTV.setText(artistsSB.toString());
                 }
-                artistNameTV.setText(artists);
+
 
                 JsonObject albumObject = result.getAsJsonObject("album");
                 if (albumObject != null) {

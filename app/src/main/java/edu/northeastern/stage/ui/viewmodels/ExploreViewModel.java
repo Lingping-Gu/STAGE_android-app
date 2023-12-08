@@ -1,15 +1,16 @@
 package edu.northeastern.stage.ui.viewmodels;
 
-import android.app.Application;
 import android.util.Log;
-
-import androidx.lifecycle.AndroidViewModel;
+import android.location.Location;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
-
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -18,19 +19,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Map;
 import java.util.Random;
-import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 
 import edu.northeastern.stage.API.Spotify;
 import edu.northeastern.stage.model.Circle;
-import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.music.Album;
 import edu.northeastern.stage.model.music.Artist;
 import edu.northeastern.stage.model.music.Track;
@@ -42,9 +36,79 @@ public class ExploreViewModel extends ViewModel {
     private String track;
     private Spotify spotify = new Spotify();
     private static final Random rand = new Random();
+    private String userID;
     CircleView circleView;
     Map<Circle, String> circleTextMap = new HashMap<>();
     List<Circle> circles;
+    final private float METER_TO_MILES_CONVERSION = 0.000621371F;
+
+    public Map<String,Integer> getTracksNearby(Integer radius) {
+
+        Location userLocation = new Location("");
+
+        DatabaseReference currentUserReference = FirebaseDatabase.getInstance().getReference("users").child(userID);
+
+        currentUserReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                userLocation.setLatitude(Double.parseDouble(snapshot.child("latitude").getKey()));
+                userLocation.setLongitude(Double.parseDouble(snapshot.child("longitude").getKey()));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        Map<String,Integer> tracksFrequency = new HashMap<>();
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference reference = mDatabase.getReference("users");
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                    if(isWithinDistance(Double.parseDouble(userSnapshot.child("location").child("latitude").getKey()),
+                            Double.parseDouble(userSnapshot.child("location").child("longitude").getKey()),
+                            userLocation.getLatitude(), userLocation.getLongitude(),radius)) {
+                        for (DataSnapshot trackSnapshot : userSnapshot.child("posts").getChildren()) {
+                            String trackID = trackSnapshot.child("trackID").getValue(String.class);
+                            if(tracksFrequency.containsKey(trackID)) {
+                                tracksFrequency.put(trackID, tracksFrequency.get(trackID) + 1);
+                            } else {
+                                tracksFrequency.put(trackID,1);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        return tracksFrequency;
+    }
+
+    private boolean isWithinDistance(double lat1, double lon1, double lat2, double lon2, Integer radius) {
+        float[] results = new float[1];
+        Location.distanceBetween(lat1,lon1,lat2,lon2,results);
+        if(results[0] * METER_TO_MILES_CONVERSION > radius) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
 
     public LiveData<List<JsonObject>> performSearch(String query) {
         MutableLiveData<List<JsonObject>> searchResults = new MutableLiveData<>();
@@ -53,33 +117,14 @@ public class ExploreViewModel extends ViewModel {
         CompletableFuture<ArrayList<JsonObject>> trackSearchFuture = spotify.trackSearch(query, 10);
         trackSearchFuture.thenAccept(searchResult -> {
             searchResults.postValue(searchResult);
-            Log.d("ExploreViewModel", "performSearch - searchResult in trackSearchFuture: " + searchResult);
+            Log.d("ExploreViewModel", "performSearch - searchResult in trackSearchFuture: " + searchResult.get(0));
         }).exceptionally(e -> {
-            Log.e("ExploreViewModel", "performSearch - TrackSearchError", e);
+            Log.e("TrackSearchError", e.getMessage());
             return null;
         });
-
-        if (searchResults.getValue() != null) {
-            Log.d("ExploreViewModel", "performSearch - LiveData NOT NULL");
-        } else {
-            Log.d("ExploreViewModel", "performSearch - LiveData IS NULL");
-        }
-
-        if (searchResults.getValue() != null) {
-            for (Integer i = 0; i < searchResults.getValue().size(); i++) {
-                Log.d("ExploreViewModel", "performSearch - searchResults " + searchResults.getValue().get(i));
-            }
-        }
-
-//        if (trackSearchFuture.isDone()) {
-//            if (searchResults.getValue() != null) {
-//                Log.d("ExploreViewModel", "performSearch IS DONE - LiveData NOT NULL");
-//            }
-//        }
-
-
         return searchResults;
     }
+
     // method to create Track object based on the selectedTrack JsonObject from Spotify API
     public Track createTrack(JsonObject selectedTrack) {
         // album variables
@@ -120,14 +165,12 @@ public class ExploreViewModel extends ViewModel {
 
     public void setTrack(String track) {
         this.track = track;
-
     }
 
     public MutableLiveData<List<JsonObject>> getRecommendations() {
         return recommendations;
     }
 
-    // TODO: maybe make circles a separate viewmodel
     public void setCircles(CircleView circleView) {
         // Process the circles as needed in the ViewModel
         this.circleView = circleView;

@@ -29,7 +29,7 @@ public class RecentListenedAdapter extends RecyclerView.Adapter<RecentListenedAd
     @Override
     public int getItemCount() {
         // If there are no images, we'll count the 'None' state as one item
-        return recentListenedUrls.isEmpty() ? 1 : Math.min(recentListenedUrls.size(), 4);
+        return recentListenedUrls.isEmpty() ? 0 : Math.min(recentListenedUrls.size(), 4);
     }
 
     public void setImageUrls(List<String> urls) {
@@ -39,10 +39,12 @@ public class RecentListenedAdapter extends RecyclerView.Adapter<RecentListenedAd
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Picasso.get()
-                .load(recentListenedUrls.get(position))
-                .error(R.drawable.profile_recent_listened_error) // shown on error
-                .into(holder.recentListenedImageView);
+        if (!recentListenedUrls.isEmpty() && position >= 0 && position < recentListenedUrls.size() && recentListenedUrls != null) {
+            Picasso.get()
+                    .load(recentListenedUrls.get(position))
+                    .error(R.drawable.profile_recent_listened_error) // shown on error
+                    .into(holder.recentListenedImageView);
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

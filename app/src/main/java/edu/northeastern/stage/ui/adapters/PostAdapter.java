@@ -1,15 +1,9 @@
-// TODO: I think we need to edit this adapter so that we handle visibility another way and liked logic another way
-
 package edu.northeastern.stage.ui.adapters;
 
-import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,21 +11,39 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import edu.northeastern.stage.API.Spotify;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
+import edu.northeastern.stage.ui.profile.ProfileFragment;
+
+// TODO: check if I'm looking at Lingping's profile and the third post out of 5 posts
+//  is for herself only, how the recycler view looks
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
-
+    private Context context;
     private List<Post> postList;
+    private String currentUserId;
 
-    public PostAdapter(List<Post> postList) {
+    public PostAdapter(Context context, List<Post> postList, String currentUserId) {
+        this.context = context;
         this.postList = postList;
+        this.currentUserId = currentUserId;
     }
 
     @Override
@@ -41,60 +53,243 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     @Override
-
     public void onBindViewHolder(PostViewHolder holder, int position) {
         Post post = postList.get(position);
+
+        String viewType = "";
+
+        if (isOwner(post)) {
+            viewType = "owner";
+        } else if (isFriend(post)) {
+            viewType = "friend";
+        } else {
+            viewType = "stranger";
+        }
+
+        // set post visibility
+        String visibilityState = post.getVisibilityState();
+        if(visibilityState == null) {
+            visibilityState = "private";
+        }
+
+        // friend
+        if (viewType.equals("friend")) {
+            if (visibilityState.equals("private")) {
+                holder.itemView.setVisibility(View.GONE);
+            } else {
+                holder.itemView.setVisibility(View.VISIBLE);
+            }
+        }
+        // stranger
+        if (viewType.equals("stranger")) {
+            if (!visibilityState.equals("public")) {
+                holder.itemView.setVisibility(View.GONE);
+            } else {
+                holder.itemView.setVisibility(View.VISIBLE);
+            }
+        }
+
+        // set Visibility State Icon
+        if (viewType.equals("owner")) {
+            switch (visibilityState) {
+                case "friends":
+                    holder.visibleState.setImageResource(R.drawable.profile_friends);
+                    break;
+                case "private":
+                    holder.visibleState.setImageResource(R.drawable.profile_private);
+                    break;
+                default:
+                    holder.visibleState.setImageResource(R.drawable.profile_public);
+            }
+        }
+
+        // set post content
         holder.tvPostContent.setText(post.getContent());
 
-//        switch (post.getVisibilityState()) {
-//            case "public":
-//                holder.visibleState.setImageResource(R.drawable.profile_public);
-//                break;
-//            case "friends":
-//                holder.visibleState.setImageResource(R.drawable.profile_friends);
-//                break;
-//            case "private":
-//                holder.visibleState.setImageResource(R.drawable.profile_private);
-//                break;
-//            default:
-//                holder.visibleState.setImageResource(R.drawable.profile_public);
-//        }
-
         //open music link
-//        String url = postList.get(position).getMusicLink();
-//        holder.songCard.setOnClickListener(v -> {
-//            Intent i = new Intent(Intent.ACTION_VIEW);
-//            i.setData(Uri.parse(url));
-//            v.getContext().startActivity(i);
-//        });
+        String url = post.getSpotifyURL();
+        holder.songCard.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            v.getContext().startActivity(i);
+        });
 
         //display artist and track name
         holder.tvTrackName.setText(post.getTrackName());
         holder.tvArtistName.setText(post.getArtistName());
+
+        // set profile pic
+        setProfilePicResourceID(holder,post);
+
         //display song image
-//        Picasso.get()
-//                .load(post.getMusicImageUrl())
-//                .error(R.drawable.profile_recent_listened_error)
-//                .into(holder.tvMusicImage);
+        Picasso.get()
+                .load(post.getImageURL())
+                .error(R.drawable.profile_recent_listened_error)
+                .into(holder.tvMusicImage);
 
+        // TODO: add logic to change heart based on like/not liked
         // Set the like status on the ivLike ImageView
-//        holder.ivLike.setOnClickListener(v -> {
-//            boolean isLiked = !post.isLiked();
-//            post.setLiked(isLiked);
-//            holder.ivLike.setSelected(isLiked);
-//            //TODO: database update
-//        });
+        holder.ivLike.setOnClickListener(v -> {
+            if (isLiked(post)) {
+                // liked
+                removeLikeFBDB(post);
+            } else {
+                // not liked
+                addLikeFDBD(post);
+            }
+        });
 
-        //display user avatar
-//        Picasso.get()
-//                .load(post.getUserAvatarUrl())
-//                .error(R.drawable.default_pfp)
-//                .into(holder.ivUserAvatar);
+        holder.ivUserAvatar.setOnClickListener(v -> {
+            // TODO: navigate to ProfileFragment and bundle PROFILE_OWNER_ID
+//            Intent intent = new Intent(context, ProfileFragment.class);
+//            intent.putExtra("PROFILE_OWNER_ID", post.getOwnerID());
+//            context.startActivity(intent);
+        });
+    }
+
+    private void setProfilePicResourceID(PostViewHolder holder, Post post) {
+
+        final Integer[] profilePicResourceID = new Integer[1];
+
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(currentUserId)
+                .child("imageURL");
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    holder.ivUserAvatar.setImageResource(Integer.parseInt(snapshot.getValue().toString()));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void addLikeFDBD(Post post) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(post.getOwnerID())
+                .child("posts")
+                .child(post.getPostID())
+                .child("likes")
+                .child(currentUserId);
+
+        reference.setValue(true)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d("PostAdapter","Added like to database.");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("PostAdapter","Failed to add like to database.");
+                    }
+                });
+    }
+
+    private void removeLikeFBDB(Post post) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(post.getOwnerID())
+                .child("posts")
+                .child(post.getPostID())
+                .child("likes")
+                .child(currentUserId);
+
+        reference.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d("PostAdapter","Removed like from database.");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("PostAdapter","Failed to remove like from database.");
+                    }
+                });
+    }
+
+    private boolean isLiked(Post post) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(post.getOwnerID())
+                .child("posts")
+                .child(post.getPostID())
+                .child("likes");
+
+        List<String> likedUserIDs = new ArrayList<>();
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> likedUserIDs = new ArrayList<>();
+
+                for (DataSnapshot likeSnapshot : snapshot.getChildren()) {
+                    String likedUserID = likeSnapshot.getKey();
+                    likedUserIDs.add(likedUserID);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+        return likedUserIDs.contains(currentUserId);
+    }
+
+    private boolean isOwner(Post post) {
+        return currentUserId.equals(post.getOwnerID());
+    }
+
+    private boolean isFriend(Post post) {
+
+        final boolean[] isFriend = {false};
+
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(currentUserId);
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.child("following").hasChild(post.getOwnerID()) &&
+                        snapshot.child("followers").hasChild(post.getOwnerID())) {
+                    isFriend[0] = true;
+                } else {
+                    isFriend[0] = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
+        return isFriend[0];
     }
 
     @Override
     public int getItemCount() {
-        return postList.size();
+        return postList != null ? postList.size() : 0;
     }
 
     public static class PostViewHolder extends RecyclerView.ViewHolder {
