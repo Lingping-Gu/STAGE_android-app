@@ -1,6 +1,5 @@
 package edu.northeastern.stage.ui.profile;
 
-import android.app.Activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -10,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,146 +22,139 @@ import edu.northeastern.stage.ui.adapters.RecentListenedAdapter;
 import edu.northeastern.stage.ui.adapters.TagsAdapter;
 import edu.northeastern.stage.ui.editProfile.EditProfile;
 import edu.northeastern.stage.ui.viewmodels.ProfileViewModel;
+import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 import android.content.Intent;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.squareup.picasso.Picasso;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
 
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
     private ProfileViewModel viewModel;
+    private SharedDataViewModel sharedDataViewModel;
     private TagsAdapter tagsAdapter;
     private PostAdapter postsAdapter;
     private RecentListenedAdapter recentListenedAdapter;
-    private static final int REQUEST_EDIT_PROFILE = 1;
+    private String profileOwnerId;
+    private List<Post> posts;
+    private List<String> recentlyListenedToImageURLs;
 
+    // TODO: need to set onClick for follow/unfollow button
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
-        initUI();
-        observeViewModel();
+
+        // initialize view models
+        viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
+        sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
+
+        // get current user ID
+        sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
+            if (userID != null) {
+                Bundle arguments = getArguments();
+                if(arguments != null && arguments.getString("PROFILE_OWNER_ID") != null) {
+                    profileOwnerId = arguments.getString("PROFILE_OWNER_ID");
+                } else {
+                    profileOwnerId = userID;
+                }
+
+                // set profile owner ID and current ID in the viewmodel
+                viewModel.setProfileOwnerID(profileOwnerId);
+                viewModel.setCurrentID(userID);
+
+                // set up adapters
+                setUpAdapters();
+
+                // show edit button or follow button depending on profile owner and current user
+                showEditProfileButtonOrFollowButton();
+
+                // retrieve all values from database first
+                viewModel.retrieveDataFromDatabase();
+            }
+        });
+
+        // initialize variables
+        posts = new ArrayList<>();
+        recentlyListenedToImageURLs = new ArrayList<>();
+
         return binding.getRoot();
     }
 
-    private void initUI() {
-        //set view
-        viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+    private void setUIValues() {
+        binding.description.setText(viewModel.getDescription());
+        binding.profileImage.setImageResource(viewModel.getProfilePicResource());
+        binding.userName.setText(viewModel.getEmail());
+        for(Post post : posts) {
+            recentlyListenedToImageURLs.add(post.getImageURL());
+        }
+        tagsAdapter.setTags(viewModel.getTags());
+        postsAdapter.setPosts(posts);
+        recentListenedAdapter.setImageUrls(recentlyListenedToImageURLs);
+    }
 
-        // Tags
+    @Override
+    public void onResume() {
+        super.onResume();
+        // set values to UI
+        posts = viewModel.getPosts();
+        setUIValues();
+    }
+
+    private void setUpAdapters() {
+        // Set up TagsAdapter and connect to view
         tagsAdapter = new TagsAdapter(new ArrayList<>());
         binding.tags.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.tags.setAdapter(tagsAdapter);
 
-        // Set up Posts Adapter
-        postsAdapter = new PostAdapter(new ArrayList<>());
+        // Set up PostAdapter and connect to view
+        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>(), viewModel.getCurrentID());
         binding.activities.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.activities.setAdapter(postsAdapter);
 
-        // Set up RecentListened Adapter
+        // Set up RecentListenedAdapter and connect to view
         recentListenedAdapter = new RecentListenedAdapter(new ArrayList<>());
         binding.recentListened.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.recentListened.setAdapter(recentListenedAdapter);
+    }
 
-        // Edit Button
-        binding.editProfileButton.setVisibility(checkIfOwner() ? View.VISIBLE : View.GONE);
-        binding.editProfileButton.setOnClickListener(v -> launchEditProfile());
-        Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.profile_edit).mutate();
-        drawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.profile_edit_button_tint), PorterDuff.Mode.SRC_IN);
-        binding.editProfileButton.setBackground(drawable);
+    private void showEditProfileButtonOrFollowButton() {
+        // Set up Edit Profile Button or Follow Button
+        if (viewModel.getCurrentID().equals(profileOwnerId)) {
+            // User is viewing their own profile, show Edit Profile Button
+            binding.editProfileButton.setVisibility(View.VISIBLE);
+            binding.followButton.setVisibility(View.GONE);
 
-        // If the fragment is not for the profile owner, the edit button should not be shown
-        if (!checkIfOwner()) {
+            binding.editProfileButton.setOnClickListener(v -> launchEditProfile());
+            Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.profile_edit).mutate();
+            drawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.profile_edit_button_tint), PorterDuff.Mode.SRC_IN);
+            binding.editProfileButton.setBackground(drawable);
+        } else {
+            // User is viewing someone else's profile, show Follow Button
+            binding.followButton.setVisibility(View.VISIBLE);
             binding.editProfileButton.setVisibility(View.GONE);
+            binding.followButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewModel.follow();
+                }
+            });
         }
-    }
-
-    private void observeViewModel() {
-        //get user avatar
-        viewModel.getUserAvatarUrl().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(String url) {
-                if (url != null) {
-                    if (url != null) {
-                        Picasso.get()
-                                .load(url)
-                                .error(R.drawable.default_pfp)
-                                .into(binding.profileImage);
-                    }
-                }
-            }
-        });
-
-        // Observe the LiveData for posts
-        viewModel.getPosts().observe(getViewLifecycleOwner(), new Observer<List<Post>>() {
-            @Override
-            public void onChanged(List<Post> posts) {
-                postsAdapter.setPosts(posts);
-            }
-        });
-
-        // Observe the LiveData for image URLs
-        viewModel.getImageUrls().observe(getViewLifecycleOwner(), new Observer<List<String>>() {
-            @Override
-            public void onChanged(List<String> imageUrls) {
-                if (imageUrls.isEmpty()) {
-                    binding.textNoImages.setVisibility(View.VISIBLE);
-                    binding.recentListened.setVisibility(View.GONE);
-                } else {
-                    binding.textNoImages.setVisibility(View.GONE);
-                    binding.recentListened.setVisibility(View.VISIBLE);
-                    recentListenedAdapter.setImageUrls(imageUrls);
-                }
-            }
-        });
-
-        // Observe the LiveData for tags
-        viewModel.getTags().observe(getViewLifecycleOwner(), new Observer<List<String>>() {
-            @Override
-            public void onChanged(List<String> tags) {
-                tagsAdapter.setTags(tags);
-            }
-        });
-
-    }
-
-    private boolean checkIfOwner() {
-        // TODO: use firebase function to finish the userId check.
-        return true;
     }
 
     private void launchEditProfile() {
-        // TODO: Refactor for ActivityResultLauncher if using
         Intent intent = new Intent(getActivity(), EditProfile.class);
-        startActivityForResult(intent, REQUEST_EDIT_PROFILE);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_EDIT_PROFILE && resultCode == Activity.RESULT_OK && data != null) {
-            // Retrieve the data from the result intent
-            String username = data.getStringExtra(EditProfile.EXTRA_USERNAME);
-            String description = data.getStringExtra(EditProfile.EXTRA_DESCRIPTION);
-            String tagsString = data.getStringExtra(EditProfile.EXTRA_TAGS);
-
-            // Update your views using binding
-            binding.userName.setText(username);
-            binding.description.setText(description);
-            // Split by the delimiter used when setting the tags
-            List<String> updatedTags = Arrays.asList(tagsString.split("#(?=[^#])")); // Ensure this regex correctly matches your format
-            viewModel.setTags(updatedTags);
-        }
+        startActivity(intent);
     }
 
 }

@@ -13,7 +13,8 @@ import edu.northeastern.stage.model.music.Track;
 public class SharedDataViewModel extends ViewModel {
     private MutableLiveData<String> userID = new MutableLiveData<>();
     private MutableLiveData<JsonObject> trackJson = new MutableLiveData<>();
-    private MutableLiveData<Track> track = new MutableLiveData<>();
+    private MutableLiveData<Track> trackPost = new MutableLiveData<>();
+    private MutableLiveData<Track> trackReview = new MutableLiveData<>();
 
     public void setUserID(String userID) {
         this.userID.setValue(userID);
@@ -31,12 +32,19 @@ public class SharedDataViewModel extends ViewModel {
         return trackJson;
     }
 
-    public void setTrack(Track track) {
-        this.track.setValue(track);
+    public void setTrackPost(Track track) {
+        this.trackPost.setValue(track);
     }
 
-    public LiveData<Track> getTrack() {
-        return track;
+    public LiveData<Track> getTrackPost() {
+        return trackPost;
     }
 
+    public void setTrackReview(Track track) {
+        this.trackReview.setValue(track);
+    }
+
+    public LiveData<Track> getTrackReview() {
+        return trackReview;
+    }
 }

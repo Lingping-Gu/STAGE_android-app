@@ -39,7 +39,7 @@ public class TagsAdapter extends RecyclerView.Adapter<TagsAdapter.TagViewHolder>
 
     @Override
     public int getItemCount() {
-        return tags.size();
+        return tags != null ? tags.size() : 0;
     }
 
     static class TagViewHolder extends RecyclerView.ViewHolder {

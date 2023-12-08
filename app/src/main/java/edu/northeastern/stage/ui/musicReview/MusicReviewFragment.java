@@ -1,7 +1,5 @@
 package edu.northeastern.stage.ui.musicReview;
 
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.ActivityNotFoundException;
@@ -10,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -55,7 +52,6 @@ public class MusicReviewFragment extends Fragment {
     private ReviewAdapter reviewAdapter;
     private TextView overallScoreTextView;
     private TextView noReviewsTextView;
-    private TextView musicAttributesTextView;
     private Button addReviewButton;
     private TextView musicTitleTextView;
     private String dynamicLink;
@@ -79,7 +75,7 @@ public class MusicReviewFragment extends Fragment {
         });
 
         // set track
-        sharedDataViewModel.getTrack().observe(getViewLifecycleOwner(), track -> {
+        sharedDataViewModel.getTrackReview().observe(getViewLifecycleOwner(), track -> {
             if (track != null) {
                 updateMusicAttributes(track.getAlbum().getName(), track.getAlbum().getReleaseDate(), track.getArtists().get(0).getGenres() !=null ? String.valueOf(track.getArtists().get(0).getGenres()) : "N/A");
 
@@ -95,7 +91,6 @@ public class MusicReviewFragment extends Fragment {
             }
         });
 
-        musicAttributesTextView = binding.musicAttributesTextView;
         reviewsRecyclerView = binding.reviewsRecyclerView;
         overallScoreTextView = binding.overallScoreTextView;
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
