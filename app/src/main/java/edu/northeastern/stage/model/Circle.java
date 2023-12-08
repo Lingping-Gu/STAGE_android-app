@@ -11,7 +11,7 @@ public class Circle {
     private float x;
     private float y;
     private float radius;
-    public int speed = 6;
+    public int speed = 1;
     public int[] direction = new int[]{1,1}; //direction modifier (-1,1)
     public RectF oval;
     public Paint paint;

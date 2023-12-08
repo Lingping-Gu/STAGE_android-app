@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
+import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.musicReview.SubmitReviewFragment;
 import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
@@ -39,6 +40,7 @@ public class NewPostFragment extends Fragment {
     private NewPostViewModel viewModel;
     private SharedDataViewModel sharedDataViewModel;
     private JsonObject selectedTrack;
+    private String visibilityState;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNewPostBinding.inflate(inflater, container, false);
@@ -55,16 +57,38 @@ public class NewPostFragment extends Fragment {
             }
         });
 
+        // get track if it exists
+        sharedDataViewModel.getTrackPost().observe(getViewLifecycleOwner(), track -> {
+            if (track != null) {
+                viewModel.setTrack(track);
+            }
+        });
+
+        // todo - add empty entry error messages
         // Set up the interactions for the new post elements
         binding.btnSubmitPost.setOnClickListener(v -> {
             String postContent = binding.etPostContent.getText().toString();
+
+            // get visibility state
+            int selectedId = binding.rgPostVisibility.getCheckedRadioButtonId();
+            if (selectedId != -1) {
+                RadioButton selectedRadioButton = getView().findViewById(selectedId);
+                visibilityState = selectedRadioButton.getText().toString();
+                if(visibilityState.equals("Private")) {
+                    visibilityState = "private";
+                } else if (visibilityState.equals("Only Friends")) {
+                    visibilityState = "friends";
+                } else if (visibilityState.equals("Everyone")) {
+                    visibilityState = "public";
+                }
+            }
 
             if (postContent.equalsIgnoreCase("")) {
                 Toast.makeText(getActivity(), "Please enter post content.", Toast.LENGTH_SHORT).show();
             } else if (selectedTrack == null) {
                 Toast.makeText(getActivity(), "Please search for a song to post.", Toast.LENGTH_SHORT).show();
             } else {
-                viewModel.createPost(selectedTrack, postContent);
+                viewModel.createPost(postContent, visibilityState);
                 Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
 
                 NavOptions navOptions = new NavOptions.Builder()
@@ -128,6 +152,8 @@ public class NewPostFragment extends Fragment {
                         }
                     }
                     artists = artists.trim();
+                    Track trackToStore = viewModel.createTrack(selectedTrack);
+                    sharedDataViewModel.setTrackPost(trackToStore);
                     binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
                 }
             });
