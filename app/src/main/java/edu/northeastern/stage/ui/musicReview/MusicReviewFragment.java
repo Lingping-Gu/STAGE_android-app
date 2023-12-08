@@ -79,6 +79,8 @@ public class MusicReviewFragment extends Fragment {
         // set track
         sharedDataViewModel.getTrackReview().observe(getViewLifecycleOwner(), track -> {
             if (track != null) {
+                mViewModel.setTrack(track);
+
                 updateMusicAttributes(track.getAlbum().getName(), track.getAlbum().getReleaseDate(), track.getArtists().get(0).getGenres() !=null ? String.valueOf(track.getArtists().get(0).getGenres()) : "N/A");
 
                 updateMusicTitle(track.getName(), track.getArtists());
@@ -139,7 +141,7 @@ public class MusicReviewFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-//        mViewModel.fetchReviews(); // fetch all reviews
+        mViewModel.fetchReviews(); // fetch all reviews
     }
 
     private void gotoUrl(String s) {
