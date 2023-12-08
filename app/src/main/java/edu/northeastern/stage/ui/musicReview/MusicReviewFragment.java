@@ -56,6 +56,7 @@ public class MusicReviewFragment extends Fragment {
     private TextView musicTitleTextView;
     private String dynamicLink;
     private ImageView spotifyLogoImageView;
+    private TextView musicAttributesTextView;
 
 
     @Override
@@ -91,6 +92,7 @@ public class MusicReviewFragment extends Fragment {
             }
         });
 
+        musicAttributesTextView = binding.musicAttributesTextView;
         reviewsRecyclerView = binding.reviewsRecyclerView;
         overallScoreTextView = binding.overallScoreTextView;
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
