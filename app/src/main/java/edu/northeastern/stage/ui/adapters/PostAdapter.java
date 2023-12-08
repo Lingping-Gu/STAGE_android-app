@@ -1,6 +1,13 @@
+// TODO: I think we need to edit this adapter so that we handle visibility another way and liked logic another way
+
 package edu.northeastern.stage.ui.adapters;
 
-import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -11,8 +18,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -24,26 +31,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import edu.northeastern.stage.API.Spotify;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
-import edu.northeastern.stage.ui.profile.ProfileFragment;
-
-// TODO: check if I'm looking at Lingping's profile and the third post out of 5 posts
-//  is for herself only, how the recycler view looks
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
-    private Context context;
+
     private List<Post> postList;
     private String currentUserId;
 
-    public PostAdapter(Context context, List<Post> postList, String currentUserId) {
-        this.context = context;
+
+    public PostAdapter(List<Post> postList) {
         this.postList = postList;
-        this.currentUserId = currentUserId;
     }
 
     @Override
@@ -53,6 +53,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     @Override
+
     public void onBindViewHolder(PostViewHolder holder, int position) {
         Post post = postList.get(position);
 
@@ -104,15 +105,30 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         }
 
         // set post content
+
         holder.tvPostContent.setText(post.getContent());
 
+//        switch (post.getVisibilityState()) {
+//            case "public":
+//                holder.visibleState.setImageResource(R.drawable.profile_public);
+//                break;
+//            case "friends":
+//                holder.visibleState.setImageResource(R.drawable.profile_friends);
+//                break;
+//            case "private":
+//                holder.visibleState.setImageResource(R.drawable.profile_private);
+//                break;
+//            default:
+//                holder.visibleState.setImageResource(R.drawable.profile_public);
+//        }
+
         //open music link
-        String url = post.getSpotifyURL();
-        holder.songCard.setOnClickListener(v -> {
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
-            v.getContext().startActivity(i);
-        });
+//        String url = postList.get(position).getMusicLink();
+//        holder.songCard.setOnClickListener(v -> {
+//            Intent i = new Intent(Intent.ACTION_VIEW);
+//            i.setData(Uri.parse(url));
+//            v.getContext().startActivity(i);
+//        });
 
         //display artist and track name
         holder.tvTrackName.setText(post.getTrackName());

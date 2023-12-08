@@ -1,5 +1,6 @@
 package edu.northeastern.stage.ui.profile;
 
+import android.app.Activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -22,10 +23,10 @@ import edu.northeastern.stage.ui.adapters.RecentListenedAdapter;
 import edu.northeastern.stage.ui.adapters.TagsAdapter;
 import edu.northeastern.stage.ui.editProfile.EditProfile;
 import edu.northeastern.stage.ui.viewmodels.ProfileViewModel;
-import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 import android.content.Intent;
 
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -35,13 +36,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
     private ProfileViewModel viewModel;
-    private SharedDataViewModel sharedDataViewModel;
     private TagsAdapter tagsAdapter;
     private PostAdapter postsAdapter;
     private RecentListenedAdapter recentListenedAdapter;
@@ -54,6 +55,10 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
+        initUI();
+        observeViewModel();
+        return binding.getRoot();
+    }
 
         // initialize view models
         viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
@@ -121,11 +126,6 @@ public class ProfileFragment extends Fragment {
         postsAdapter = new PostAdapter(getActivity(), new ArrayList<>(), viewModel.getCurrentID());
         binding.activities.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.activities.setAdapter(postsAdapter);
-
-        // Set up RecentListenedAdapter and connect to view
-        recentListenedAdapter = new RecentListenedAdapter(new ArrayList<>());
-        binding.recentListened.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.recentListened.setAdapter(recentListenedAdapter);
     }
 
     private void showEditProfileButtonOrFollowButton() {
@@ -150,11 +150,8 @@ public class ProfileFragment extends Fragment {
                 }
             });
         }
-    }
-
-    private void launchEditProfile() {
-        Intent intent = new Intent(getActivity(), EditProfile.class);
-        startActivity(intent);
-    }
+    private boolean checkIfOwner() {
+        // TODO: use firebase function to finish the userId check.
+        return true;
 
 }

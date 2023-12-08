@@ -8,12 +8,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -21,9 +25,10 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
+import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
-import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
+import edu.northeastern.stage.ui.musicReview.SubmitReviewFragment;
 import edu.northeastern.stage.ui.viewmodels.NewPostViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
@@ -34,7 +39,6 @@ public class NewPostFragment extends Fragment {
     private NewPostViewModel viewModel;
     private SharedDataViewModel sharedDataViewModel;
     private JsonObject selectedTrack;
-    private String visibilityState;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNewPostBinding.inflate(inflater, container, false);
@@ -75,6 +79,7 @@ public class NewPostFragment extends Fragment {
                 }
             }
             viewModel.createPost(postContent, visibilityState);
+
         });
 
         // Setup AutoCompleteTextView for song search
@@ -128,8 +133,6 @@ public class NewPostFragment extends Fragment {
                         }
                     }
                     artists = artists.trim();
-                    Track trackToStore = viewModel.createTrack(selectedTrack);
-                    sharedDataViewModel.setTrackPost(trackToStore);
                     binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
                 }
             });

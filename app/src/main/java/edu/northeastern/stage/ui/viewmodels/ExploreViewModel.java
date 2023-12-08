@@ -117,13 +117,33 @@ public class ExploreViewModel extends ViewModel {
         CompletableFuture<ArrayList<JsonObject>> trackSearchFuture = spotify.trackSearch(query, 10);
         trackSearchFuture.thenAccept(searchResult -> {
             searchResults.postValue(searchResult);
+            Log.d("ExploreViewModel", "performSearch - searchResult in trackSearchFuture: " + searchResult);
         }).exceptionally(e -> {
-            Log.e("TrackSearchError", e.getMessage());
+            Log.e("ExploreViewModel", "performSearch - TrackSearchError", e);
             return null;
         });
+
+        if (searchResults.getValue() != null) {
+            Log.d("ExploreViewModel", "performSearch - LiveData NOT NULL");
+        } else {
+            Log.d("ExploreViewModel", "performSearch - LiveData IS NULL");
+        }
+
+        if (searchResults.getValue() != null) {
+            for (Integer i = 0; i < searchResults.getValue().size(); i++) {
+                Log.d("ExploreViewModel", "performSearch - searchResults " + searchResults.getValue().get(i));
+            }
+        }
+
+//        if (trackSearchFuture.isDone()) {
+//            if (searchResults.getValue() != null) {
+//                Log.d("ExploreViewModel", "performSearch IS DONE - LiveData NOT NULL");
+//            }
+//        }
+
+
         return searchResults;
     }
-
     // method to create Track object based on the selectedTrack JsonObject from Spotify API
     public Track createTrack(JsonObject selectedTrack) {
         // album variables
@@ -164,6 +184,7 @@ public class ExploreViewModel extends ViewModel {
 
     public void setTrack(String track) {
         this.track = track;
+
     }
 
     public MutableLiveData<List<JsonObject>> getRecommendations() {
@@ -182,7 +203,7 @@ public class ExploreViewModel extends ViewModel {
         int maxAttempts = 100000; // Limit the number of attempts to avoid infinite loop
         int MIN_DISTANCE_THRESHOLD = 10;
 
-        while (circles.size() < 100 && attempts < maxAttempts) {
+        while (circles.size() < 20 && attempts < maxAttempts) {
             float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
             float y = rand.nextFloat() * 2000 - 1000;
             float radius = rand.nextFloat() * 200 + 100;

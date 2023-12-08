@@ -18,7 +18,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +29,9 @@ import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
+    private boolean isUserInteraction = false;
     private SharedDataViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,42 +71,59 @@ public class MainActivity extends AppCompatActivity {
         // the NavController is responsible for switching fragments using res.navigation.mobile_navigation.xml
         NavController navController = navHostFragment.getNavController();
 
-        // Set up a NavController listener to handle menu item selection
+        // Handle bottom nav bar display
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.navigation_music_review) {
+            if (!isUserInteraction) { // Check if change is not due to user interaction
+                int destinationId = destination.getId();
+                if (destinationId == R.id.navigation_home) {
+                    binding.navView.setSelectedItemId(R.id.navigation_home);
+                } else if (destinationId == R.id.navigation_explore) {
+                    binding.navView.setSelectedItemId(R.id.navigation_explore);
+                } else if (destinationId == R.id.navigation_new_post) {
+                    binding.navView.setSelectedItemId(R.id.navigation_new_post);
+                } else if (destinationId == R.id.navigation_profile) {
+                    binding.navView.setSelectedItemId(R.id.navigation_profile);
+                }
+            }
+            if (destination.getId() == R.id.navigation_music_review
+                    || destination.getId() == R.id.navigation_submit_review) {
                 // Only set the selected item if it's not already selected
                 if (binding.navView.getSelectedItemId() != R.id.navigation_explore) {
                     binding.navView.getMenu().findItem(R.id.navigation_explore).setChecked(true);
                 }
-            } else {
-                // Handle other destinations if needed
             }
         });
 
-        // used for handling selections of different items in the BottomNavigationView
+        // Handle navigation through bottom nav bar
         binding.navView.setOnItemSelectedListener(item -> {
-            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review && item.getItemId() == R.id.navigation_explore) {
-                // Navigate back to Explore fragment
-                navController.popBackStack(R.id.navigation_explore, false);
-                return true; // Event handled
+            isUserInteraction = true;
+            int itemId = item.getItemId();
+            if (navController.getCurrentDestination().getId() != itemId) {
+                navController.navigate(itemId);
             }
-            // Default navigation behavior
-            return NavigationUI.onNavDestinationSelected(item, navController);
+            isUserInteraction = false;
+            return true;
         });
 
         // used to handle the scenario where the user re-selects the Explore button while on the Music Review fragment
         binding.navView.setOnItemReselectedListener(item -> {
-            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review && item.getItemId() == R.id.navigation_explore) {
+            if (navController.getCurrentDestination().getId() == R.id.navigation_music_review
+                    && item.getItemId() == R.id.navigation_explore) {
                 // Navigate back to Explore fragment
                 navController.popBackStack(R.id.navigation_explore, false);
+            } else if (navController.getCurrentDestination().getId() == R.id.navigation_submit_review
+                    && item.getItemId() == R.id.navigation_explore) {
+                // Navigate back to music review page
+                navController.popBackStack(R.id.navigation_music_review, false);
             }
         });
 
+        // DO NOT USE: it hinders normal backstack operation.
         // Binds the BottomNavigationView to the NavController.
         // Sets up listeners on the bottom navigation items such that when the user tap an item,
         // the NavController receives a callback and takes the appropriate action defined in the navigation graph (mobile_navigation.xml).
         // The NavHostFragment then inflates the appropriate fragment.
-        NavigationUI.setupWithNavController(binding.navView, navController);
+//        NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
     private void updateUser(String UID) {
@@ -116,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                 .child(UID);
 
         Map<String, Object> updates = new HashMap<>();
-        updates.put("lastLocation",new Location(100.0,100.0)); // TODO: need to edit this
+        updates.put("lastLocation",new Location(100.0,100.0)); // need to edit this
         updates.put("lastLoggedInTimeStamp",System.currentTimeMillis());
 
         reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
