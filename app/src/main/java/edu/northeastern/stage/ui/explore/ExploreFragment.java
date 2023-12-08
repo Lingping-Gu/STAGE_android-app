@@ -30,6 +30,7 @@ import com.google.gson.JsonPrimitive;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentExploreBinding;
 import edu.northeastern.stage.model.music.Album;
@@ -83,11 +84,12 @@ public class ExploreFragment extends Fragment {
         setupSearch();
 
         buttonToMusicReview.setOnClickListener(v -> {
-            // Use the NavController to navigate to the MusicReviewFragment
             if(!actv.getText().toString().isEmpty()) {
                 actv.setText("");
-                NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
-                navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
+//                NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
+//                navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
+                // Use the manual navigation.
+                ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true);
             }
         });
 
@@ -177,7 +179,6 @@ public class ExploreFragment extends Fragment {
             selectedTrack = searchAdapter.getItem(position);
             if (selectedTrack != null) {
                 String artists = "";
-
                 try {
                     Log.d("ExploreFragment", "onItemClick - Selected track: " + selectedTrack);
                     JsonArray artistsArray = selectedTrack.getAsJsonArray("artists");

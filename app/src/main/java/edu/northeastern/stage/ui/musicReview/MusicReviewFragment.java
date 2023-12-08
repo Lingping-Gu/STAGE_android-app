@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.R;
 
 import android.widget.Button;
@@ -103,9 +104,10 @@ public class MusicReviewFragment extends Fragment {
 
 
         addReviewButton.setOnClickListener(v -> {
-            // Use the NavController to navigate to the MusicReviewFragment
-            NavController navController = NavHostFragment.findNavController(MusicReviewFragment.this);
-            navController.navigate(R.id.action_navigation_music_review_to_submit_review);
+//            NavController navController = NavHostFragment.findNavController(MusicReviewFragment.this);
+//            navController.navigate(R.id.action_navigation_music_review_to_submit_review);
+            // Use the manual navigation.
+            ((MainActivity)requireActivity()).navigateToFragment("SUBMIT_REVIEW_FRAGMENT", true);
         });
 
         mViewModel.getReviews().observe(getViewLifecycleOwner(), reviews -> {
