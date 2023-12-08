@@ -1,9 +1,19 @@
 package edu.northeastern.stage;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
+import android.Manifest;
+import android.location.Location;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -15,6 +25,8 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -28,7 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.northeastern.stage.databinding.ActivityMainBinding;
-import edu.northeastern.stage.model.Location;
+//import edu.northeastern.stage.model.Location;
 import edu.northeastern.stage.ui.authentication.Login;
 import edu.northeastern.stage.ui.explore.ExploreFragment;
 import edu.northeastern.stage.ui.home.HomeFragment;
@@ -45,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private boolean isProgrammaticSelection = false;
     private SharedDataViewModel viewModel;
     private CustomBackStack customBackStack = new CustomBackStack();
+    private FusedLocationProviderClient fusedLocationClient;
+    private Integer LOCATION_PERMISSION_REQUEST_CODE = 101;
+    private String UID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +77,10 @@ public class MainActivity extends AppCompatActivity {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        String UID = "";
+        UID = "";
         if (currentUser != null) {
             UID = currentUser.getUid();
             viewModel.setUserID(UID);
-            updateUser(UID);
         } else {
             Intent intent = new Intent(MainActivity.this, Login.class);
             startActivity(intent);
@@ -130,7 +144,78 @@ public class MainActivity extends AppCompatActivity {
             int itemId = item.getItemId();
             handleReselection(itemId);
         });
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        checkAndRequestLocationPermission();
     }
+
+    // ask if the user hasn't give location permission
+    private void checkAndRequestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    // user permission
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                updateUser();
+            } else {
+                Toast.makeText(this, "Location permission is needed.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUser();
+    }
+
+    // update user information
+    private void updateUser() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.requestLocationUpdates(LocationRequest.create(), new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if (locationResult == null) {
+                        return;
+                    }
+                    for (Location location : locationResult.getLocations()) {
+                        if (location != null) {
+                            updateUserHelper(location);
+                            Log.i("location", location.toString());
+                        }
+                    }
+                }
+            }, Looper.getMainLooper());
+        }
+    }
+
+    private void updateUserHelper(Location location) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference reference = mDatabase.getReference("users").child(UID);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("lastLocation", new edu.northeastern.stage.model.Location(location.getLatitude(), location.getLongitude()));
+        updates.put("lastLoggedInTimeStamp", System.currentTimeMillis());
+
+        reference.updateChildren(updates, (error, ref) -> {
+            if (error == null) {
+                Log.d("UpdateUserLocation", "Location update successful");
+            } else {
+                Log.e("UpdateUserLocation", "Location update failed: " + error.getMessage());
+            }
+        });
+    }
+
 
     public void navigateToFragment(String tag, boolean addToStack) {
         if (addToStack) {
@@ -254,26 +339,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateUser(String UID) {
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-
-        DatabaseReference reference = mDatabase
-                .getReference("users")
-                .child(UID);
-
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("lastLocation",new Location(100.0,100.0)); // need to edit this
-        updates.put("lastLoggedInTimeStamp",System.currentTimeMillis());
-
-        reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                if (error == null) {
-                    Log.d("UpdateUser", "User update successful");
-                } else {
-                    Log.e("UpdateUser","Update user failed: " + error.getMessage());
-                }
-            }
-        });
-    }
 }
