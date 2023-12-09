@@ -12,9 +12,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -31,13 +31,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.northeastern.stage.API.Spotify;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
-import edu.northeastern.stage.ui.profile.ProfileFragment;
-
-// TODO: check if I'm looking at Lingping's profile and the third post out of 5 posts
-//  is for herself only, how the recycler view looks
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
     private Context context;
@@ -137,16 +132,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 .error(R.drawable.profile_recent_listened_error)
                 .into(holder.tvMusicImage);
 
-        // TODO: add logic to change heart based on like/not liked
         // Set the like status on the ivLike ImageView
-        holder.ivLike.setOnClickListener(v -> {
-            if (isLiked(post)) {
-                // liked
-                removeLikeFBDB(post);
-            } else {
-                // not liked
-                addLikeFDBD(post);
-            }
+        updateLikeUnlike(post, holder);
+
+        // set on click listener
+        holder.ivLike.setOnClickListener(v-> {
+            isLikedAndRemoveIfLiked(post);
+            updateLikeUnlike(post, holder);
         });
 
         holder.ivUserAvatar.setOnClickListener(v -> {
@@ -234,7 +226,40 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 });
     }
 
-    private boolean isLiked(Post post) {
+    private void isLikedAndRemoveIfLiked(Post post) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(post.getOwnerID())
+                .child("posts")
+                .child(post.getPostID())
+                .child("likes");
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> likedUserIDs = new ArrayList<>();
+                for(DataSnapshot likeSnapshot : snapshot.getChildren()) {
+                    likedUserIDs.add(likeSnapshot.getKey());
+                }
+
+                boolean isLiked = likedUserIDs.contains(currentUserId);
+                if (isLiked) {
+                    removeLikeFBDB(post);
+                } else {
+                    addLikeFDBD(post);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void updateLikeUnlike(Post post, PostViewHolder holder) {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
         DatabaseReference reference = mDatabase
@@ -249,19 +274,24 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<String> likedUserIDs = new ArrayList<>();
 
                 for (DataSnapshot likeSnapshot : snapshot.getChildren()) {
                     String likedUserID = likeSnapshot.getKey();
                     likedUserIDs.add(likedUserID);
                 }
+
+                if(likedUserIDs.contains(currentUserId)) {
+                    holder.ivLike.setColorFilter(ContextCompat.getColor(context,R.color.green));
+                } else {
+                    holder.ivLike.setColorFilter(ContextCompat.getColor(context,R.color.black));
+                }
+
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-        return likedUserIDs.contains(currentUserId);
     }
 
     private boolean isOwner(Post post) {
