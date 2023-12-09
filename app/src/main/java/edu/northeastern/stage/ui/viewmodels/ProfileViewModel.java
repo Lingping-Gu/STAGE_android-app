@@ -25,6 +25,9 @@ import edu.northeastern.stage.model.Post;
 
 public class ProfileViewModel extends ViewModel {
     private MutableLiveData<Boolean> dataRetrieved = new MutableLiveData<>();
+    private MutableLiveData<Boolean> followedStatus = new MutableLiveData<>();
+    private boolean isFollowing;
+    private boolean isFollowed;
     private Integer profilePicResource;
     private String description;
     private String email;
@@ -34,8 +37,48 @@ public class ProfileViewModel extends ViewModel {
     private String currentID;
     private String profileOwnerID;
 
+    public void followStatus() {
+
+        if(currentID != null && profileOwnerID != null) {
+            FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+            DatabaseReference rootRef = mDatabase.getReference();
+            DatabaseReference currentUserRef = rootRef.child("users").child(currentID).child("following").child(profileOwnerID);
+            DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerID).child("followers").child(currentID);
+
+            currentUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()) {
+                        setIsFollowing(true);
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+
+            profileOwnerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()) {
+                        setIsFollowed(true);
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+            followedStatus.setValue(isFollowing && isFollowed);
+        }
+
+    }
+
     public LiveData<Boolean> getDataRetrievedStatus() {
         return dataRetrieved;
+    }
+
+    public LiveData<Boolean> getFollowedStatus() {
+        return followedStatus;
     }
 
     public void retrieveDataFromDatabase() {
@@ -133,6 +176,15 @@ public class ProfileViewModel extends ViewModel {
             }
         });
         profileOwnerRef.setValue(true);
+    }
+
+
+    private void setIsFollowing(boolean following) {
+        isFollowing = following;
+    }
+
+    private void setIsFollowed(boolean followed) {
+        isFollowed = followed;
     }
 
     public Integer getProfilePicResource() {

@@ -71,9 +71,6 @@ public class ProfileFragment extends Fragment {
                 // set up adapters
                 setUpAdapters();
 
-                // show edit button or follow button depending on profile owner and current user
-                showEditProfileButtonOrFollowButton();
-
                 // retrieve all values from database first
                 viewModel.retrieveDataFromDatabase();
 
@@ -82,6 +79,11 @@ public class ProfileFragment extends Fragment {
                     if(dataRetrieved) {
                         posts = viewModel.getPosts();
                         setUIValues();
+
+                        // initiate follow status
+                        viewModel.followStatus();
+
+                        // update adapters
                         tagsAdapter.setTags(viewModel.getTags());
                         tagsAdapter.notifyDataSetChanged();
                         postsAdapter.setPosts(viewModel.getPosts());
@@ -89,6 +91,13 @@ public class ProfileFragment extends Fragment {
                         recentListenedAdapter.setImageUrls(viewModel.getRecentlyListenedToImageURLs());
                         recentListenedAdapter.notifyDataSetChanged();
                     }
+                });
+
+                // get followed status
+                viewModel.getFollowedStatus().observe(getViewLifecycleOwner(), followedStatus -> {
+                    // true = following this profile owner
+                    // false = not following this profile owner
+                    showEditProfileButtonOrFollowButton(followedStatus);
                 });
 
 
@@ -137,7 +146,7 @@ public class ProfileFragment extends Fragment {
         binding.recentListened.setAdapter(recentListenedAdapter);
     }
 
-    private void showEditProfileButtonOrFollowButton() {
+    private void showEditProfileButtonOrFollowButton(boolean followedStatus) {
         // Set up Edit Profile Button or Follow Button
         if (viewModel.getCurrentID().equals(profileOwnerId)) {
             // User is viewing their own profile, show Edit Profile Button
@@ -150,14 +159,26 @@ public class ProfileFragment extends Fragment {
             binding.editProfileButton.setBackground(drawable);
         } else {
             // User is viewing someone else's profile, show Follow Button
-            binding.followButton.setVisibility(View.VISIBLE);
+            if(followedStatus) {
+                binding.followButton.setVisibility(View.GONE);
+                binding.unfollowButton.setVisibility(View.VISIBLE);
+                binding.unfollowButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        viewModel.unfollow();
+                    }
+                });
+            } else {
+                binding.followButton.setVisibility(View.VISIBLE);
+                binding.unfollowButton.setVisibility(View.GONE);
+                binding.followButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        viewModel.follow();
+                    }
+                });
+            }
             binding.editProfileButton.setVisibility(View.GONE);
-            binding.followButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    viewModel.follow();
-                }
-            });
         }
     }
 
