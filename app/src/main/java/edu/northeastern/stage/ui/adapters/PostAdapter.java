@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -123,9 +124,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
         // TODO: add logic to change heart based on like/not liked
         // Set the like status on the ivLike ImageView
-        holder.ivLike.setOnClickListener(v -> {
-            likedOrUnlike(post);
-        });
+        likedOrUnlike(post, holder);
 
         holder.ivUserAvatar.setOnClickListener(v -> {
             // TODO: navigate to ProfileFragment and bundle PROFILE_OWNER_ID
@@ -210,7 +209,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 });
     }
 
-    private void likedOrUnlike(Post post) {
+    private void likedOrUnlike(Post post, PostViewHolder holder) {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
         DatabaseReference reference = mDatabase
@@ -232,9 +231,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 }
 
                 if(likedUserIDs.contains(currentUserId)) {
-                    removeLikeFBDB(post);
+                    holder.ivLike.setColorFilter(ContextCompat.getColor(context,R.color.green));
+                    holder.ivLike.setOnClickListener(v -> {
+                        removeLikeFBDB(post);
+                        holder.ivLike.setOnClickListener(null);
+                    });
                 } else {
-                    addLikeFDBD(post);
+                    holder.ivLike.setColorFilter(ContextCompat.getColor(context,R.color.black));
+                    holder.ivLike.setOnClickListener(v -> {
+                        addLikeFDBD(post);
+                        holder.ivLike.setOnClickListener(null);
+                    });
                 }
 
             }
