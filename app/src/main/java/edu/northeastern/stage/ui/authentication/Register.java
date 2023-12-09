@@ -3,8 +3,12 @@ package edu.northeastern.stage.ui.authentication;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.Image;
 import android.os.Bundle;
 import android.text.Editable;
@@ -185,4 +189,6 @@ public class Register extends AppCompatActivity {
                     });
         }
     }
+
+
 }
