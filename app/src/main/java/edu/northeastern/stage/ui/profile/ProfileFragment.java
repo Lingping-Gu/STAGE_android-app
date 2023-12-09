@@ -152,6 +152,7 @@ public class ProfileFragment extends Fragment {
             // User is viewing their own profile, show Edit Profile Button
             binding.editProfileButton.setVisibility(View.VISIBLE);
             binding.followButton.setVisibility(View.GONE);
+            binding.unfollowButton.setVisibility(View.GONE);
 
             binding.editProfileButton.setOnClickListener(v -> launchEditProfile());
             Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.profile_edit).mutate();
@@ -177,8 +178,8 @@ public class ProfileFragment extends Fragment {
                         viewModel.follow();
                     }
                 });
+                binding.editProfileButton.setVisibility(View.GONE);
             }
-            binding.editProfileButton.setVisibility(View.GONE);
         }
     }
 
