@@ -14,7 +14,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -27,13 +26,8 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.northeastern.stage.API.Spotify;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
-import edu.northeastern.stage.ui.profile.ProfileFragment;
-
-// TODO: check if I'm looking at Lingping's profile and the third post out of 5 posts
-//  is for herself only, how the recycler view looks
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
     private Context context;
@@ -130,13 +124,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         // TODO: add logic to change heart based on like/not liked
         // Set the like status on the ivLike ImageView
         holder.ivLike.setOnClickListener(v -> {
-            if (isLiked(post)) {
-                // liked
-                removeLikeFBDB(post);
-            } else {
-                // not liked
-                addLikeFDBD(post);
-            }
+            likedOrUnlike(post);
         });
 
         holder.ivUserAvatar.setOnClickListener(v -> {
@@ -149,14 +137,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     private void setProfilePicResourceID(PostViewHolder holder, Post post) {
 
-        final Integer[] profilePicResourceID = new Integer[1];
-
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
         DatabaseReference reference = mDatabase
                 .getReference("users")
-                .child(currentUserId)
-                .child("imageURL");
+                .child(post.getOwnerID())
+                .child("profilePicResource");
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -224,7 +210,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 });
     }
 
-    private boolean isLiked(Post post) {
+    private void likedOrUnlike(Post post) {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
         DatabaseReference reference = mDatabase
@@ -239,19 +225,24 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<String> likedUserIDs = new ArrayList<>();
 
                 for (DataSnapshot likeSnapshot : snapshot.getChildren()) {
                     String likedUserID = likeSnapshot.getKey();
                     likedUserIDs.add(likedUserID);
                 }
+
+                if(likedUserIDs.contains(currentUserId)) {
+                    removeLikeFBDB(post);
+                } else {
+                    addLikeFDBD(post);
+                }
+
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-        return likedUserIDs.contains(currentUserId);
     }
 
     private boolean isOwner(Post post) {
