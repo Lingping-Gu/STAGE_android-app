@@ -158,15 +158,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     private void setProfilePicResourceID(PostViewHolder holder, Post post) {
-
-        final Integer[] profilePicResourceID = new Integer[1];
+        // Assuming the post object contains the ownerID
+        String ownerId = post.getOwnerID();
 
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
         DatabaseReference reference = mDatabase
                 .getReference("users")
-                .child(currentUserId)
-                .child("imageURL");
+                .child(ownerId)
+                .child("profilePicResource");
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
