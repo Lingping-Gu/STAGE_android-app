@@ -122,9 +122,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 .error(R.drawable.profile_recent_listened_error)
                 .into(holder.tvMusicImage);
 
-        // TODO: add logic to change heart based on like/not liked
         // Set the like status on the ivLike ImageView
-        likedOrUnlike(post, holder);
+        updateLikeUnlike(post, holder);
+
+        // set on click listener
+        holder.ivLike.setOnClickListener(v-> {
+            isLikedAndRemoveIfLiked(post);
+            updateLikeUnlike(post, holder);
+        });
 
         holder.ivUserAvatar.setOnClickListener(v -> {
             // TODO: navigate to ProfileFragment and bundle PROFILE_OWNER_ID
@@ -209,7 +214,40 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 });
     }
 
-    private void likedOrUnlike(Post post, PostViewHolder holder) {
+    private void isLikedAndRemoveIfLiked(Post post) {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(post.getOwnerID())
+                .child("posts")
+                .child(post.getPostID())
+                .child("likes");
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> likedUserIDs = new ArrayList<>();
+                for(DataSnapshot likeSnapshot : snapshot.getChildren()) {
+                    likedUserIDs.add(likeSnapshot.getKey());
+                }
+
+                boolean isLiked = likedUserIDs.contains(currentUserId);
+                if (isLiked) {
+                    removeLikeFBDB(post);
+                } else {
+                    addLikeFDBD(post);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void updateLikeUnlike(Post post, PostViewHolder holder) {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
         DatabaseReference reference = mDatabase
@@ -232,16 +270,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
                 if(likedUserIDs.contains(currentUserId)) {
                     holder.ivLike.setColorFilter(ContextCompat.getColor(context,R.color.green));
-                    holder.ivLike.setOnClickListener(v -> {
-                        removeLikeFBDB(post);
-                        holder.ivLike.setOnClickListener(null);
-                    });
                 } else {
                     holder.ivLike.setColorFilter(ContextCompat.getColor(context,R.color.black));
-                    holder.ivLike.setOnClickListener(v -> {
-                        addLikeFDBD(post);
-                        holder.ivLike.setOnClickListener(null);
-                    });
                 }
 
             }
