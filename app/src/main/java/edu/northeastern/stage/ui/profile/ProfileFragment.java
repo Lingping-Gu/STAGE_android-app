@@ -35,7 +35,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements PostAdapter.NavigationCallback {
 
     private FragmentProfileBinding binding;
     private ProfileViewModel viewModel;
@@ -149,7 +149,7 @@ public class ProfileFragment extends Fragment {
         binding.tags.setAdapter(tagsAdapter);
 
         // Set up PostAdapter and connect to view
-        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>(), viewModel.getCurrentID());
+        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>(), viewModel.getCurrentID(), this);
         binding.activities.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.activities.setAdapter(postsAdapter);
 
@@ -199,5 +199,10 @@ public class ProfileFragment extends Fragment {
     private void launchEditProfile() {
         Intent intent = new Intent(getActivity(), EditProfile.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onNavigateToProfile(String profileOwnerId) {
+
     }
 }

@@ -97,7 +97,7 @@ public class NewPostFragment extends Fragment {
                 Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
 
                 ((MainActivity)requireActivity()).removeFragmentFromBackStack("NEW_POST_FRAGMENT");
-                ((MainActivity)requireActivity()).navigateToFragment("HOME_FRAGMENT", true);
+                ((MainActivity)requireActivity()).navigateToFragment("HOME_FRAGMENT", true, null);
             }
         });
 

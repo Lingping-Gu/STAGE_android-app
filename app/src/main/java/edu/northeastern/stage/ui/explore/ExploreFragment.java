@@ -43,6 +43,8 @@ public class ExploreFragment extends Fragment {
     private TextView progressTextView;
     private SharedDataViewModel sharedDataViewModel;
     TrackSearchAdapter searchAdapter;
+    private static final int SEARCH_DELAY = 500;
+    private long lastSearchTime = 0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -68,13 +70,17 @@ public class ExploreFragment extends Fragment {
             }
         });
 
+        searchAdapter = new TrackSearchAdapter(getContext(), actv);
         //setup search
         setupSearch();
 
         buttonToMusicReview.setOnClickListener(v -> {
             if(!actv.getText().toString().isEmpty()) {
                 actv.setText("");
-                ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true);
+//                NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
+//                navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
+                // Use the manual navigation.
+                ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true, null);
             }
         });
 
@@ -114,6 +120,8 @@ public class ExploreFragment extends Fragment {
     }
 
     private void setupSearch() {
+        actv.setAdapter(searchAdapter);
+
         actv.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -124,24 +132,33 @@ public class ExploreFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length() == 0){
+                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+
                 try {
-                    Log.d("ABC123",String.valueOf(s.length()));
-                    if(s.length() != 0) {
+                    long currentTime = System.currentTimeMillis();
+                    // add delay of 500 ms between current time and last search time for efficiency
+                    // search length should be more than 0
+                    if(currentTime - lastSearchTime > SEARCH_DELAY && s.length() != 0) {
+                        lastSearchTime = currentTime;
+                        actv.showDropDown();
+
+                        Log.d("ExploreFragment", "afterTextChanged - Performing search for: " + s.toString());
                         viewModel.performSearch(s.toString())
                                 .observe(getViewLifecycleOwner(), searchResults -> {
-                                    ArrayList<JsonObject> results = new ArrayList<>();
+                                    Log.d("ExploreFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
+
+                                    List<JsonObject> results = new ArrayList<>();
 
                                     for (int i = 0; i < searchResults.size(); i++) {
                                         Log.d("ExploreFragment", "afterTextChanged - LOOP " + searchResults.get(i).get("name").getAsString() + " BY " + searchResults.get(i).getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString());
                                         results.add(searchResults.get(i).getAsJsonObject());
                                     }
-                                    searchAdapter = new TrackSearchAdapter(getContext(),results);
-                                    actv.setAdapter(searchAdapter);
-                                    searchAdapter.notifyDataSetChanged();
+                                    searchAdapter.setSelectedResult(results);
                                 });
                     }
                 } catch (Exception e) {
