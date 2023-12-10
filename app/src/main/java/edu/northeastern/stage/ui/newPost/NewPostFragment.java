@@ -44,8 +44,6 @@ public class NewPostFragment extends Fragment {
     private JsonObject selectedTrack;
     private String visibilityState;
     private TrackSearchAdapter searchAdapter;
-    private static final int SEARCH_DELAY = 500;
-    private long lastSearchTime = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNewPostBinding.inflate(inflater, container, false);

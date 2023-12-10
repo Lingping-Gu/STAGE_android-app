@@ -43,8 +43,6 @@ public class ExploreFragment extends Fragment {
     private TextView progressTextView;
     private SharedDataViewModel sharedDataViewModel;
     private int currentMileRadius; // current value selected on slider bar.
-    private static final int SEARCH_DELAY = 500;
-    private long lastSearchTime = 0;
     private TrackSearchAdapter searchAdapter;
 
     @Override
