@@ -215,6 +215,7 @@ public class EditProfile extends AppCompatActivity {
             List<String> tags = viewModel.getSelectedTags();
             tags.remove(position);
             viewModel.setSelectedTags(tags);
+            tagsAdapter.setTags(tags);
             tagsAdapter.notifyDataSetChanged();
         }
     }
