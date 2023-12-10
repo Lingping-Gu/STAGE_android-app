@@ -24,6 +24,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +56,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         Post post = postList.get(position);
 
         String viewType = "";
+
+        Instant instant = Instant.ofEpochMilli(post.getTimestamp());
+        ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = dateTime.format(formatter);
+        holder.tvTimestamp.setText(formattedDateTime);
 
         if (isOwner(post)) {
             viewType = "owner";
@@ -140,12 +150,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     private void setProfilePicResourceID(PostViewHolder holder, Post post) {
+        // Assuming the post object contains the ownerID
+        String ownerId = post.getOwnerID();
 
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
         DatabaseReference reference = mDatabase
                 .getReference("users")
-                .child(post.getOwnerID())
+                .child(ownerId)
                 .child("profilePicResource");
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -322,7 +334,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     public static class PostViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvPostContent, tvTrackName, tvArtistName;
+        TextView tvPostContent, tvTrackName, tvArtistName, tvTimestamp;
         ImageView ivUserAvatar, ivLike, visibleState, tvMusicImage;
         LinearLayout songCard;
 
@@ -336,6 +348,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             tvTrackName = itemView.findViewById(R.id.tvTrackName);
             tvArtistName = itemView.findViewById(R.id.tvArtistName);
             tvMusicImage = itemView.findViewById(R.id.tvMusicImage);
+            tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
         }
     }
 
