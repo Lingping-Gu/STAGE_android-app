@@ -104,13 +104,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         if (viewType.equals("owner")) {
             switch (visibilityState) {
                 case "friends":
-                    holder.visibleState.setImageResource(R.drawable.profile_friends);
+                    holder.visibleState.setImageResource(R.drawable.share_friend_foreground);
                     break;
                 case "private":
-                    holder.visibleState.setImageResource(R.drawable.profile_private);
+                    holder.visibleState.setImageResource(R.drawable.share_private_foreground);
                     break;
                 default:
-                    holder.visibleState.setImageResource(R.drawable.profile_public);
+                    holder.visibleState.setImageResource(R.drawable.share_public_foreground);
             }
         }
 
