@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import edu.northeastern.stage.ui.adapters.NavigationCallback;
 import edu.northeastern.stage.ui.adapters.PostAdapter;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
@@ -35,7 +36,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileFragment extends Fragment implements PostAdapter.NavigationCallback {
+public class ProfileFragment extends Fragment implements NavigationCallback {
 
     private FragmentProfileBinding binding;
     private ProfileViewModel viewModel;
