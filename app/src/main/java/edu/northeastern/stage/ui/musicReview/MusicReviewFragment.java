@@ -180,7 +180,7 @@ public class MusicReviewFragment extends Fragment {
         if (overallRating == 0) {
             overallScoreTextView.setText("Overall rating: N/A");
         } else {
-            String formattedRating = String.format(Locale.getDefault(), "Overall rating: %.1f / 5", overallRating);
+            String formattedRating = String.format(Locale.getDefault(), "Overall rating: %.1f / 5.0", overallRating);
             overallScoreTextView.setText(formattedRating);
         }
     }
