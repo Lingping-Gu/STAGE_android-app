@@ -155,7 +155,11 @@ public class EditProfile extends AppCompatActivity {
             if (dataRetrieved) {
                 runOnUiThread(() -> {
                     editDescription.setText(viewModel.getDescription());
-                    profilePic.setImageResource(getResources().getIdentifier(viewModel.getProfilePictureResource(), "drawable", getPackageName()));
+                    if(getResources().getIdentifier(viewModel.getProfilePictureResource(), "drawable", getPackageName()) == 0) {
+                        profilePic.setImageResource(getResources().getIdentifier("user", "drawable", getPackageName()));
+                    } else {
+                        profilePic.setImageResource(getResources().getIdentifier(viewModel.getProfilePictureResource(), "drawable", getPackageName()));
+                    }
                     tagsAdapter.setTags(viewModel.getSelectedTags());
 
                     // Set up button click listener after data retrieval
