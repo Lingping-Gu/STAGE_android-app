@@ -80,7 +80,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         // friend
         if (viewType.equals("friend")) {
             if (visibilityState.equals("private")) {
-                holder.itemView.setVisibility(View.GONE);
+                holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
             } else {
                 holder.itemView.setVisibility(View.VISIBLE);
             }
@@ -88,7 +88,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         // stranger
         if (viewType.equals("stranger")) {
             if (!visibilityState.equals("public")) {
-                holder.itemView.setVisibility(View.GONE);
+                holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
             } else {
                 holder.itemView.setVisibility(View.VISIBLE);
             }
