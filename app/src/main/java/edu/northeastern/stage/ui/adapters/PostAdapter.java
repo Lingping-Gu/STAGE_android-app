@@ -57,7 +57,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public void onBindViewHolder(PostViewHolder holder, int position) {
         Post post = postList.get(position);
 
-        String viewType = "";
+        String viewType = determineViewType(post);
+
+        String visibilityState = post.getVisibilityState() != null ? post.getVisibilityState() : "private";
 
         Instant instant = Instant.ofEpochMilli(post.getTimestamp());
         ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
@@ -65,35 +67,25 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         String formattedDateTime = dateTime.format(formatter);
         holder.tvTimestamp.setText(formattedDateTime);
 
-        if (isOwner(post)) {
-            viewType = "owner";
-        } else if (isFriend(post)) {
-            viewType = "friend";
+        // Set Visibility State Icon only for the owner
+        if (viewType.equals("owner")) {
+            switch (visibilityState) {
+                case "friends":
+                    holder.visibleState.setImageResource(R.drawable.share_friend_foreground);
+                    holder.visibleState.setVisibility(View.VISIBLE);
+                    break;
+                case "private":
+                    holder.visibleState.setImageResource(R.drawable.share_private_foreground);
+                    holder.visibleState.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    holder.visibleState.setImageResource(R.drawable.share_public_foreground);
+                    holder.visibleState.setVisibility(View.VISIBLE);
+                    break;
+            }
         } else {
-            viewType = "stranger";
-        }
-
-        // set post visibility
-        String visibilityState = post.getVisibilityState();
-        if(visibilityState == null) {
-            visibilityState = "private";
-        }
-
-        // friend
-        if (viewType.equals("friend")) {
-            if (visibilityState.equals("private")) {
-                holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
-            } else {
-                holder.itemView.setVisibility(View.VISIBLE);
-            }
-        }
-        // stranger
-        if (viewType.equals("stranger")) {
-            if (!visibilityState.equals("public")) {
-                holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
-            } else {
-                holder.itemView.setVisibility(View.VISIBLE);
-            }
+            // Hide the visibility icon for users other than the owner
+            holder.visibleState.setVisibility(View.INVISIBLE);
         }
 
         // set Visibility State Icon
@@ -195,6 +187,56 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
             }
         });
+    }
+    
+    // Helper method to filter posts
+    private List<Post> filterPosts(List<Post> originalPosts) {
+        List<Post> filteredPosts = new ArrayList<>();
+        for (Post post : originalPosts) {
+            String viewType = determineViewType(post);
+            String visibilityState = post.getVisibilityState() != null ? post.getVisibilityState() : "private";
+            if (determineIfShouldShowPost(post, viewType, visibilityState)) {
+                filteredPosts.add(post);
+            }
+        }
+        return filteredPosts;
+    }
+
+    // Method to determine the viewType based on the post and current user
+    private String determineViewType(Post post) {
+        if (isOwner(post)) {
+            return "owner";
+        } else if (isFriend(post)) {
+            return "friend";
+        } else {
+            return "stranger";
+        }
+    }
+
+    private boolean determineIfShouldShowPost(Post post, String viewType, String visibilityState) {
+        // For an owner, the post is always visible
+        if (viewType.equals("owner")) {
+            return true;
+        }
+
+        // For a friend, check the visibility state
+        if (viewType.equals("friend")) {
+            // If the post is private, it should not be shown to friends
+            if (visibilityState.equals("private")) {
+                return false;
+            } else {
+                // If the post is not private, it should be shown
+                return true;
+            }
+        }
+
+        // For a stranger, only show the post if it is public
+        if (viewType.equals("stranger")) {
+            return visibilityState.equals("public");
+        }
+
+        // Default case, if none of the above conditions are met
+        return false;
     }
 
     private void addLikeFDBD(Post post) {
@@ -381,7 +423,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     public void setPosts(List<Post> posts) {
-        this.postList = posts;
+        this.postList = filterPosts(posts);
         notifyDataSetChanged();
     }
 }
