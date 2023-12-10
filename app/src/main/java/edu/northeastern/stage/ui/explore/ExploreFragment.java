@@ -43,8 +43,6 @@ public class ExploreFragment extends Fragment {
     private TextView progressTextView;
     private SharedDataViewModel sharedDataViewModel;
     TrackSearchAdapter searchAdapter;
-    private static final int SEARCH_DELAY = 500;
-    private long lastSearchTime = 0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -116,8 +114,6 @@ public class ExploreFragment extends Fragment {
     }
 
     private void setupSearch() {
-        actv.setAdapter(searchAdapter);
-
         actv.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -134,20 +130,11 @@ public class ExploreFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-
                 try {
-                    long currentTime = System.currentTimeMillis();
-                    // add delay of 500 ms between current time and last search time for efficiency
-                    // search length should be more than 0
-                    if(currentTime - lastSearchTime > SEARCH_DELAY && s.length() != 0) {
-                        lastSearchTime = currentTime;
-                        actv.showDropDown();
-
-                        Log.d("ExploreFragment", "afterTextChanged - Performing search for: " + s.toString());
+                    Log.d("ABC123",String.valueOf(s.length()));
+                    if(s.length() != 0) {
                         viewModel.performSearch(s.toString())
                                 .observe(getViewLifecycleOwner(), searchResults -> {
-                                    Log.d("ExploreFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
-
                                     ArrayList<JsonObject> results = new ArrayList<>();
 
                                     for (int i = 0; i < searchResults.size(); i++) {
@@ -156,6 +143,7 @@ public class ExploreFragment extends Fragment {
                                     }
                                     searchAdapter = new TrackSearchAdapter(getContext(),results);
                                     actv.setAdapter(searchAdapter);
+                                    searchAdapter.notifyDataSetChanged();
                                 });
                     }
                 } catch (Exception e) {
