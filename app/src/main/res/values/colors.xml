@@ -24,9 +24,11 @@
     <!-- Cream -->
     <color name="cream">#E9DCC3</color>
 
-    <color name="light_black">#222222</color>
+    <color name="light_black">#252525</color>
 
     <!-- Blue Accent -->
     <color name="light_blue">#5C7980</color>
+
+    <color name="light_cool_grey">#B7C0C3</color>
 
 </resources>
