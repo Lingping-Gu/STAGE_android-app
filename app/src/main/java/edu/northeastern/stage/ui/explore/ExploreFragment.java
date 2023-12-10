@@ -70,16 +70,12 @@ public class ExploreFragment extends Fragment {
             }
         });
 
-        searchAdapter = new TrackSearchAdapter(getContext(), actv);
         //setup search
         setupSearch();
 
         buttonToMusicReview.setOnClickListener(v -> {
             if(!actv.getText().toString().isEmpty()) {
                 actv.setText("");
-//                NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
-//                navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
-                // Use the manual navigation.
                 ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true);
             }
         });
@@ -152,13 +148,14 @@ public class ExploreFragment extends Fragment {
                                 .observe(getViewLifecycleOwner(), searchResults -> {
                                     Log.d("ExploreFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
 
-                                    List<JsonObject> results = new ArrayList<>();
+                                    ArrayList<JsonObject> results = new ArrayList<>();
 
                                     for (int i = 0; i < searchResults.size(); i++) {
                                         Log.d("ExploreFragment", "afterTextChanged - LOOP " + searchResults.get(i).get("name").getAsString() + " BY " + searchResults.get(i).getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString());
                                         results.add(searchResults.get(i).getAsJsonObject());
                                     }
-                                    searchAdapter.setSelectedResult(results);
+                                    searchAdapter = new TrackSearchAdapter(getContext(),results);
+                                    actv.setAdapter(searchAdapter);
                                 });
                     }
                 } catch (Exception e) {
