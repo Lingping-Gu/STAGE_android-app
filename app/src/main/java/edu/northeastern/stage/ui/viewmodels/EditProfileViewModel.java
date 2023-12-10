@@ -26,6 +26,11 @@ public class EditProfileViewModel extends ViewModel {
     private String description;
     private List<String> selectedTags = new ArrayList<>();
 
+    public void reset() {
+        setSelectedTags(new ArrayList<>());
+        dataRetrieved.setValue(false);
+    }
+
     public MutableLiveData<Boolean> getDataRetrievedStatus() {
         return dataRetrieved;
     }
