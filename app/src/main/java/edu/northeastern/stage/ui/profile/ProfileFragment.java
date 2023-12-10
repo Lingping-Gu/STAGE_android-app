@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.ui.adapters.PostAdapter;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
