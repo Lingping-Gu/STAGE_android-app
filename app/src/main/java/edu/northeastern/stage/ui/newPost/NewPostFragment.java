@@ -126,27 +126,19 @@ public class NewPostFragment extends Fragment {
                 @Override
                 public void afterTextChanged(Editable s) {
                     try {
-                        long currentTime = System.currentTimeMillis();
-                        // add delay of 500 ms between current time and last search time for efficiency
-                        // search length should be more than 0
-                        if(currentTime - lastSearchTime > SEARCH_DELAY && s.length() != 0) {
-                            lastSearchTime = currentTime;
-                            binding.actvSongSearch.showDropDown();
-
-                            Log.d("NewPostFragment", "afterTextChanged - Performing search for: " + s.toString());
+                        if(s.length() != 0) {
                             viewModel.performSearch(s.toString())
                                     .observe(getViewLifecycleOwner(), searchResults -> {
-                                        Log.d("NewPostFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
-
                                         ArrayList<JsonObject> results = new ArrayList<>();
 
                                         for (int i = 0; i < searchResults.size(); i++) {
-                                            Log.d("NewPostFragment", "afterTextChanged - LOOP " + searchResults.get(i).get("name").getAsString() + " BY " + searchResults.get(i).getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString());
                                             results.add(searchResults.get(i).getAsJsonObject());
                                         }
                                         searchAdapter = new TrackSearchAdapter(getContext(),results);
                                         binding.actvSongSearch.setAdapter(searchAdapter);
+                                        searchAdapter.notifyDataSetChanged();
                                     });
+                            binding.actvSongSearch.showDropDown();
                         }
                     } catch (Exception e) {
                         Log.e("NewPostFragment", "afterTextChanged - Error performing search", e);

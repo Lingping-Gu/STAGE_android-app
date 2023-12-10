@@ -42,7 +42,7 @@ public class ExploreFragment extends Fragment {
     private SeekBar geoSlider;
     private TextView progressTextView;
     private SharedDataViewModel sharedDataViewModel;
-    TrackSearchAdapter searchAdapter;
+    private TrackSearchAdapter searchAdapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -126,20 +126,19 @@ public class ExploreFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 try {
-                    Log.d("ABC123",String.valueOf(s.length()));
                     if(s.length() != 0) {
                         viewModel.performSearch(s.toString())
                                 .observe(getViewLifecycleOwner(), searchResults -> {
                                     ArrayList<JsonObject> results = new ArrayList<>();
 
                                     for (int i = 0; i < searchResults.size(); i++) {
-                                        Log.d("ExploreFragment", "afterTextChanged - LOOP " + searchResults.get(i).get("name").getAsString() + " BY " + searchResults.get(i).getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString());
                                         results.add(searchResults.get(i).getAsJsonObject());
                                     }
                                     searchAdapter = new TrackSearchAdapter(getContext(),results);
                                     actv.setAdapter(searchAdapter);
                                     searchAdapter.notifyDataSetChanged();
                                 });
+                        actv.showDropDown();
                     }
                 } catch (Exception e) {
                     Log.e("ExploreFragment", "afterTextChanged - Error performing search", e);

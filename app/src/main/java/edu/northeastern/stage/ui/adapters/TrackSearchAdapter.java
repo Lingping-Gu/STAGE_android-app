@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,11 +17,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import edu.northeastern.stage.R;
 
@@ -52,6 +48,8 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
 
     private View createItemView(int position, View convertView, ViewGroup parent) {
         View view = inflater.inflate(R.layout.item_search, parent, false);
+
+        Log.d("TrackSearchAdapter","getView called for position: " + position);
 
         TextView trackTitleTV = view.findViewById(R.id.trackTitleTV);
         TextView artistNameTV = view.findViewById(R.id.artistNameTV);
