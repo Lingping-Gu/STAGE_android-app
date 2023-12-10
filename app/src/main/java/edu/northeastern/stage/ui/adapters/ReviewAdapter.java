@@ -24,13 +24,15 @@ import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.model.Review;
 
-public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
+public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> implements NavigationCallback {
     private List<Review> reviewList;
     private FirebaseDatabase mDatabase;
+    private NavigationCallback navigationCallback;
 
-    public ReviewAdapter(List<Review> reviewList) {
+    public ReviewAdapter(List<Review> reviewList, NavigationCallback navigationCallback) {
         this.reviewList = reviewList;
         this.mDatabase = FirebaseDatabase.getInstance();
+        this.navigationCallback = navigationCallback;
     }
 
     @NonNull
@@ -73,8 +75,11 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = dateTime.format(formatter);
         holder.timestampTextView.setText(formattedDateTime);
-        // If to use Glide or Picasso, load image here
-        // Glide.with(holder.avatarImageView.getContext()).load(review.getAvatarUri()).into(holder.avatarImageView);
+
+        holder.avatarImageView.setOnClickListener(v -> {
+            String reviewOwnerId = review.getUserID();
+            navigationCallback.onNavigateToProfile(reviewOwnerId);
+        });
     }
 
     private void setProfileUsername(ReviewViewHolder holder, String userID) {
@@ -99,6 +104,11 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     @Override
     public int getItemCount() {
         return reviewList.size();
+    }
+
+    @Override
+    public void onNavigateToProfile(String profileOwnerId) {
+
     }
 
     public static class ReviewViewHolder extends RecyclerView.ViewHolder {
