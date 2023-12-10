@@ -136,7 +136,6 @@ public class NewPostFragment extends Fragment {
                             Log.d("NewPostFragment", "afterTextChanged - Performing search for: " + s.toString());
                             viewModel.performSearch(s.toString())
                                     .observe(getViewLifecycleOwner(), searchResults -> {
-                                        searchAdapter.clear();
                                         Log.d("NewPostFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
 
                                         ArrayList<JsonObject> results = new ArrayList<>();
