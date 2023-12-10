@@ -186,7 +186,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    holder.ivUserAvatar.setImageResource(context.getResources().getIdentifier(snapshot.getValue(String.class), "drawable", context.getPackageName()));
+                    if(context.getResources().getIdentifier(snapshot.getValue(String.class), "drawable", context.getPackageName()) == 0) {
+                        holder.ivUserAvatar.setImageResource(context.getResources().getIdentifier("user", "drawable", context.getPackageName()));
+                    } else {
+                        holder.ivUserAvatar.setImageResource(context.getResources().getIdentifier(snapshot.getValue(String.class), "drawable", context.getPackageName()));
+                    }
                 }
             }
 

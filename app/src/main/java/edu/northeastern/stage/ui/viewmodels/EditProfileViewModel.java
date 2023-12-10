@@ -4,12 +4,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,8 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import edu.northeastern.stage.model.Post;
 
 public class EditProfileViewModel extends ViewModel {
     private MutableLiveData<Boolean> dataRetrieved = new MutableLiveData<>();
@@ -105,7 +100,7 @@ public class EditProfileViewModel extends ViewModel {
                     if(snapshot.hasChild("profilePicResourceName")) {
                         profilePictureResource = snapshot.child("profilePicResourceName").getValue(String.class);
                     } else {
-
+                        profilePictureResource = "user";
                     }
                     if(snapshot.hasChild("description")) {
                         description = snapshot.child("description").getValue(String.class);
