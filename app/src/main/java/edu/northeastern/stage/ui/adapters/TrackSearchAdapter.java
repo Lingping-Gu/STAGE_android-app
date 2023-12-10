@@ -24,9 +24,9 @@ import edu.northeastern.stage.R;
 
 public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
 
-    private LayoutInflater inflater;
-    private ArrayList<JsonObject> results;
-    private Context context;
+    final private LayoutInflater inflater;
+    final private ArrayList<JsonObject> results;
+    final private Context context;
 
     public TrackSearchAdapter(Context context, ArrayList<JsonObject> results) {
         super(context, R.layout.item_search, results);
@@ -38,15 +38,15 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        return createItemView(position, convertView, parent);
+        return createItemView(position,  parent);
     }
 
     @Override
     public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        return createItemView(position, convertView, parent);
+        return createItemView(position,  parent);
     }
 
-    private View createItemView(int position, View convertView, ViewGroup parent) {
+    private View createItemView(int position, ViewGroup parent) {
         View view = inflater.inflate(R.layout.item_search, parent, false);
 
         Log.d("TrackSearchAdapter","getView called for position: " + position);
