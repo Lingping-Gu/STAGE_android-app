@@ -14,12 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.ui.adapters.PostAdapter;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.databinding.FragmentProfileBinding;
 import edu.northeastern.stage.ui.adapters.RecentListenedAdapter;
 import edu.northeastern.stage.ui.adapters.TagsAdapter;
+import edu.northeastern.stage.ui.authentication.Login;
 import edu.northeastern.stage.ui.editProfile.EditProfile;
 import edu.northeastern.stage.ui.viewmodels.ProfileViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
@@ -28,6 +30,8 @@ import android.content.Intent;
 
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +101,18 @@ public class ProfileFragment extends Fragment {
                     // true = following this profile owner
                     // false = not following this profile owner
                     showEditProfileButtonOrFollowButton(followedStatus);
+                });
+
+                //set up logout button
+                binding.LogOutButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(requireContext(), Login.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                        mAuth.signOut(); // use this to sign out
+                        startActivity(intent);
+                    }
                 });
             }
         });
