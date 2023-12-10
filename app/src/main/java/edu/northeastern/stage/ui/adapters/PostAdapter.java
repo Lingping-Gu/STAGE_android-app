@@ -38,11 +38,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     private Context context;
     private List<Post> postList;
     private String currentUserId;
+    private NavigationCallback navigationCallback;
 
-    public PostAdapter(Context context, List<Post> postList, String currentUserId) {
+    public interface NavigationCallback {
+        void onNavigateToProfile(String profileOwnerId);
+    }
+
+    public PostAdapter(Context context, List<Post> postList, String currentUserId, NavigationCallback navigationCallback) {
         this.context = context;
         this.postList = postList;
         this.currentUserId = currentUserId;
+        this.navigationCallback = navigationCallback;
     }
 
     @Override
@@ -80,7 +86,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         // friend
         if (viewType.equals("friend")) {
             if (visibilityState.equals("private")) {
-                holder.itemView.setVisibility(View.GONE);
+                holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
             } else {
                 holder.itemView.setVisibility(View.VISIBLE);
             }
@@ -88,7 +94,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         // stranger
         if (viewType.equals("stranger")) {
             if (!visibilityState.equals("public")) {
-                holder.itemView.setVisibility(View.GONE);
+                holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
             } else {
                 holder.itemView.setVisibility(View.VISIBLE);
             }
@@ -145,10 +151,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         });
 
         holder.ivUserAvatar.setOnClickListener(v -> {
-            // TODO: navigate to ProfileFragment and bundle PROFILE_OWNER_ID
-//            Intent intent = new Intent(context, ProfileFragment.class);
-//            intent.putExtra("PROFILE_OWNER_ID", post.getOwnerID());
-//            context.startActivity(intent);
+            String postOwnerId = post.getOwnerID();
+            navigationCallback.onNavigateToProfile(postOwnerId);
         });
     }
 

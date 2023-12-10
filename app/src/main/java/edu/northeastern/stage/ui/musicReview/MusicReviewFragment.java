@@ -92,7 +92,12 @@ public class MusicReviewFragment extends Fragment {
 //                  .placeholder(R.drawable.placeholder_image) // Set a placeholder image
 //                  .error(R.drawable.error_image) // Set an error image
                         .into(binding.albumCoverImageView);
+
+                // fetch all reviews for this track
+                mViewModel.fetchReviews(); // fetch all reviews
             }
+
+
         });
 
         musicAttributesTextView = binding.musicAttributesTextView;
@@ -109,7 +114,7 @@ public class MusicReviewFragment extends Fragment {
 //            NavController navController = NavHostFragment.findNavController(MusicReviewFragment.this);
 //            navController.navigate(R.id.action_navigation_music_review_to_submit_review);
             // Use the manual navigation.
-            ((MainActivity)requireActivity()).navigateToFragment("SUBMIT_REVIEW_FRAGMENT", true);
+            ((MainActivity)requireActivity()).navigateToFragment("SUBMIT_REVIEW_FRAGMENT", true, null);
         });
 
         mViewModel.getReviews().observe(getViewLifecycleOwner(), reviews -> {
@@ -136,12 +141,6 @@ public class MusicReviewFragment extends Fragment {
         });
 
         return root;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mViewModel.fetchReviews(); // fetch all reviews
     }
 
     private void gotoUrl(String s) {
@@ -180,7 +179,7 @@ public class MusicReviewFragment extends Fragment {
         if (overallRating == 0) {
             overallScoreTextView.setText("Overall rating: N/A");
         } else {
-            String formattedRating = String.format(Locale.getDefault(), "Overall rating: %.1f / 5", overallRating);
+            String formattedRating = String.format(Locale.getDefault(), "Overall rating: %.1f / 5.0", overallRating);
             overallScoreTextView.setText(formattedRating);
         }
     }

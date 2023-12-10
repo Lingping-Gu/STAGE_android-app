@@ -4,11 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -25,16 +20,12 @@ import android.widget.TextView;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.stage.MainActivity;
-import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentExploreBinding;
-import edu.northeastern.stage.model.music.Album;
-import edu.northeastern.stage.model.music.Artist;
 import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.viewmodels.ExploreViewModel;
@@ -51,9 +42,8 @@ public class ExploreFragment extends Fragment {
     private SeekBar geoSlider;
     private TextView progressTextView;
     private SharedDataViewModel sharedDataViewModel;
-    TrackSearchAdapter searchAdapter;
-    private static final int SEARCH_DELAY = 500;
-    private long lastSearchTime = 0;
+    private int currentMileRadius; // current value selected on slider bar.
+    private TrackSearchAdapter searchAdapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -79,24 +69,17 @@ public class ExploreFragment extends Fragment {
             }
         });
 
-        searchAdapter = new TrackSearchAdapter(getContext(), actv);
         //setup search
         setupSearch();
 
         buttonToMusicReview.setOnClickListener(v -> {
             if(!actv.getText().toString().isEmpty()) {
                 actv.setText("");
-//                NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
-//                navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
-                // Use the manual navigation.
-                ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true);
+                ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true, null);
             }
         });
 
         viewModel.setCircles(circleView);
-
-        // in the fragment, when a circle is clicked, get entire track JsonElement by API call
-        // then, store this in the shared view model and convert the jsonelement to Track object and store that in shared view model
 
         // perform seek bar change listener event used for getting the progress value
         geoSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -104,7 +87,8 @@ public class ExploreFragment extends Fragment {
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 progressChangedValue = progress;
-                progressTextView.setText(String.valueOf(progressChangedValue));
+                String progressText = progressChangedValue + " miles";
+                progressTextView.setText(progressText);
 
                 int width = geoSlider.getWidth() - geoSlider.getPaddingLeft() - geoSlider.getPaddingRight();
                 int thumbPos = geoSlider.getPaddingLeft() + width * geoSlider.getProgress() / geoSlider.getMax();
@@ -113,6 +97,7 @@ public class ExploreFragment extends Fragment {
                 int txtW = progressTextView.getMeasuredWidth();
                 int delta = txtW / 2;
                 progressTextView.setX(geoSlider.getX() + thumbPos - delta);
+                currentMileRadius = geoSlider.getProgress();
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -129,8 +114,6 @@ public class ExploreFragment extends Fragment {
     }
 
     private void setupSearch() {
-        actv.setAdapter(searchAdapter);
-
         actv.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -141,33 +124,24 @@ public class ExploreFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.length() == 0){
-                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
                 try {
-                    long currentTime = System.currentTimeMillis();
-                    // add delay of 500 ms between current time and last search time for efficiency
-                    // search length should be more than 0
-                    if(currentTime - lastSearchTime > SEARCH_DELAY && s.length() != 0) {
-                        lastSearchTime = currentTime;
-                        actv.showDropDown();
-
-                        Log.d("ExploreFragment", "afterTextChanged - Performing search for: " + s.toString());
+                    if(s.length() != 0) {
                         viewModel.performSearch(s.toString())
                                 .observe(getViewLifecycleOwner(), searchResults -> {
-                                    searchAdapter.clear();
-                                    Log.d("ExploreFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
+                                    ArrayList<JsonObject> results = new ArrayList<>();
 
                                     for (int i = 0; i < searchResults.size(); i++) {
-                                        Log.d("ExploreFragment", "afterTextChanged - LOOP " + searchResults.get(i).get("name").getAsString() + " BY " + searchResults.get(i).getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString());
-                                        searchAdapter.add(searchResults.get(i).getAsJsonObject());
+                                        results.add(searchResults.get(i).getAsJsonObject());
                                     }
+                                    searchAdapter = new TrackSearchAdapter(getContext(),results);
+                                    actv.setAdapter(searchAdapter);
                                     searchAdapter.notifyDataSetChanged();
                                 });
+                        actv.showDropDown();
                     }
                 } catch (Exception e) {
                     Log.e("ExploreFragment", "afterTextChanged - Error performing search", e);
