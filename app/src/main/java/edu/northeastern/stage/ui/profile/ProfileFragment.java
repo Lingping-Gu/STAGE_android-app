@@ -93,9 +93,6 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
                         posts = viewModel.getPosts();
                         setUIValues();
 
-                        // initiate follow status
-                        viewModel.followStatus();
-
                         // update adapters
                         tagsAdapter.setTags(viewModel.getTags());
                         tagsAdapter.notifyDataSetChanged();
@@ -192,11 +189,11 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
             // User is viewing someone else's profile, show Follow/Unfollow Button
             binding.LogOutButton.setVisibility(View.GONE);
             if(followedStatus) {
-                binding.followButton.setVisibility(View.VISIBLE);
-                binding.unfollowButton.setVisibility(View.GONE);
-            } else {
                 binding.followButton.setVisibility(View.GONE);
                 binding.unfollowButton.setVisibility(View.VISIBLE);
+            } else {
+                binding.followButton.setVisibility(View.VISIBLE);
+                binding.unfollowButton.setVisibility(View.GONE);
             }
             binding.editProfileButton.setVisibility(View.GONE);
         }
