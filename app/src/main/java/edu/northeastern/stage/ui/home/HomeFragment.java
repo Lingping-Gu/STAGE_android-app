@@ -63,7 +63,7 @@ public class HomeFragment extends Fragment implements PostAdapter.NavigationCall
         if (mainActivity != null) {
             Bundle bundle = new Bundle();
             bundle.putString("PROFILE_OWNER_ID", profileOwnerId);
-            mainActivity.navigateToFragment("PROFILE_FRAGMENT", true, bundle);
+            mainActivity.navigateToFragment("OTHER_PROFILE_FRAGMENT", true, bundle);
         }
     }
 }

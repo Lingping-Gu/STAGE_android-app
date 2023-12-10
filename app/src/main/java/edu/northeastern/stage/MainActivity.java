@@ -245,6 +245,11 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.Navig
                 customBackStack.pop();
                 navigateToFragment("MUSIC_REVIEW_FRAGMENT", true, null);
             }
+        } else if (itemId == R.id.navigation_profile) {
+            if (customBackStack.peekFirst().equalsIgnoreCase("OTHER_PROFILE_FRAGMENT")) {
+                customBackStack.pop();
+                navigateToFragment("PROFILE_FRAGMENT", true, null);
+            }
         }
     }
 
@@ -294,6 +299,8 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.Navig
             return R.id.navigation_music_review;
         } else if ("SUBMIT_REVIEW_FRAGMENT".equalsIgnoreCase(tag)) {
             return R.id.navigation_submit_review;
+        } else if ("OTHER_PROFILE_FRAGMENT".equalsIgnoreCase(tag)) {
+            return R.id.navigation_profile;
         }
         return -1; // Indicates error
     }
@@ -336,6 +343,6 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.Navig
     public void onNavigateToProfile(String profileOwnerId) {
         Bundle bundle = new Bundle();
         bundle.putString("PROFILE_OWNER_ID", profileOwnerId);
-        navigateToFragment("PROFILE_FRAGMENT", true, bundle);
+        navigateToFragment("OTHER_PROFILE_FRAGMENT", true, bundle);
     }
 }
