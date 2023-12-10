@@ -95,7 +95,8 @@ public class ExploreFragment extends Fragment {
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 progressChangedValue = progress;
-                progressTextView.setText(String.valueOf(progressChangedValue));
+                String progressText = progressChangedValue + " miles";
+                progressTextView.setText(progressText);
 
                 int width = geoSlider.getWidth() - geoSlider.getPaddingLeft() - geoSlider.getPaddingRight();
                 int thumbPos = geoSlider.getPaddingLeft() + width * geoSlider.getProgress() / geoSlider.getMax();
