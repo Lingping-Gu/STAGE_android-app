@@ -16,6 +16,8 @@
         android:hint="@string/explore_search"
         android:popupBackground="@color/beige"
         android:shadowColor="@color/black"
+        android:dropDownHeight="wrap_content"
+        android:dropDownWidth="match_parent"
         app:layout_constraintBottom_toTopOf="@+id/reviewButton"
         app:layout_constraintEnd_toEndOf="@id/reviewButton"
         app:layout_constraintStart_toStartOf="@id/reviewButton"

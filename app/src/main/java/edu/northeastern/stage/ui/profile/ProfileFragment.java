@@ -110,6 +110,22 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
                 viewModel.getFollowedStatus().observe(getViewLifecycleOwner(), followedStatus -> {
                     // true = following this profile owner
                     // false = not following this profile owner
+                    binding.unfollowButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            viewModel.unfollow();
+                            binding.followButton.setVisibility(View.VISIBLE);
+                            binding.unfollowButton.setVisibility(View.GONE);
+                        }
+                    });
+                    binding.followButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            viewModel.follow();
+                            binding.followButton.setVisibility(View.GONE);
+                            binding.unfollowButton.setVisibility(View.VISIBLE);
+                        }
+                    });
                     showEditProfileButtonOrFollowButton(followedStatus);
                 });
 
@@ -160,9 +176,10 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
     }
 
     private void showEditProfileButtonOrFollowButton(boolean followedStatus) {
-        // Set up Edit Profile Button or Follow Button
+        // Set up Edit Profile Button or Follow Button and Logout Button
         if (viewModel.getCurrentID().equals(profileOwnerId)) {
             // User is viewing their own profile, show Edit Profile Button
+            binding.LogOutButton.setVisibility(View.VISIBLE);
             binding.editProfileButton.setVisibility(View.VISIBLE);
             binding.followButton.setVisibility(View.GONE);
             binding.unfollowButton.setVisibility(View.GONE);
@@ -172,27 +189,16 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
             drawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.profile_edit_button_tint), PorterDuff.Mode.SRC_IN);
             binding.editProfileButton.setBackground(drawable);
         } else {
-            // User is viewing someone else's profile, show Follow Button
+            // User is viewing someone else's profile, show Follow/Unfollow Button
+            binding.LogOutButton.setVisibility(View.GONE);
             if(followedStatus) {
                 binding.followButton.setVisibility(View.GONE);
                 binding.unfollowButton.setVisibility(View.VISIBLE);
-                binding.unfollowButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        viewModel.unfollow();
-                    }
-                });
             } else {
                 binding.followButton.setVisibility(View.VISIBLE);
                 binding.unfollowButton.setVisibility(View.GONE);
-                binding.followButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        viewModel.follow();
-                    }
-                });
-                binding.editProfileButton.setVisibility(View.GONE);
             }
+            binding.editProfileButton.setVisibility(View.GONE);
         }
     }
     
