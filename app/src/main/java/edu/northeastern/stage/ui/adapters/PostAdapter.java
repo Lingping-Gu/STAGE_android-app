@@ -34,15 +34,11 @@ import java.util.List;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
 
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
+public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> implements NavigationCallback{
     private Context context;
     private List<Post> postList;
     private String currentUserId;
     private NavigationCallback navigationCallback;
-
-    public interface NavigationCallback {
-        void onNavigateToProfile(String profileOwnerId);
-    }
 
     public PostAdapter(Context context, List<Post> postList, String currentUserId, NavigationCallback navigationCallback) {
         this.context = context;
@@ -356,6 +352,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     @Override
     public int getItemCount() {
         return postList != null ? postList.size() : 0;
+    }
+
+    @Override
+    public void onNavigateToProfile(String profileOwnerId) {
+
     }
 
     public static class PostViewHolder extends RecyclerView.ViewHolder {

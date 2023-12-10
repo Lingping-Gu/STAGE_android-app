@@ -14,12 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import edu.northeastern.stage.MainActivity;
+import edu.northeastern.stage.ui.adapters.NavigationCallback;
 import edu.northeastern.stage.ui.adapters.PostAdapter;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.ui.viewmodels.HomeViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
-public class HomeFragment extends Fragment implements PostAdapter.NavigationCallback {
+public class HomeFragment extends Fragment implements NavigationCallback {
 
     private RecyclerView recyclerView;
     private PostAdapter adapter;
