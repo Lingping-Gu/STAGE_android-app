@@ -130,8 +130,11 @@ public class ProfileViewModel extends ViewModel {
                                 return Long.compare(o2.getTimestamp(), o1.getTimestamp());
                             }
                         });
-
+                        for(Post post : posts) {
+                            recentlyListenedToImageURLs.add(post.getImageURL());
+                        }
                         followStatus();
+
                     }
                 }
                 dataRetrieved.setValue(true);
