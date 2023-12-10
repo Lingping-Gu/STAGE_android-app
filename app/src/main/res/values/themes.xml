@@ -1,12 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-<!--    <style name="Base.Theme.STAGE" parent="Theme.Material3.DayNight.NoActionBar">-->
-<!--        &lt;!&ndash; Customize your light theme here. &ndash;&gt;-->
-<!--        &lt;!&ndash; <item name="colorPrimary">@color/my_light_primary</item> &ndash;&gt;-->
-<!--        <item name="android:statusBarColor">@android:color/transparent</item>-->
-<!--        <item name="android:windowTranslucentStatus">true</item>-->
-<!--        -->
-<!--    </style>-->
         <!-- Base application theme. -->
         <style name="Base.Theme.STAGE" parent="Theme.Material3.DayNight.NoActionBar">
             <!-- Primary brand color. -->
@@ -22,7 +14,6 @@
             <item name="colorOnSecondary">@color/cream</item>
             <!-- Status bar color. -->
             <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-            <!-- Customize your theme here. -->
         </style>
 
     <style name="Theme.STAGE" parent="Base.Theme.STAGE" />

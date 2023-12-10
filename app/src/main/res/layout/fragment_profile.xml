@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:maxWidth="240dp"
             android:text="A music enthusiastic. Welcome to my home page, explore and enjoy my rhythms!"
-            style="@style/TextStyle"
+            android:backgroundTint="@color/olive_green"
             app:layout_constraintLeft_toLeftOf="@+id/tags"
             app:layout_constraintTop_toBottomOf="@+id/tags"
             android:layout_marginTop="8dp" />

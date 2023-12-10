@@ -22,10 +22,11 @@
     <color name="nested_card">#EBE1D8</color>
 
     <!-- Cream -->
-    <color name="cream">#EBE4D6</color>
+    <color name="cream">#E9DCC3</color>
 
-    <!-- Blue Accent -->
     <color name="light_black">#222222</color>
 
+    <!-- Blue Accent -->
+    <color name="light_blue">#5C7980</color>
 
 </resources>
