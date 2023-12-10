@@ -42,6 +42,9 @@ public class ExploreFragment extends Fragment {
     private SeekBar geoSlider;
     private TextView progressTextView;
     private SharedDataViewModel sharedDataViewModel;
+    private int currentMileRadius; // current value selected on slider bar.
+    private static final int SEARCH_DELAY = 500;
+    private long lastSearchTime = 0;
     private TrackSearchAdapter searchAdapter;
 
     @Override
@@ -86,7 +89,8 @@ public class ExploreFragment extends Fragment {
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 progressChangedValue = progress;
-                progressTextView.setText(String.valueOf(progressChangedValue));
+                String progressText = progressChangedValue + " miles";
+                progressTextView.setText(progressText);
 
                 int width = geoSlider.getWidth() - geoSlider.getPaddingLeft() - geoSlider.getPaddingRight();
                 int thumbPos = geoSlider.getPaddingLeft() + width * geoSlider.getProgress() / geoSlider.getMax();
@@ -95,6 +99,7 @@ public class ExploreFragment extends Fragment {
                 int txtW = progressTextView.getMeasuredWidth();
                 int delta = txtW / 2;
                 progressTextView.setX(geoSlider.getX() + thumbPos - delta);
+                currentMileRadius = geoSlider.getProgress();
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {
