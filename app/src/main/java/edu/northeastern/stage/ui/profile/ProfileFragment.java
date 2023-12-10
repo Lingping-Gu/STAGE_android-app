@@ -96,6 +96,8 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
                         // initiate follow status
                         viewModel.followStatus();
 
+                        // hide logout button if on other profile
+
                         // update adapters
                         tagsAdapter.setTags(viewModel.getTags());
                         tagsAdapter.notifyDataSetChanged();
@@ -157,6 +159,10 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
         recentListenedAdapter = new RecentListenedAdapter(new ArrayList<>());
         binding.recentListened.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.recentListened.setAdapter(recentListenedAdapter);
+    }
+
+    private void showLogoutButton() {
+
     }
 
     private void showEditProfileButtonOrFollowButton(boolean followedStatus) {

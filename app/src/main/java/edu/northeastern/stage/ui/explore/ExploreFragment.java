@@ -80,9 +80,6 @@ public class ExploreFragment extends Fragment {
 
         viewModel.setCircles(circleView);
 
-        // in the fragment, when a circle is clicked, get entire track JsonElement by API call
-        // then, store this in the shared view model and convert the jsonelement to Track object and store that in shared view model
-
         // perform seek bar change listener event used for getting the progress value
         geoSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int progressChangedValue = 0;
