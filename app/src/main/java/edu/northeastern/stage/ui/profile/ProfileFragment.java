@@ -44,7 +44,6 @@ public class ProfileFragment extends Fragment {
     private List<Post> posts;
     private List<String> recentlyListenedToImageURLs;
 
-    // TODO: need to set onClick for follow/unfollow button
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -99,8 +98,6 @@ public class ProfileFragment extends Fragment {
                     // false = not following this profile owner
                     showEditProfileButtonOrFollowButton(followedStatus);
                 });
-
-
             }
         });
 
@@ -120,7 +117,7 @@ public class ProfileFragment extends Fragment {
     private void setUIValues() {
         binding.description.setText(viewModel.getDescription());
         binding.profileImage.setImageResource(viewModel.getProfilePicResource());
-        binding.userName.setText(viewModel.getEmail());
+        binding.userName.setText(viewModel.getUserName());
         for(Post post : posts) {
             recentlyListenedToImageURLs.add(post.getImageURL());
         }
