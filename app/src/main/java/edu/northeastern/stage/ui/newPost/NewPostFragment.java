@@ -107,7 +107,7 @@ public class NewPostFragment extends Fragment {
 //                NavController navController = NavHostFragment.findNavController(NewPostFragment.this);
 //                navController.navigate(R.id.action_navigation_new_post_to_navigation_home, null, navOptions);
                 ((MainActivity)requireActivity()).removeFragmentFromBackStack("NEW_POST_FRAGMENT");
-                ((MainActivity)requireActivity()).navigateToFragment("HOME_FRAGMENT", true);
+                ((MainActivity)requireActivity()).navigateToFragment("HOME_FRAGMENT", true, null);
             }
         });
 

@@ -114,7 +114,7 @@ public class MusicReviewFragment extends Fragment {
 //            NavController navController = NavHostFragment.findNavController(MusicReviewFragment.this);
 //            navController.navigate(R.id.action_navigation_music_review_to_submit_review);
             // Use the manual navigation.
-            ((MainActivity)requireActivity()).navigateToFragment("SUBMIT_REVIEW_FRAGMENT", true);
+            ((MainActivity)requireActivity()).navigateToFragment("SUBMIT_REVIEW_FRAGMENT", true, null);
         });
 
         mViewModel.getReviews().observe(getViewLifecycleOwner(), reviews -> {
