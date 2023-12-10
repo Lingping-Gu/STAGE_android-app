@@ -180,13 +180,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         DatabaseReference reference = mDatabase
                 .getReference("users")
                 .child(ownerId)
-                .child("profilePicResource");
+                .child("profilePicResourceName");
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    holder.ivUserAvatar.setImageResource(Integer.parseInt(snapshot.getValue().toString()));
+                    holder.ivUserAvatar.setImageResource(context.getResources().getIdentifier(snapshot.getValue(String.class), "drawable", context.getPackageName()));
                 }
             }
 

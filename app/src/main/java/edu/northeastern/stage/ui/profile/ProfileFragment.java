@@ -146,7 +146,7 @@ public class ProfileFragment extends Fragment implements NavigationCallback {
 
     private void setUIValues() {
         binding.description.setText(viewModel.getDescription());
-        binding.profileImage.setImageResource(viewModel.getProfilePicResource());
+        binding.profileImage.setImageResource(getResources().getIdentifier(viewModel.getProfilePicResource(), "drawable", requireContext().getPackageName()));
         binding.userName.setText(viewModel.getUserName());
         for(Post post : posts) {
             recentlyListenedToImageURLs.add(post.getImageURL());
