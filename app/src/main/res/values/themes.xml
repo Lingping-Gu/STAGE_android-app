@@ -17,4 +17,22 @@
         </style>
 
     <style name="Theme.STAGE" parent="Base.Theme.STAGE" />
+
+    <style name="Main.Theme.STAGE" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorPrimaryVariant">@color/olive_green</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:windowBackground">@color/beige</item>
+        <item name="cardBackgroundColor">@color/black</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/sage_green</item>
+        <item name="colorSecondaryVariant">@color/cream</item>
+        <item name="colorOnSecondary">@color/cream</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+
+    <style name="MainTheme.STAGE" parent="Main.Theme.STAGE" />
 </resources>
