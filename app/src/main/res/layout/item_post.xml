@@ -16,20 +16,22 @@
         android:padding="16dp">
 
         <!-- New vertical container for username and user avatar -->
+
+        <!-- Vertical container for texts and like image -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginRight="16dp"
-            android:gravity="start">
+            android:gravity="start"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvUserName"
+                style="@style/SmallerTextStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Username"
                 android:gravity="start"
-                style="@style/SmallerTextStyle"/>
+                android:text="Username" />
 
             <ImageView
                 android:id="@+id/ivUserAvatar"
@@ -39,12 +41,12 @@
 
         </LinearLayout>
 
-        <!-- Vertical container for texts and like image -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="14dp">
 
             <LinearLayout
                 android:id="@+id/songCard"
@@ -112,7 +114,8 @@
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:color="@color/olive_green"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="14dp"/>
 
         <ImageView
             android:id="@+id/ivLike"
