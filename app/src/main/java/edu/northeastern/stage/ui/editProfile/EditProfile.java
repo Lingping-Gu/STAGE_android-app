@@ -143,6 +143,12 @@ public class EditProfile extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        viewModel.reset();
+    }
+
     private void setupObservers() {
         // get current user ID
         viewModel.getUserID().observe(this, userID -> {
