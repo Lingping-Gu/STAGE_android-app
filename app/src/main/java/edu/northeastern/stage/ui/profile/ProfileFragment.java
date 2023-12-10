@@ -96,8 +96,6 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
                         // initiate follow status
                         viewModel.followStatus();
 
-                        // hide logout button if on other profile
-
                         // update adapters
                         tagsAdapter.setTags(viewModel.getTags());
                         tagsAdapter.notifyDataSetChanged();
@@ -161,14 +159,11 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
         binding.recentListened.setAdapter(recentListenedAdapter);
     }
 
-    private void showLogoutButton() {
-
-    }
-
     private void showEditProfileButtonOrFollowButton(boolean followedStatus) {
-        // Set up Edit Profile Button or Follow Button
+        // Set up Edit Profile Button or Follow Button and Logout Button
         if (viewModel.getCurrentID().equals(profileOwnerId)) {
             // User is viewing their own profile, show Edit Profile Button
+            binding.LogOutButton.setVisibility(View.VISIBLE);
             binding.editProfileButton.setVisibility(View.VISIBLE);
             binding.followButton.setVisibility(View.GONE);
             binding.unfollowButton.setVisibility(View.GONE);
@@ -179,6 +174,7 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
             binding.editProfileButton.setBackground(drawable);
         } else {
             // User is viewing someone else's profile, show Follow Button
+            binding.LogOutButton.setVisibility(View.GONE);
             if(followedStatus) {
                 binding.followButton.setVisibility(View.GONE);
                 binding.unfollowButton.setVisibility(View.VISIBLE);
