@@ -47,6 +47,7 @@ public class Register extends AppCompatActivity {
     private Button registerBT;
     private Spinner imageSpinner;
     private Integer profilePicSelected;
+    private EditText usernameET;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,7 @@ public class Register extends AppCompatActivity {
             startActivity(intent);
         }
 
+        usernameET = findViewById(R.id.userNameET);
         pwConfirmIV = findViewById(R.id.pwConfirmIV);
         emailET = findViewById(R.id.emailAddressET);
         pwET = findViewById(R.id.passwordET);
@@ -117,7 +119,8 @@ public class Register extends AppCompatActivity {
         registerBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createUserAccount(emailET.getText().toString(), pwET.getText().toString(), pwConfirmET.getText().toString());
+                createUserAccount(emailET.getText().toString(), pwET.getText().toString(),
+                        pwConfirmET.getText().toString(),usernameET.getText().toString());
             }
         });
     }
@@ -130,8 +133,9 @@ public class Register extends AppCompatActivity {
         outState.putString("passwordConfirm", pwConfirmET.getText().toString());
     }
 
-    private void createUserAccount(String email, String password, String confirmPassword) {
-        if (email == null || password == null || confirmPassword == null || email.equals("") || password.equals("") || confirmPassword.equals("") || profilePicSelected == null) {
+    private void createUserAccount(String email, String password, String confirmPassword, String username) {
+        if (email == null || password == null || confirmPassword == null || email.equals("") || password.equals("")
+                || confirmPassword.equals("") || profilePicSelected == null || username.equals("") || username == null) {
             Toast.makeText(Register.this, "Register failed. Please make sure to enter an email and password.", Toast.LENGTH_SHORT).show();
         } else {
             mAuth.createUserWithEmailAndPassword(email, password)
@@ -148,6 +152,7 @@ public class Register extends AppCompatActivity {
                                 Map<String, Object> updates = new HashMap<>();
                                 updates.put("profilePicResource",profilePicSelected);
                                 updates.put("email",user.getEmail());
+                                updates.put("userName",username);
 
                                 reference.child(user.getUid()).updateChildren(updates, new DatabaseReference.CompletionListener() {
                                     @Override
