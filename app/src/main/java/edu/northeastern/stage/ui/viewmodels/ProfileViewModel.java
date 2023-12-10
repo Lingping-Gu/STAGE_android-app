@@ -176,7 +176,7 @@ public class ProfileViewModel extends ViewModel {
                 Log.d("ProfileFragment","Unfollow unsuccessful!");
             }
         });
-        profileOwnerRef.setValue(true);
+        profileOwnerRef.removeValue();
     }
 
 
