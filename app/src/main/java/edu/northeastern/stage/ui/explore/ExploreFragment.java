@@ -80,7 +80,7 @@ public class ExploreFragment extends Fragment {
 //                NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
 //                navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
                 // Use the manual navigation.
-                ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true);
+                ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true, null);
             }
         });
 
