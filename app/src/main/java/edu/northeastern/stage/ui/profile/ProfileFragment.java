@@ -52,6 +52,17 @@ public class ProfileFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
 
+        // initialize variables
+        posts = new ArrayList<>();
+        recentlyListenedToImageURLs = new ArrayList<>();
+
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
         // initialize view models
         viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
@@ -116,16 +127,6 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        // initialize variables
-        posts = new ArrayList<>();
-        recentlyListenedToImageURLs = new ArrayList<>();
-
-        return binding.getRoot();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         viewModel.reset();
     }
 
@@ -194,7 +195,7 @@ public class ProfileFragment extends Fragment {
             }
         }
     }
-
+    
     private void launchEditProfile() {
         Intent intent = new Intent(getActivity(), EditProfile.class);
         startActivity(intent);
