@@ -42,6 +42,7 @@ public class ExploreFragment extends Fragment {
     private SeekBar geoSlider;
     private TextView progressTextView;
     private SharedDataViewModel sharedDataViewModel;
+    private int currentMileRadius; // current value selected on slider bar.
     TrackSearchAdapter searchAdapter;
     private static final int SEARCH_DELAY = 500;
     private long lastSearchTime = 0;
@@ -105,6 +106,7 @@ public class ExploreFragment extends Fragment {
                 int txtW = progressTextView.getMeasuredWidth();
                 int delta = txtW / 2;
                 progressTextView.setX(geoSlider.getX() + thumbPos - delta);
+                currentMileRadius = geoSlider.getProgress();
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {
