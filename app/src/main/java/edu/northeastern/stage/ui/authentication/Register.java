@@ -32,6 +32,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class Register extends AppCompatActivity {
     private EditText userNameET;
     private Button registerBT;
     private Spinner imageSpinner;
-    private Integer profilePicSelected;
+    private String profilePicSelected;
     private EditText usernameET;
 
     @Override
@@ -76,15 +77,25 @@ public class Register extends AppCompatActivity {
         userNameET = findViewById(R.id.userNameET);
         imageSpinner = findViewById(R.id.spinnerIV);
 
-        Integer[] images = {R.drawable.anger, R.drawable.sad, R.drawable.sob, R.drawable.shock, R.drawable.blush};
+        String angerResourceString = "anger";
+        String sadResourceString = "sad";
+        String sobResourceString = "sob";
+        String shockResourceString = "shock";
+        String blushResourceString = "blush";
 
-        ImageAdapter adapter = new ImageAdapter(this, images);
+        String[] imagesString = {angerResourceString,sadResourceString,sobResourceString,shockResourceString,blushResourceString};
+        Integer[] images = new Integer[imagesString.length];
+        for(int i = 0; i < imagesString.length; i++) {
+            images[i] = getResources().getIdentifier(imagesString[i], "drawable", getPackageName());
+        }
+
+        ImageAdapter adapter = new ImageAdapter(this,images);
         imageSpinner.setAdapter(adapter);
 
         imageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                profilePicSelected = images[position];
+                profilePicSelected = imagesString[position];
             }
 
             @Override
@@ -156,7 +167,7 @@ public class Register extends AppCompatActivity {
                                 DatabaseReference reference = mDatabase.getReference("users");
 
                                 Map<String, Object> updates = new HashMap<>();
-                                updates.put("profilePicResource",profilePicSelected);
+                                updates.put("profilePicResourceName",profilePicSelected);
 
                                 updates.put("email",user.getEmail());
                                 updates.put("userName",username);

@@ -126,7 +126,7 @@ public class MusicReviewFragment extends Fragment implements NavigationCallback 
                 updateOverallScore();
             } else {
                 // Show RecyclerView and hide "No reviews yet." text
-                reviewAdapter = new ReviewAdapter(reviews, this);
+                reviewAdapter = new ReviewAdapter(requireActivity(), reviews, this);
                 reviewsRecyclerView.setAdapter(reviewAdapter);
                 noReviewsTextView.setVisibility(View.GONE);
                 reviewsRecyclerView.setVisibility(View.VISIBLE);

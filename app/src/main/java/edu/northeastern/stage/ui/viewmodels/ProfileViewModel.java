@@ -28,7 +28,7 @@ public class ProfileViewModel extends ViewModel {
     private MutableLiveData<Boolean> followedStatus = new MutableLiveData<>();
     private boolean isFollowing;
     private boolean isFollowed;
-    private Integer profilePicResource;
+    private String profilePicResource;
     private String description;
     private String userName;
     private List<Post> posts = new ArrayList<>();
@@ -38,7 +38,6 @@ public class ProfileViewModel extends ViewModel {
     private String profileOwnerID;
 
     public void followStatus() {
-
         if(currentID != null && profileOwnerID != null) {
             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
             DatabaseReference rootRef = mDatabase.getReference();
@@ -94,8 +93,8 @@ public class ProfileViewModel extends ViewModel {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
-                    if(snapshot.hasChild("profilePicResource")) {
-                        setProfilePicResource(snapshot.child("profilePicResource").getValue(Integer.class));
+                    if(snapshot.hasChild("profilePicResourceName")) {
+                        setProfilePicResource(snapshot.child("profilePicResourceName").getValue(String.class));
                     }
                     if(snapshot.hasChild("description")) {
                         setDescription(snapshot.child("description").getValue(String.class));
@@ -185,34 +184,6 @@ public class ProfileViewModel extends ViewModel {
         profileOwnerRef.removeValue();
     }
 
-    private boolean isFriend(Post post) {
-
-        final boolean[] isFriend = {false};
-
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-
-        DatabaseReference reference = mDatabase
-                .getReference("users")
-                .child(currentID);
-
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.child("following").hasChild(post.getOwnerID()) &&
-                        snapshot.child("followers").hasChild(post.getOwnerID())) {
-                    isFriend[0] = true;
-                } else {
-                    isFriend[0] = false;
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-
-        return isFriend[0];
-    }
     private void setIsFollowing(boolean following) {
         isFollowing = following;
     }
@@ -221,11 +192,11 @@ public class ProfileViewModel extends ViewModel {
         isFollowed = followed;
     }
 
-    public Integer getProfilePicResource() {
+    public String getProfilePicResource() {
         return profilePicResource;
     }
 
-    public void setProfilePicResource(Integer profilePicResource) {
+    public void setProfilePicResource(String profilePicResource) {
         this.profilePicResource = profilePicResource;
     }
 

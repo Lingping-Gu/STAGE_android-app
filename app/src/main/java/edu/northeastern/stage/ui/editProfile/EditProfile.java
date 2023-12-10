@@ -66,7 +66,18 @@ public class EditProfile extends AppCompatActivity {
         setupObservers();
 
         // set spinner to images
-        Integer[] images = {R.drawable.anger, R.drawable.sad, R.drawable.sob, R.drawable.shock, R.drawable.blush};
+        String angerResourceString = "anger";
+        String sadResourceString = "sad";
+        String sobResourceString = "sob";
+        String shockResourceString = "shock";
+        String blushResourceString = "blush";
+
+        String[] imagesString = {angerResourceString,sadResourceString,sobResourceString,shockResourceString,blushResourceString};
+        Integer[] images = new Integer[imagesString.length];
+        for(int i = 0; i < imagesString.length; i++) {
+            images[i] = getResources().getIdentifier(imagesString[i], "drawable", getPackageName());
+        }
+
         ImageAdapter adapter = new ImageAdapter(this, images);
         profilePicSpinner.setAdapter(adapter);
 
@@ -74,8 +85,8 @@ public class EditProfile extends AppCompatActivity {
         profilePicSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                viewModel.setProfilePictureResource(images[position]);
-                profilePic.setImageResource(viewModel.getProfilePictureResource());
+                viewModel.setProfilePictureResource(imagesString[position]);
+                profilePic.setImageResource(getResources().getIdentifier(viewModel.getProfilePictureResource(), "drawable", getPackageName()));
             }
 
             @Override
@@ -132,6 +143,12 @@ public class EditProfile extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        viewModel.reset();
+    }
+
     private void setupObservers() {
         // get current user ID
         viewModel.getUserID().observe(this, userID -> {
@@ -144,7 +161,11 @@ public class EditProfile extends AppCompatActivity {
             if (dataRetrieved) {
                 runOnUiThread(() -> {
                     editDescription.setText(viewModel.getDescription());
-                    profilePic.setImageResource(viewModel.getProfilePictureResource());
+                    if(getResources().getIdentifier(viewModel.getProfilePictureResource(), "drawable", getPackageName()) == 0) {
+                        profilePic.setImageResource(getResources().getIdentifier("user", "drawable", getPackageName()));
+                    } else {
+                        profilePic.setImageResource(getResources().getIdentifier(viewModel.getProfilePictureResource(), "drawable", getPackageName()));
+                    }
                     tagsAdapter.setTags(viewModel.getSelectedTags());
 
                     // Set up button click listener after data retrieval
