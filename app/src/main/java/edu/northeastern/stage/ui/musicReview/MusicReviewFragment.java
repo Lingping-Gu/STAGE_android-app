@@ -125,7 +125,7 @@ public class MusicReviewFragment extends Fragment {
                 updateOverallScore();
             } else {
                 // Show RecyclerView and hide "No reviews yet." text
-                reviewAdapter = new ReviewAdapter(reviews);
+                reviewAdapter = new ReviewAdapter(requireActivity(),reviews);
                 reviewsRecyclerView.setAdapter(reviewAdapter);
                 noReviewsTextView.setVisibility(View.GONE);
                 reviewsRecyclerView.setVisibility(View.VISIBLE);

@@ -1,5 +1,6 @@
 package edu.northeastern.stage.ui.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,10 +28,12 @@ import edu.northeastern.stage.model.Review;
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
     private List<Review> reviewList;
     private FirebaseDatabase mDatabase;
+    private Context context;
 
-    public ReviewAdapter(List<Review> reviewList) {
+    public ReviewAdapter(Context context, List<Review> reviewList) {
         this.reviewList = reviewList;
         this.mDatabase = FirebaseDatabase.getInstance();
+        this.context = context;
     }
 
     @NonNull
@@ -48,12 +51,12 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         DatabaseReference userRef = mDatabase
                 .getReference("users")
                 .child(review.getUserID())
-                .child("profilePicResource");
+                .child("profilePicResourceName");
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    holder.avatarImageView.setImageResource(Integer.parseInt(snapshot.getValue().toString()));
+                    holder.avatarImageView.setImageResource(context.getResources().getIdentifier(snapshot.getValue(String.class), "drawable", context.getPackageName()));
                 }
             }
 

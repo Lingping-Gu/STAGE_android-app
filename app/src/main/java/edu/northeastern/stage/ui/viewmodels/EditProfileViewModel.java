@@ -18,8 +18,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +27,7 @@ import edu.northeastern.stage.model.Post;
 public class EditProfileViewModel extends ViewModel {
     private MutableLiveData<Boolean> dataRetrieved = new MutableLiveData<>();
     private MutableLiveData<String> currentUserID = new MutableLiveData<>();
-    private Integer profilePictureResource;
+    private String profilePictureResource;
     private String description;
     private List<String> selectedTags = new ArrayList<>();
 
@@ -52,7 +50,7 @@ public class EditProfileViewModel extends ViewModel {
 
             Map<String, Object> updates = new HashMap<>();
 
-            updates.put("profilePicResource", profilePictureResource);
+            updates.put("profilePicResourceName", profilePictureResource);
             updates.put("description", description);
 
             reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
@@ -104,8 +102,8 @@ public class EditProfileViewModel extends ViewModel {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
-                    if(snapshot.hasChild("profilePicResource")) {
-                        profilePictureResource = snapshot.child("profilePicResource").getValue(Integer.class);
+                    if(snapshot.hasChild("profilePicResourceName")) {
+                        profilePictureResource = snapshot.child("profilePicResourceName").getValue(String.class);
                     } else {
 
                     }
@@ -131,11 +129,11 @@ public class EditProfileViewModel extends ViewModel {
         });
     }
 
-    public Integer getProfilePictureResource() {
+    public String getProfilePictureResource() {
         return profilePictureResource;
     }
 
-    public void setProfilePictureResource(Integer profilePictureResource) {
+    public void setProfilePictureResource(String profilePictureResource) {
         this.profilePictureResource = profilePictureResource;
     }
 
