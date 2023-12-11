@@ -273,84 +273,43 @@ public class CircleView extends View {
 
 
     //include the + & - back again after fixing the canvas touch that makes the circles disappear (rectangle border remains)
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        float touchX = event.getX();
-//        float touchY = event.getY();
-//
-//        Log.d("CIRCLEVIEW", "Touch event: " + event.getAction());
-////        toastmsg("In onTouchEvent ->" + Thread.activeCount());
-//
-//        switch (event.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                Log.d("CIRCLEVIEW", "ACTION_DOWN");
-//                lastTouchX = touchX;
-//                lastTouchY = touchY;
-//                isDragging = true;
-//                break;
-//
-//            case MotionEvent.ACTION_MOVE:
-//
-//                if (isDragging) {
-//                    Log.d("CIRCLEVIEW", "isDragging  in ACTION_MOVE");
-//
-//                    float dx = touchX - lastTouchX;
-//                    float dy = touchY - lastTouchY;
-//                    matrix.postTranslate(dx, dy);
-//                    invalidate();
-//                    lastTouchX = touchX;
-//                    lastTouchY = touchY;
-//                }
-//                break;
-//
-//            case MotionEvent.ACTION_UP:
-//                Log.d("CIRCLEVIEW", "ACTION_UP");
-//                checkCircleClick(touchX, touchY);
-//                break;
-//
-//            case MotionEvent.ACTION_CANCEL:
-//                Log.d("CIRCLEVIEW", "ACTION_CANCEL");
-//                isDragging = false;
-//                break;
-//        }
-//
-//        objScaleGestureDetector.onTouchEvent(event);
-//
-//        return true;
-//    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float touchX = event.getX();
         float touchY = event.getY();
 
+        Log.d("CIRCLEVIEW", "Touch event: " + event.getAction());
+//        toastmsg("In onTouchEvent ->" + Thread.activeCount());
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                Log.d("CIRCLEVIEW", "ACTION_DOWN");
                 lastTouchX = touchX;
                 lastTouchY = touchY;
                 isDragging = true;
                 break;
 
             case MotionEvent.ACTION_MOVE:
+
                 if (isDragging) {
-                    float[] pts = {touchX, touchY};
-                    matrix.invert(matrix);
-                    matrix.mapPoints(pts);
-                    float dx = pts[0] - lastTouchX;
-                    float dy = pts[1] - lastTouchY;
+                    Log.d("CIRCLEVIEW", "isDragging  in ACTION_MOVE");
+
+                    float dx = touchX - lastTouchX;
+                    float dy = touchY - lastTouchY;
                     matrix.postTranslate(dx, dy);
                     invalidate();
-                    lastTouchX = pts[0];
-                    lastTouchY = pts[1];
+                    lastTouchX = touchX;
+                    lastTouchY = touchY;
                 }
                 break;
 
             case MotionEvent.ACTION_UP:
-                isDragging = false;
+                Log.d("CIRCLEVIEW", "ACTION_UP");
                 checkCircleClick(touchX, touchY);
                 break;
 
             case MotionEvent.ACTION_CANCEL:
+                Log.d("CIRCLEVIEW", "ACTION_CANCEL");
                 isDragging = false;
                 break;
         }
@@ -359,7 +318,6 @@ public class CircleView extends View {
 
         return true;
     }
-
 
     @Override
     public boolean performClick() {
