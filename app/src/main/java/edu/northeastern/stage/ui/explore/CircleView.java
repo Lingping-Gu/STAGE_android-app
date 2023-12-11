@@ -108,7 +108,7 @@ public class CircleView extends View {
 
                 if(textPresent){
                     // Set random text size based on circle radius
-                    float textSize = c.getRadius() / 3;
+                    float textSize = c.getRadius() / 4;
                     paint.setTextSize(textSize);
                     String fullText  = circleTextMap.get(c);
                     String[] lines = fullText.split("//");

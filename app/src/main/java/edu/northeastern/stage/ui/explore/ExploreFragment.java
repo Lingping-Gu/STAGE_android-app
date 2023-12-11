@@ -119,7 +119,7 @@ public class ExploreFragment extends Fragment {
                     Log.d("ABC123","Current mile radius: " + String.valueOf(currentMileRadius));
                     Log.d("ABC123","Tracks found - " + tracksFrequency.toString());
                     Log.d("ABC123","Tracks found - " + tracksFrequency.size());
-                    Log.d("ABC123","Tracks found - " + tracksFrequency.get("6qAcApH8obo8eqatCKUHd9"));
+                    Log.d("ABC123","Tracks found - " + tracksFrequency.get("2DqhE7xzpGNsKYbptqblJg"));
 
 //                    Set<String> a= tracksFrequency.keySet();
 //                    a.getClass()
