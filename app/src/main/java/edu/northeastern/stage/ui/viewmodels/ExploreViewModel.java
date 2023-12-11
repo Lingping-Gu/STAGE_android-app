@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import java.util.Map;
@@ -260,11 +261,11 @@ public class ExploreViewModel extends ViewModel {
 
         Integer currentCircleSize = 0;
 
-//        for(Integer i = 0; i<keySet.size(); i++){
-//            Log.d("ExploreViewModel", "allTracksForCircleView --> " + allTracksForCircleView.getValue().get(i).get("name").getAsString());
-//            Log.d("ExploreViewModel", "tracksFrequency --> " + tracksFrequency.getValue().get(keySet.get(i)));
-//
-//        }
+        for(Integer i = 0; i<keySet.size(); i++){
+            Log.d("ExploreViewModel", "allTracksForCircleView --> " + allTracksForCircleView.getValue().get(i).get("name").getAsString());
+            Log.d("ExploreViewModel", "tracksFrequency --> " + tracksFrequency.getValue().get(keySet.get(i)));
+
+        }
         if (tracksFrequency.getValue() != null) {
 
 
@@ -288,7 +289,22 @@ public class ExploreViewModel extends ViewModel {
 
                 if (!isOverlapping) {
                     Circle c = new Circle(x, y, radius);
-                    String textInCircle = allTracksForCircleView.getValue().get(currentCircleSize).get("name").getAsString();
+                    String textInCircle = allTracksForCircleView.getValue().get(currentCircleSize).get("name").getAsString()  + "\nby\n";
+                    JsonArray artistsArray = allTracksForCircleView.getValue().get(currentCircleSize).getAsJsonArray("artists");
+
+                    if (artistsArray != null && !artistsArray.isJsonNull() && artistsArray.size() > 0) {
+                        StringBuilder artistsSB = new StringBuilder();
+                        Iterator<JsonElement> iterator = artistsArray.iterator();
+
+                        while (iterator.hasNext()) {
+                            artistsSB.append(iterator.next().getAsJsonObject().get("name").getAsString());
+
+                            if (iterator.hasNext()) {
+                                artistsSB.append(", ");
+                            }
+                        }
+                        textInCircle += artistsSB;
+                    }
                     circles.add(c);
                     circleTextMap.put(c, textInCircle);
 
