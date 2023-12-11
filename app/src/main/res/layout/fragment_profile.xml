@@ -115,6 +115,7 @@
             style="@style/LogoutButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:text="Log Out"
@@ -179,12 +180,12 @@
             android:id="@+id/activities"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_activity"
             android:layout_marginTop="5dp"
+            android:clipToPadding="false"
             android:nestedScrollingEnabled="false"
-            android:paddingBottom="90dp"
-            android:clipToPadding="false" />
+            android:paddingBottom="250dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_activity" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
