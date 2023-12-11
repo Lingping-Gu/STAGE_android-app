@@ -38,6 +38,7 @@ public class CircleView extends View {
     private boolean isDragging = false;
     Integer countDraw = 0;
     private float[] velocities;
+    Boolean textPresent = false;
 
     private CircleClickListener listener;
 
@@ -105,31 +106,34 @@ public class CircleView extends View {
             // Draw each circle on the canvas
             for (Circle c : circles) {
 
-                // Set random text size based on circle radius
-                float textSize = c.getRadius() / 3;
-                paint.setTextSize(textSize);
-                String fullText  = circleTextMap.get(c);
-                String[] lines = fullText.split("//");
-                float textWidth = maxTextWidth(lines);
-                // adjust the width to fit inside the circle
-                while (textWidth > c.getRadius() * 2 && textSize > 0) {
-                    textSize--;
+                if(textPresent){
+                    // Set random text size based on circle radius
+                    float textSize = c.getRadius() / 3;
                     paint.setTextSize(textSize);
-                    textWidth = maxTextWidth(lines);
-                }
-                if (textSize > 2) textSize -= 3;
-                Paint.FontMetrics fontMetrics = paint.getFontMetrics();
-                float lineHeight = fontMetrics.descent - fontMetrics.ascent;
-                float textHeight = lineHeight * lines.length;
+                    String fullText  = circleTextMap.get(c);
+                    String[] lines = fullText.split("//");
+                    float textWidth = maxTextWidth(lines);
+                    // adjust the width to fit inside the circle
+                    while (textWidth > c.getRadius() * 2 && textSize > 0) {
+                        textSize--;
+                        paint.setTextSize(textSize);
+                        textWidth = maxTextWidth(lines);
+                    }
+                    if (textSize > 2) textSize -= 3;
+                    Paint.FontMetrics fontMetrics = paint.getFontMetrics();
+                    float lineHeight = fontMetrics.descent - fontMetrics.ascent;
+                    float textHeight = lineHeight * lines.length;
 
-                float textY = c.getY() - (textHeight / 2); // Starting Y position to vertically center the text
-                for (String line : lines) {
-                    float textWidthCurr = paint.measureText(line);
-                    float textX = c.getX() - (textWidthCurr / 2); // Center the text horizontally
-                    textY += -fontMetrics.ascent; // Move text down by the ascent to position it correctly
-                    canvas.drawText(line, textX, textY, paint);
-                    textY += fontMetrics.descent; // Move down to the next line
+                    float textY = c.getY() - (textHeight / 2); // Starting Y position to vertically center the text
+                    for (String line : lines) {
+                        float textWidthCurr = paint.measureText(line);
+                        float textX = c.getX() - (textWidthCurr / 2); // Center the text horizontally
+                        textY += -fontMetrics.ascent; // Move text down by the ascent to position it correctly
+                        canvas.drawText(line, textX, textY, paint);
+                        textY += fontMetrics.descent; // Move down to the next line
+                    }
                 }
+
                 canvas.save();
                 // Draw circle with black border
                 canvas.drawCircle(c.getX(), c.getY(), c.getRadius(), paint);
@@ -239,10 +243,21 @@ public class CircleView extends View {
     }
 
     public void setCircles(List<Circle> circles, HashMap<Circle, String> circleTextMap) {
-        Log.d("CIRCLEVIEW", "set circles");
+        Log.d("CIRCLEVIEW", "set circles TEXT PRESENT");
 
         this.circles = circles.toArray(new Circle[0]);
         this.circleTextMap = circleTextMap;
+        this.textPresent = true;
+
+        invalidate(); // Request a redraw
+    }
+
+    public void setCircles(List<Circle> circles) {
+        Log.d("CIRCLEVIEW", "set circles NO TEXT");
+
+        this.circles = circles.toArray(new Circle[0]);
+        this.circleTextMap = circleTextMap;
+        this.textPresent = false;
 
         invalidate(); // Request a redraw
     }
@@ -258,43 +273,84 @@ public class CircleView extends View {
 
 
     //include the + & - back again after fixing the canvas touch that makes the circles disappear (rectangle border remains)
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        float touchX = event.getX();
+//        float touchY = event.getY();
+//
+//        Log.d("CIRCLEVIEW", "Touch event: " + event.getAction());
+////        toastmsg("In onTouchEvent ->" + Thread.activeCount());
+//
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                Log.d("CIRCLEVIEW", "ACTION_DOWN");
+//                lastTouchX = touchX;
+//                lastTouchY = touchY;
+//                isDragging = true;
+//                break;
+//
+//            case MotionEvent.ACTION_MOVE:
+//
+//                if (isDragging) {
+//                    Log.d("CIRCLEVIEW", "isDragging  in ACTION_MOVE");
+//
+//                    float dx = touchX - lastTouchX;
+//                    float dy = touchY - lastTouchY;
+//                    matrix.postTranslate(dx, dy);
+//                    invalidate();
+//                    lastTouchX = touchX;
+//                    lastTouchY = touchY;
+//                }
+//                break;
+//
+//            case MotionEvent.ACTION_UP:
+//                Log.d("CIRCLEVIEW", "ACTION_UP");
+//                checkCircleClick(touchX, touchY);
+//                break;
+//
+//            case MotionEvent.ACTION_CANCEL:
+//                Log.d("CIRCLEVIEW", "ACTION_CANCEL");
+//                isDragging = false;
+//                break;
+//        }
+//
+//        objScaleGestureDetector.onTouchEvent(event);
+//
+//        return true;
+//    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float touchX = event.getX();
         float touchY = event.getY();
 
-        Log.d("CIRCLEVIEW", "Touch event: " + event.getAction());
-//        toastmsg("In onTouchEvent ->" + Thread.activeCount());
-
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Log.d("CIRCLEVIEW", "ACTION_DOWN");
                 lastTouchX = touchX;
                 lastTouchY = touchY;
                 isDragging = true;
                 break;
 
             case MotionEvent.ACTION_MOVE:
-
                 if (isDragging) {
-                    Log.d("CIRCLEVIEW", "isDragging  in ACTION_MOVE");
-
-                    float dx = touchX - lastTouchX;
-                    float dy = touchY - lastTouchY;
+                    float[] pts = {touchX, touchY};
+                    matrix.invert(matrix);
+                    matrix.mapPoints(pts);
+                    float dx = pts[0] - lastTouchX;
+                    float dy = pts[1] - lastTouchY;
                     matrix.postTranslate(dx, dy);
                     invalidate();
-                    lastTouchX = touchX;
-                    lastTouchY = touchY;
+                    lastTouchX = pts[0];
+                    lastTouchY = pts[1];
                 }
                 break;
 
             case MotionEvent.ACTION_UP:
-                Log.d("CIRCLEVIEW", "ACTION_UP");
+                isDragging = false;
                 checkCircleClick(touchX, touchY);
                 break;
 
             case MotionEvent.ACTION_CANCEL:
-                Log.d("CIRCLEVIEW", "ACTION_CANCEL");
                 isDragging = false;
                 break;
         }
@@ -303,6 +359,7 @@ public class CircleView extends View {
 
         return true;
     }
+
 
     @Override
     public boolean performClick() {

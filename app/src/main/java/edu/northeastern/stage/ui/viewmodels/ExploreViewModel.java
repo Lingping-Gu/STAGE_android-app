@@ -248,11 +248,11 @@ public class ExploreViewModel extends ViewModel {
             attempts++;
         }
 
-        generateCircleTexts();
+//        generateCircleTexts();
 
         // Set the circles to the existing CircleView
         if (circleView != null) {
-            circleView.setCircles(circles, (HashMap<Circle, String>) circleTextMap);
+            circleView.setCircles(circles);
             circleView.invalidate(); // Request a redraw
         }
         return circles;
