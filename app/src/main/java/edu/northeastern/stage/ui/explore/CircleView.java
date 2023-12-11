@@ -273,6 +273,52 @@ public class CircleView extends View {
 
 
     //include the + & - back again after fixing the canvas touch that makes the circles disappear (rectangle border remains)
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        float touchX = event.getX();
+//        float touchY = event.getY();
+//
+//        Log.d("CIRCLEVIEW", "Touch event: " + event.getAction());
+////        toastmsg("In onTouchEvent ->" + Thread.activeCount());
+//
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                Log.d("CIRCLEVIEW", "ACTION_DOWN");
+//                lastTouchX = touchX;
+//                lastTouchY = touchY;
+//                isDragging = true;
+//                break;
+//
+//            case MotionEvent.ACTION_MOVE:
+//
+//                if (isDragging) {
+//                    Log.d("CIRCLEVIEW", "isDragging  in ACTION_MOVE");
+//
+//                    float dx = touchX - lastTouchX;
+//                    float dy = touchY - lastTouchY;
+//                    matrix.postTranslate(dx, dy);
+//                    invalidate();
+//                    lastTouchX = touchX;
+//                    lastTouchY = touchY;
+//                }
+//                break;
+//
+//            case MotionEvent.ACTION_UP:
+//                Log.d("CIRCLEVIEW", "ACTION_UP");
+//                checkCircleClick(touchX, touchY);
+//                break;
+//
+//            case MotionEvent.ACTION_CANCEL:
+//                Log.d("CIRCLEVIEW", "ACTION_CANCEL");
+//                isDragging = false;
+//                break;
+//        }
+//
+//        objScaleGestureDetector.onTouchEvent(event);
+//
+//        return true;
+//    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float touchX = event.getX();
@@ -293,7 +339,6 @@ public class CircleView extends View {
 
                 if (isDragging) {
                     Log.d("CIRCLEVIEW", "isDragging  in ACTION_MOVE");
-
                     float dx = touchX - lastTouchX;
                     float dy = touchY - lastTouchY;
                     matrix.postTranslate(dx, dy);
@@ -334,34 +379,23 @@ public class CircleView extends View {
 
 
     //check if we still want to leave the pinch in and out seeing that texts don't get zoomed in
-    public class PinchZoomListener extends SimpleOnScaleGestureListener{
-
+    public class PinchZoomListener extends SimpleOnScaleGestureListener {
         @Override
-        public boolean onScale(ScaleGestureDetector detector){
-            Log.d("CIRCLEVIEW", "Touch PinchZoomListener");
+        public boolean onScale(ScaleGestureDetector detector) {
+            scaleFactor *= detector.getScaleFactor();
+            scaleFactor = Math.max(0.1f, Math.min(scaleFactor, 5.0f)); // Optional: Limit the scale factor
 
-            float gestureFactor = detector.getScaleFactor();
-            // zoom out
-            if(gestureFactor > 1){
-                Log.d("CIRCLEVIEW", "Touch PinchZoomListener zoom in");
-                scaleFactor *= 1.05f;
-            } else { //zoom in
-                Log.d("CIRCLEVIEW", "Touch PinchZoomListener zoom out");
-                scaleFactor /= 1.05f;
-            }
-
-            matrix.reset();
-            matrix.postScale(scaleFactor, scaleFactor, getWidth() / 2f, getHeight() / 2f);
+            matrix.postScale(detector.getScaleFactor(), detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
             invalidate();
             return true;
-
         }
 
         @Override
-        public boolean onScaleBegin(ScaleGestureDetector detector){
+        public boolean onScaleBegin(ScaleGestureDetector detector) {
             return true;
         }
     }
+
 
     private void toastmsg(String msg){
         Toast.makeText(this.getContext(), msg, Toast.LENGTH_SHORT).show();
@@ -389,12 +423,11 @@ public class CircleView extends View {
     }
 
     private boolean isPointInsideCircle(float x, float y, Circle circle) {
-        //Create a float array to represent the touch coordinates as a point.
         float[] point = {x, y};
-        matrix.invert(matrix); // Invert the matrix to get the original coordinates
-        matrix.mapPoints(point); // Map the touch coordinates to the original coordinates
+        Matrix invertedMatrix = new Matrix();
+        matrix.invert(invertedMatrix);
+        invertedMatrix.mapPoints(point);
 
-        //Calculate the distance between the mapped touch coordinates and the circle's center using the Pythagorean theorem.
         float distance = (float) Math.sqrt(Math.pow(point[0] - circle.getX(), 2) + Math.pow(point[1] - circle.getY(), 2));
         return distance <= circle.getRadius();
     }
