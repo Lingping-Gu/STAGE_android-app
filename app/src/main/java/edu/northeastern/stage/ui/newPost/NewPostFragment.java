@@ -134,8 +134,8 @@ public class NewPostFragment extends Fragment {
                                     searchAdapter = new TrackSearchAdapter(getContext(), results);
                                     binding.actvSongSearch.setAdapter(searchAdapter);
                                     searchAdapter.notifyDataSetChanged();
+                                    binding.actvSongSearch.showDropDown();
                                 });
-                        binding.actvSongSearch.showDropDown();
                     }
                 } catch (Exception e) {
                     Log.e("NewPostFragment", "afterTextChanged - Error performing search", e);

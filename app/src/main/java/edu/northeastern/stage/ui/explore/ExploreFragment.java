@@ -150,8 +150,8 @@ public class ExploreFragment extends Fragment {
                                     searchAdapter = new TrackSearchAdapter(getContext(),results);
                                     actv.setAdapter(searchAdapter);
                                     searchAdapter.notifyDataSetChanged();
+                                    actv.showDropDown();
                                 });
-                        actv.showDropDown();
                     }
                 } catch (Exception e) {
                     Log.e("ExploreFragment", "afterTextChanged - Error performing search", e);
