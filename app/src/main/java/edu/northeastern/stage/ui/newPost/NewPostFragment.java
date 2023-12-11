@@ -89,6 +89,8 @@ public class NewPostFragment extends Fragment {
                 Toast.makeText(getActivity(), "Please enter post content.", Toast.LENGTH_SHORT).show();
             } else if (selectedTrack == null) {
                 Toast.makeText(getActivity(), "Please search for a song to post.", Toast.LENGTH_SHORT).show();
+            } else if (selectedId == -1) {
+                Toast.makeText(getActivity(), "Please select who can see your post.", Toast.LENGTH_SHORT).show();
             } else {
                 viewModel.createPost(postContent, visibilityState);
                 Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
