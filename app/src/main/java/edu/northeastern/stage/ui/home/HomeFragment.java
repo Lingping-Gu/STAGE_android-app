@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,10 +27,19 @@ public class HomeFragment extends Fragment implements NavigationCallback {
     private PostAdapter adapter;
     private HomeViewModel viewModel;
     private SharedDataViewModel sharedDataViewModel;
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        // Initialize views
+        recyclerView = view.findViewById(R.id.recycler_view);
+        progressBar = view.findViewById(R.id.progressBar);
+
+        // Initially, hide RecyclerView and show ProgressBar
+        recyclerView.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
 
         // initialize view models
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
@@ -45,14 +55,14 @@ public class HomeFragment extends Fragment implements NavigationCallback {
             }
         });
 
-        // initialize views + adapter
-        recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // observe changes in posts and update adapter
         viewModel.getPosts().observe(getViewLifecycleOwner(), posts -> {
             // Update the UI when the data changes
             adapter.setPosts(posts);
+            progressBar.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
         });
 
         return view;
