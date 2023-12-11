@@ -17,13 +17,16 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import edu.northeastern.stage.API.Spotify;
+import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.model.Circle;
 import edu.northeastern.stage.model.music.Album;
 import edu.northeastern.stage.model.music.Artist;
@@ -34,7 +37,11 @@ public class ExploreViewModel extends ViewModel {
 
     private MutableLiveData<List<JsonObject>> recommendations = new MutableLiveData<>();
     private MutableLiveData<Map<String,Integer>> tracksFrequency = new MutableLiveData<>();
+    private MutableLiveData<ArrayList<JsonObject>> allTracksForCircleView = new MutableLiveData<>();
+
     private String track;
+    private ArrayList<JsonObject> allTracksCircle = new ArrayList<JsonObject>();
+
     private Spotify spotify = new Spotify();
     private static final Random rand = new Random();
     private String userID;
@@ -42,6 +49,13 @@ public class ExploreViewModel extends ViewModel {
     Map<Circle, String> circleTextMap = new HashMap<>();
     List<Circle> circles;
     final private float METER_TO_MILES_CONVERSION = 0.000621371F;
+
+    private MutableLiveData<JsonObject> clickedTrack = new MutableLiveData<>();
+
+    public void setClickedTrack(JsonObject track) {
+        clickedTrack.setValue(track);
+        Log.d("ExploreViewModel", "in setClickedTrack -> " + track);
+    }
 
     public MutableLiveData<Map<String,Integer>> getTracksNearby(Integer radius) {
 
@@ -112,6 +126,25 @@ public class ExploreViewModel extends ViewModel {
         this.userID = userID;
     }
 
+    public LiveData<ArrayList<JsonObject>> getTrackFromId(String trackId, Integer circleCount) {
+//        dataRetrieved.postValue(false);
+
+        // change numResults
+        CompletableFuture<JsonObject> trackSearchFuture = spotify.trackSearchByID(trackId);
+        trackSearchFuture.thenAccept(searchResult -> {
+            allTracksCircle.add(searchResult);
+            allTracksForCircleView.postValue(allTracksCircle);
+            Log.d("ExploreViewModel", "getTracksForCircles - " + searchResult);
+            Log.d("ExploreViewModel", "circleCount - " + circleCount);
+            Log.d("ExploreViewModel", "allTracksForCircleView.getValue().size() - " + allTracksForCircleView.getValue().size());
+
+        }).exceptionally(e -> {
+            Log.e("TrackSearchError", e.getMessage());
+            return null;
+        });
+
+        return allTracksForCircleView;
+    }
     public LiveData<List<JsonObject>> performSearch(String query) {
         MutableLiveData<List<JsonObject>> searchResults = new MutableLiveData<>();
 
@@ -184,8 +217,14 @@ public class ExploreViewModel extends ViewModel {
         int attempts = 0;
         int maxAttempts = 100000; // Limit the number of attempts to avoid infinite loop
         int MIN_DISTANCE_THRESHOLD = 10;
+        Log.d("ExploreViewModel", "IN createCircles");
 
-        while (circles.size() < 20 && attempts < maxAttempts) {
+        if(tracksFrequency.getValue() != null){
+            Log.d("ExploreViewModel", "tracksFrequency.getValue().get(0) --> " + tracksFrequency.getValue().get(0));
+            Log.d("ExploreViewModel", "tracksFrequency.getValue().size() --> " + tracksFrequency.getValue().size());
+
+        }
+        while (circles.size() <= 20 && attempts < maxAttempts) {
             float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
             float y = rand.nextFloat() * 2000 - 1000;
             float radius = rand.nextFloat() * 200 + 100;
@@ -215,6 +254,84 @@ public class ExploreViewModel extends ViewModel {
         if (circleView != null) {
             circleView.setCircles(circles, (HashMap<Circle, String>) circleTextMap);
             circleView.invalidate(); // Request a redraw
+        }
+        return circles;
+    }
+
+    public List<Circle> setCirclesWithTracks(List<String> keySet, CircleView circleView) {
+        this.circleView = circleView;
+        Log.d("ExploreViewModel", "KEYSET --> " + keySet);
+
+        JsonObject track;
+        circles = new ArrayList<>();
+        int attempts = 0;
+        int maxAttempts = 100000; // Limit the number of attempts to avoid infinite loop
+        int MIN_DISTANCE_THRESHOLD = 10;
+        Log.d("ExploreViewModel", "IN createCircles");
+
+        Integer currentCircleSize = 0;
+
+        for(Integer i = 0; i<keySet.size(); i++){
+            Log.d("ExploreViewModel", "allTracksForCircleView --> " + allTracksForCircleView.getValue().get(i).get("name").getAsString());
+            Log.d("ExploreViewModel", "tracksFrequency --> " + tracksFrequency.getValue().get(keySet.get(i)));
+
+        }
+        if (tracksFrequency.getValue() != null) {
+
+
+            while (currentCircleSize < keySet.size() && attempts < maxAttempts) {
+
+                float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
+                float y = rand.nextFloat() * 2000 - 1000;
+
+                Log.d("ExploreViewModel", "Current circle size -> " + currentCircleSize);
+                float radius = tracksFrequency.getValue().get(keySet.get(currentCircleSize)) * 100 + 100;
+
+                // Ensure the newly created circle doesn't overlap with existing circles
+                boolean isOverlapping = false;
+                for (Circle existingCircle : circles) {
+                    float distance = calculateDistance(x, y, existingCircle.getX(), existingCircle.getY());
+                    // add min_distance_threshold so they are bit further away from each other
+                    float minDistance = radius + existingCircle.getRadius() + MIN_DISTANCE_THRESHOLD;
+                    if (distance < minDistance) {
+                        isOverlapping = true;
+                        break; // This circle overlaps, generate a new one
+                    }
+                }
+
+                if (!isOverlapping) {
+                    track = allTracksForCircleView.getValue().get(currentCircleSize);
+                    Circle c = new Circle(x, y, radius);
+                    String textInCircle = "";
+                    textInCircle = allTracksForCircleView.getValue().get(currentCircleSize).get("name").getAsString() + "//";
+                    textInCircle += "by//";
+                    JsonArray artistsArray = allTracksForCircleView.getValue().get(currentCircleSize).getAsJsonArray("artists");
+
+                    if (artistsArray != null && !artistsArray.isJsonNull() && artistsArray.size() > 0) {
+                        StringBuilder artistsSB = new StringBuilder();
+                        Iterator<JsonElement> iterator = artistsArray.iterator();
+
+                        while (iterator.hasNext()) {
+                            artistsSB.append(iterator.next().getAsJsonObject().get("name").getAsString());
+
+                            if (iterator.hasNext()) {
+                                artistsSB.append(", ");
+                            }
+                        }
+                        textInCircle += artistsSB;
+                    }
+                    circles.add(c);
+                    circleTextMap.put(c, textInCircle);
+                    currentCircleSize++;
+                }
+                attempts++;
+            }
+        }
+
+        // Set the circles to the existing CircleView
+        if (this.circleView != null) {
+            this.circleView.setCircles(circles, (HashMap<Circle, String>) circleTextMap);
+            this.circleView.invalidate(); // Request a redraw
         }
         return circles;
     }

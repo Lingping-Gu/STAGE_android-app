@@ -6,6 +6,10 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import com.google.gson.JsonObject;
+
+import edu.northeastern.stage.model.music.Track;
+
 public class Circle {
 
     private float x;
@@ -15,8 +19,19 @@ public class Circle {
     public int[] direction = new int[]{1,1}; //direction modifier (-1,1)
     public RectF oval;
     public Paint paint;
+    public JsonObject track;
 
     // Constructor
+    @SuppressLint("ResourceAsColor")
+    public Circle(float x, float y, float radius, JsonObject track) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.paint = new Paint();
+        this.paint.setColor(android.R.color.white);
+        this.track = track;
+    }
+
     @SuppressLint("ResourceAsColor")
     public Circle(float x, float y, float radius) {
         this.x = x;
@@ -71,6 +86,10 @@ public class Circle {
 
     public void setRadius(float radius) {
         this.radius = radius;
+    }
+
+    public JsonObject getTrackObject(){
+        return track;
     }
 
 }

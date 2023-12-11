@@ -36,7 +36,6 @@ import java.util.Map;
 
 import edu.northeastern.stage.databinding.ActivityMainBinding;
 import edu.northeastern.stage.ui.adapters.NavigationCallback;
-import edu.northeastern.stage.ui.adapters.PostAdapter;
 import edu.northeastern.stage.ui.authentication.Login;
 import edu.northeastern.stage.ui.explore.ExploreFragment;
 import edu.northeastern.stage.ui.home.HomeFragment;
@@ -46,7 +45,6 @@ import edu.northeastern.stage.ui.newPost.NewPostFragment;
 import edu.northeastern.stage.ui.profile.ProfileFragment;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
-// TODO: Add comments for newly added navigation methods.
 public class MainActivity extends AppCompatActivity implements NavigationCallback {
     private ActivityMainBinding binding;
     private boolean isUserInteraction = false;

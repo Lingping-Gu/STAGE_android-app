@@ -19,13 +19,12 @@
     <EditText
         android:id="@+id/reviewContentEditText"
         android:layout_width="0dp"
-        android:layout_height="150dp"
+        android:layout_height="50dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="15dp"
         android:hint="Write your review here"
         android:inputType="textMultiLine"
-        android:gravity="top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/reviewRatingBar" />

@@ -171,6 +171,7 @@ public class Register extends AppCompatActivity {
 
                                 updates.put("email",user.getEmail());
                                 updates.put("userName",username);
+                                updates.put("description","");
 
                                 reference.child(user.getUid()).updateChildren(updates, new DatabaseReference.CompletionListener() {
                                     @Override
