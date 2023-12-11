@@ -132,10 +132,10 @@ public class ProfileViewModel extends ViewModel {
                         for(Post post : posts) {
                             recentlyListenedToImageURLs.add(post.getImageURL());
                         }
-                        followStatus();
-
                     }
+                    followStatus();
                 }
+
                 dataRetrieved.setValue(true);
             }
             @Override
