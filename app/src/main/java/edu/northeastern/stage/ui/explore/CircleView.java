@@ -12,14 +12,19 @@ import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.View;
 import android.widget.Toast;
+import edu.northeastern.stage.MainActivity;
 
 import androidx.annotation.NonNull;
+
+import com.google.gson.JsonObject;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.model.Circle;
+import edu.northeastern.stage.model.music.Track;
 
 public class CircleView extends View {
 
@@ -33,6 +38,12 @@ public class CircleView extends View {
     private boolean isDragging = false;
     Integer countDraw = 0;
     private float[] velocities;
+
+    private CircleClickListener listener;
+
+    public void setCircleClickListener(CircleClickListener listener) {
+        this.listener = listener;
+    }
 
     Map<Circle, String> circleTextMap = new HashMap<>();
 
@@ -317,7 +328,6 @@ public class CircleView extends View {
         public boolean onScaleBegin(ScaleGestureDetector detector){
             return true;
         }
-
     }
 
     private void toastmsg(String msg){
@@ -331,6 +341,14 @@ public class CircleView extends View {
                 if (isPointInsideCircle(touchX, touchY, c)) {
                     // Handle the circle click, for example, display a message or perform an action
                     toastmsg("" + c + " text value is " + circleTextMap.get(c));
+                    Log.d("CircleView", "Current selected track :  -> " + c.getTrackObject());
+                    Log.d("CircleView", "Listener   -> " + listener);
+
+//                    ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true, null);
+
+                    if(listener != null) {
+                        listener.onCircleClicked(c.getTrackObject());
+                    }
                     break; // Exit the loop once a circle is clicked
                 }
             }
@@ -347,6 +365,11 @@ public class CircleView extends View {
         float distance = (float) Math.sqrt(Math.pow(point[0] - circle.getX(), 2) + Math.pow(point[1] - circle.getY(), 2));
         return distance <= circle.getRadius();
     }
+
+    public interface CircleClickListener {
+        void onCircleClicked(JsonObject clickedTrack);
+    }
+
 
 
 }

@@ -125,19 +125,20 @@ public class ExploreFragment extends Fragment {
                             if(allTrackObjects.size() == tracksFrequency.size()){
                                 Log.d("ABC123", "ALL TRACK OBJECTS RECEIVED " + allTrackObjects);
 
-                                circleView = new CircleView(requireContext());
+                                circleView = binding.circleView;
                                 // Get keySet
                                 Set<String> keySet = tracksFrequency.keySet();
 
                                 // Convert to list
                                 List<String> keyList = new ArrayList<>(keySet);
-                                viewModel.setCirclesWithTracks(keyList);
+                                viewModel.setCirclesWithTracks(keyList, binding.circleView);
+
+                                binding.circleView.setCircleClickListener(clickedTrack -> {
+                                    viewModel.setClickedTrack(clickedTrack);
+                                });
                             }
                         });
-
-
                     }
-
                 });
 
             }
