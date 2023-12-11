@@ -134,7 +134,6 @@ public class NewPostFragment extends Fragment {
                                     searchAdapter = new TrackSearchAdapter(getContext(), results);
                                     binding.actvSongSearch.setAdapter(searchAdapter);
                                     searchAdapter.notifyDataSetChanged();
-                                    binding.actvSongSearch.showDropDown();
                                 });
                     }
                 } catch (Exception e) {

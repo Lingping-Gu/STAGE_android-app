@@ -182,7 +182,6 @@ public class ExploreFragment extends Fragment {
                                     searchAdapter = new TrackSearchAdapter(getContext(),results);
                                     actv.setAdapter(searchAdapter);
                                     searchAdapter.notifyDataSetChanged();
-                                    actv.showDropDown();
                                 });
                     }
                 } catch (Exception e) {
