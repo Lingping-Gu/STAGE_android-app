@@ -261,7 +261,7 @@ public class CircleView extends View {
 
             case MotionEvent.ACTION_UP:
                 Log.d("CIRCLEVIEW", "ACTION_UP");
-//                checkCircleClick(touchX, touchY);
+                checkCircleClick(touchX, touchY);
                 break;
 
             case MotionEvent.ACTION_CANCEL:

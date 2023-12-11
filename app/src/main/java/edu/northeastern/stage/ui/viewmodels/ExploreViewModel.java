@@ -21,6 +21,7 @@ import java.util.List;
 
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import edu.northeastern.stage.API.Spotify;
@@ -33,7 +34,12 @@ import edu.northeastern.stage.ui.explore.CircleView;
 public class ExploreViewModel extends ViewModel {
 
     private MutableLiveData<List<JsonObject>> recommendations = new MutableLiveData<>();
+    private MutableLiveData<Map<String,Integer>> tracksFrequency = new MutableLiveData<>();
+    private MutableLiveData<ArrayList<JsonObject>> allTracksForCircleView = new MutableLiveData<>();
+
     private String track;
+    private ArrayList<JsonObject> allTracksCircle = new ArrayList<JsonObject>();
+
     private Spotify spotify = new Spotify();
     private static final Random rand = new Random();
     private String userID;
@@ -42,46 +48,49 @@ public class ExploreViewModel extends ViewModel {
     List<Circle> circles;
     final private float METER_TO_MILES_CONVERSION = 0.000621371F;
 
-    public Map<String,Integer> getTracksNearby(Integer radius) {
+
+
+    public MutableLiveData<Map<String,Integer>> getTracksNearby(Integer radius) {
 
         Location userLocation = new Location("");
+        Map<String,Integer> frequency = new HashMap<>();
 
-        DatabaseReference currentUserReference = FirebaseDatabase.getInstance().getReference("users").child(userID);
+        DatabaseReference currentUserReference = FirebaseDatabase.getInstance().getReference("users").child(userID).child("lastLocation");
 
+        // get current user location
         currentUserReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                userLocation.setLatitude(Double.parseDouble(snapshot.child("latitude").getKey()));
-                userLocation.setLongitude(Double.parseDouble(snapshot.child("longitude").getKey()));
-            }
+                userLocation.setLatitude(Double.parseDouble(snapshot.child("latitude").getValue().toString()));
+                userLocation.setLongitude(Double.parseDouble(snapshot.child("longitude").getValue().toString()));
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        Map<String,Integer> tracksFrequency = new HashMap<>();
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference reference = mDatabase.getReference("users");
-
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                    if(isWithinDistance(Double.parseDouble(userSnapshot.child("location").child("latitude").getKey()),
-                            Double.parseDouble(userSnapshot.child("location").child("longitude").getKey()),
-                            userLocation.getLatitude(), userLocation.getLongitude(),radius)) {
-                        for (DataSnapshot trackSnapshot : userSnapshot.child("posts").getChildren()) {
-                            String trackID = trackSnapshot.child("trackID").getValue(String.class);
-                            if(tracksFrequency.containsKey(trackID)) {
-                                tracksFrequency.put(trackID, tracksFrequency.get(trackID) + 1);
-                            } else {
-                                tracksFrequency.put(trackID,1);
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                            if(isWithinDistance(Double.parseDouble(userSnapshot.child("lastLocation").child("latitude").getValue().toString()),
+                                    Double.parseDouble(userSnapshot.child("lastLocation").child("longitude").getValue().toString()),
+                                    userLocation.getLatitude(), userLocation.getLongitude(),radius)) {
+                                for (DataSnapshot trackSnapshot : userSnapshot.child("posts").getChildren()) {
+                                    String trackID = trackSnapshot.child("trackID").getValue(String.class);
+                                    if(frequency.containsKey(trackID)) {
+                                        frequency.put(trackID, frequency.get(trackID) + 1);
+                                    } else {
+                                        frequency.put(trackID,1);
+                                    }
+                                }
                             }
                         }
+                        tracksFrequency.setValue(frequency);
                     }
-                }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+
+                });
             }
 
             @Override
@@ -110,6 +119,25 @@ public class ExploreViewModel extends ViewModel {
         this.userID = userID;
     }
 
+    public LiveData<ArrayList<JsonObject>> getTrackFromId(String trackId, Integer circleCount) {
+//        dataRetrieved.postValue(false);
+
+        // change numResults
+        CompletableFuture<JsonObject> trackSearchFuture = spotify.trackSearchByID(trackId);
+        trackSearchFuture.thenAccept(searchResult -> {
+            allTracksCircle.add(searchResult);
+            allTracksForCircleView.postValue(allTracksCircle);
+            Log.d("ExploreViewModel", "getTracksForCircles - " + searchResult);
+            Log.d("ExploreViewModel", "circleCount - " + circleCount);
+            Log.d("ExploreViewModel", "allTracksForCircleView.getValue().size() - " + allTracksForCircleView.getValue().size());
+
+        }).exceptionally(e -> {
+            Log.e("TrackSearchError", e.getMessage());
+            return null;
+        });
+
+        return allTracksForCircleView;
+    }
     public LiveData<List<JsonObject>> performSearch(String query) {
         MutableLiveData<List<JsonObject>> searchResults = new MutableLiveData<>();
 
@@ -182,8 +210,14 @@ public class ExploreViewModel extends ViewModel {
         int attempts = 0;
         int maxAttempts = 100000; // Limit the number of attempts to avoid infinite loop
         int MIN_DISTANCE_THRESHOLD = 10;
+        Log.d("ExploreViewModel", "IN createCircles");
 
-        while (circles.size() < 20 && attempts < maxAttempts) {
+        if(tracksFrequency.getValue() != null){
+            Log.d("ExploreViewModel", "tracksFrequency.getValue().get(0) --> " + tracksFrequency.getValue().get(0));
+            Log.d("ExploreViewModel", "tracksFrequency.getValue().size() --> " + tracksFrequency.getValue().size());
+
+        }
+        while (circles.size() <= 20 && attempts < maxAttempts) {
             float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
             float y = rand.nextFloat() * 2000 - 1000;
             float radius = rand.nextFloat() * 200 + 100;
@@ -208,6 +242,63 @@ public class ExploreViewModel extends ViewModel {
         }
 
         generateCircleTexts();
+
+        // Set the circles to the existing CircleView
+        if (circleView != null) {
+            circleView.setCircles(circles, (HashMap<Circle, String>) circleTextMap);
+            circleView.invalidate(); // Request a redraw
+        }
+        return circles;
+    }
+
+    public List<Circle> setCirclesWithTracks(List<String> keySet) {
+        circles = new ArrayList<>();
+        int attempts = 0;
+        int maxAttempts = 100000; // Limit the number of attempts to avoid infinite loop
+        int MIN_DISTANCE_THRESHOLD = 10;
+        Log.d("ExploreViewModel", "IN createCircles");
+
+        Integer currentCircleSize = 0;
+
+//        for(Integer i = 0; i<keySet.size(); i++){
+//            Log.d("ExploreViewModel", "allTracksForCircleView --> " + allTracksForCircleView.getValue().get(i).get("name").getAsString());
+//            Log.d("ExploreViewModel", "tracksFrequency --> " + tracksFrequency.getValue().get(keySet.get(i)));
+//
+//        }
+        if (tracksFrequency.getValue() != null) {
+
+
+            while (currentCircleSize <= keySet.size() && attempts < maxAttempts) {
+
+                float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
+                float y = rand.nextFloat() * 2000 - 1000;
+                float radius = tracksFrequency.getValue().get(keySet.get(currentCircleSize)) * 200 + 100;
+
+                // Ensure the newly created circle doesn't overlap with existing circles
+                boolean isOverlapping = false;
+                for (Circle existingCircle : circles) {
+                    float distance = calculateDistance(x, y, existingCircle.getX(), existingCircle.getY());
+                    // add min_distance_threshold so they are bit further away from each other
+                    float minDistance = radius + existingCircle.getRadius() + MIN_DISTANCE_THRESHOLD;
+                    if (distance < minDistance) {
+                        isOverlapping = true;
+                        break; // This circle overlaps, generate a new one
+                    }
+                }
+
+                if (!isOverlapping) {
+                    Circle c = new Circle(x, y, radius);
+                    String textInCircle = allTracksForCircleView.getValue().get(currentCircleSize).get("name").getAsString();
+                    circles.add(c);
+                    circleTextMap.put(c, textInCircle);
+
+                }
+
+                attempts++;
+                currentCircleSize = circles.size();
+            }
+        }
+
 
         // Set the circles to the existing CircleView
         if (circleView != null) {
