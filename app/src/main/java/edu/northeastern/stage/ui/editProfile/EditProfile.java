@@ -146,6 +146,7 @@ public class EditProfile extends AppCompatActivity {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("description", editDescription.getText().toString());
+        outState.putStringArrayList("tags",(ArrayList) viewModel.getSelectedTags());
     }
 
     @Override
@@ -176,6 +177,9 @@ public class EditProfile extends AppCompatActivity {
                     // config change keep state
                     if (savedInstanceState != null) {
                         editDescription.setText(savedInstanceState.getString("description"));
+                        viewModel.setSelectedTags(savedInstanceState.getStringArrayList("tags"));
+                        tagsAdapter.setTags(savedInstanceState.getStringArrayList("tags"));
+                        tagsAdapter.notifyDataSetChanged();
                     }
 
                     // Set up button click listener after data retrieval
