@@ -52,6 +52,9 @@ public class ProfileFragment extends Fragment implements NavigationCallback {
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
 
+        binding.progressBar.setVisibility(View.VISIBLE); // Make ProgressBar visible
+        hideMainContent();
+
         // initialize variables
         posts = new ArrayList<>();
         recentlyListenedToImageURLs = new ArrayList<>();
@@ -62,6 +65,8 @@ public class ProfileFragment extends Fragment implements NavigationCallback {
     @Override
     public void onResume() {
         super.onResume();
+        binding.progressBar.setVisibility(View.VISIBLE);
+        hideMainContent();
 
         // initialize view models
         viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
@@ -92,6 +97,9 @@ public class ProfileFragment extends Fragment implements NavigationCallback {
                     if(dataRetrieved) {
                         posts = viewModel.getPosts();
                         setUIValues();
+                        // Hide ProgressBar and show main content
+                        binding.progressBar.setVisibility(View.GONE);
+                        showMainContent();
 
                         // update adapters
                         tagsAdapter.setTags(viewModel.getTags());
@@ -158,6 +166,32 @@ public class ProfileFragment extends Fragment implements NavigationCallback {
         tagsAdapter.setTags(viewModel.getTags());
         postsAdapter.setPosts(posts);
         recentListenedAdapter.setImageUrls(recentlyListenedToImageURLs);
+    }
+
+    private void hideMainContent() {
+        // Hide all main content views
+        binding.userName.setVisibility(View.INVISIBLE);
+        binding.description.setVisibility(View.INVISIBLE);
+        binding.activities.setVisibility(View.INVISIBLE);
+        binding.tags.setVisibility(View.INVISIBLE);
+        binding.profilePicture.setVisibility(View.INVISIBLE);
+        binding.editProfileButton.setVisibility(View.GONE);
+        binding.LogOutButton.setVisibility(View.GONE);
+        binding.followButton.setVisibility(View.GONE);
+        binding.recentListened.setVisibility(View.INVISIBLE);
+    }
+
+    private void showMainContent() {
+        // Show all main content views
+        binding.userName.setVisibility(View.VISIBLE);
+        binding.description.setVisibility(View.VISIBLE);
+        binding.activities.setVisibility(View.VISIBLE);
+        binding.tags.setVisibility(View.VISIBLE);
+        binding.profilePicture.setVisibility(View.VISIBLE);
+        binding.editProfileButton.setVisibility(View.VISIBLE);
+        binding.LogOutButton.setVisibility(View.VISIBLE);
+
+        binding.recentListened.setVisibility(View.VISIBLE);
     }
 
     private void setUpAdapters() {
