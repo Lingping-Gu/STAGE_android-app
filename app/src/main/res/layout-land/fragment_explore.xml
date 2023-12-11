@@ -43,7 +43,7 @@
         android:layout_width="350dp"
         android:layout_height="220dp"
         android:layout_marginRight="16dp"
-        android:background="#000000"
+        android:background="@color/olive_green"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/reviewButton"
         app:layout_constraintHorizontal_chainStyle="spread"

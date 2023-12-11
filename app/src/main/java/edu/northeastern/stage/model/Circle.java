@@ -8,6 +8,7 @@ import android.graphics.RectF;
 
 import com.google.gson.JsonObject;
 
+import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.music.Track;
 
 public class Circle {
@@ -15,7 +16,7 @@ public class Circle {
     private float x;
     private float y;
     private float radius;
-    public int speed = 1;
+    public double speed = 0.5;
     public int[] direction = new int[]{1,1}; //direction modifier (-1,1)
     public RectF oval;
     public Paint paint;
@@ -28,7 +29,7 @@ public class Circle {
         this.y = y;
         this.radius = radius;
         this.paint = new Paint();
-        this.paint.setColor(android.R.color.white);
+        this.paint.setColor(R.color.beige);
         this.track = track;
     }
 
@@ -38,7 +39,7 @@ public class Circle {
         this.y = y;
         this.radius = radius;
         this.paint = new Paint();
-        this.paint.setColor(android.R.color.white);
+        this.paint.setColor(R.color.beige);
     }
 
     public void move(Canvas canvas) {

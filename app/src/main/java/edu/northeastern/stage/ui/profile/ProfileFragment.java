@@ -237,7 +237,7 @@ public class ProfileFragment extends Fragment implements NavigationCallback {
             binding.editProfileButton.setVisibility(View.GONE);
         }
     }
-    
+
     private void launchEditProfile() {
         Intent intent = new Intent(getActivity(), EditProfile.class);
         startActivity(intent);

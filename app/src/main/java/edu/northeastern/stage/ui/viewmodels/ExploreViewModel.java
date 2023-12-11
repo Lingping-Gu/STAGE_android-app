@@ -248,11 +248,11 @@ public class ExploreViewModel extends ViewModel {
             attempts++;
         }
 
-        generateCircleTexts();
+//        generateCircleTexts();
 
         // Set the circles to the existing CircleView
         if (circleView != null) {
-            circleView.setCircles(circles, (HashMap<Circle, String>) circleTextMap);
+            circleView.setCircles(circles);
             circleView.invalidate(); // Request a redraw
         }
         return circles;
@@ -301,7 +301,7 @@ public class ExploreViewModel extends ViewModel {
 
                 if (!isOverlapping) {
                     track = allTracksForCircleView.getValue().get(currentCircleSize);
-                    Circle c = new Circle(x, y, radius);
+                    Circle c = new Circle(x, y, radius, track);
                     String textInCircle = "";
                     textInCircle = allTracksForCircleView.getValue().get(currentCircleSize).get("name").getAsString() + "//";
                     textInCircle += "by//";
