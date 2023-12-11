@@ -289,7 +289,9 @@ public class ExploreViewModel extends ViewModel {
 
                 if (!isOverlapping) {
                     Circle c = new Circle(x, y, radius);
-                    String textInCircle = allTracksForCircleView.getValue().get(currentCircleSize).get("name").getAsString()  + "\nby\n";
+                    String textInCircle = "";
+                    textInCircle = allTracksForCircleView.getValue().get(currentCircleSize).get("name").getAsString() + "/";
+                    textInCircle += "by/";
                     JsonArray artistsArray = allTracksForCircleView.getValue().get(currentCircleSize).getAsJsonArray("artists");
 
                     if (artistsArray != null && !artistsArray.isJsonNull() && artistsArray.size() > 0) {
@@ -307,7 +309,6 @@ public class ExploreViewModel extends ViewModel {
                     }
                     circles.add(c);
                     circleTextMap.put(c, textInCircle);
-
                 }
 
                 attempts++;

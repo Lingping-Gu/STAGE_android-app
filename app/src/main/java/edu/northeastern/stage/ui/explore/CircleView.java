@@ -97,22 +97,31 @@ public class CircleView extends View {
                 // Set random text size based on circle radius
                 float textSize = c.getRadius() / 3;
                 paint.setTextSize(textSize);
+                String fullText  = circleTextMap.get(c);
+                String[] lines = fullText.split("/");
+                float textWidth = maxTextWidth(lines);
+                // adjust the width to fit inside the circle
+                while (textWidth > c.getRadius() * 2 && textSize > 0) {
+                    textSize--;
+                    paint.setTextSize(textSize);
+                    textWidth = maxTextWidth(lines);
+                }
+                if (textSize > 2) textSize -= 3;
+                Paint.FontMetrics fontMetrics = paint.getFontMetrics();
+                float lineHeight = fontMetrics.descent - fontMetrics.ascent;
+                float textHeight = lineHeight * lines.length;
 
-                // Generate random text
-                String randomText = circleTextMap.get(c);
-                // Calculate text width and height
-                float textWidth = paint.measureText(randomText);
-                Paint.FontMetrics metrics = paint.getFontMetrics();
-                float textHeight = metrics.descent - metrics.ascent;
-                // Calculate centered coordinates for the text
-                float textX = c.getX() - (textWidth / 2);
-                float textY = c.getY() - (textHeight / 2);
-
+                float textY = c.getY() - (textHeight / 2); // Starting Y position to vertically center the text
+                for (String line : lines) {
+                    float textWidthCurr = paint.measureText(line);
+                    float textX = c.getX() - (textWidthCurr / 2); // Center the text horizontally
+                    textY += -fontMetrics.ascent; // Move text down by the ascent to position it correctly
+                    canvas.drawText(line, textX, textY, paint);
+                    textY += fontMetrics.descent; // Move down to the next line
+                }
                 canvas.save();
                 // Draw circle with black border
                 canvas.drawCircle(c.getX(), c.getY(), c.getRadius(), paint);
-                // Draw text inside the circle
-                canvas.drawText(randomText, textX, textY, paint);
             }
         }
 
@@ -136,6 +145,15 @@ public class CircleView extends View {
             invalidate();
         }
 //        postInvalidate();
+    }
+
+    private float maxTextWidth(String[] lines) {
+        float maxWidth = 0;
+        for (String line: lines) {
+            float textWidth = paint.measureText(line);
+            maxWidth = Math.max(maxWidth, textWidth);
+        }
+        return maxWidth;
     }
 
     private void updateCirclePositions(Canvas canvas) {
