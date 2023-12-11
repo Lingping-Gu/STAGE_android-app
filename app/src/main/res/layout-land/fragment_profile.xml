@@ -183,7 +183,7 @@
             android:layout_marginTop="5dp"
             android:clipToPadding="false"
             android:nestedScrollingEnabled="false"
-            android:paddingBottom="90dp"
+            android:paddingBottom="250dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView_activity" />
 
