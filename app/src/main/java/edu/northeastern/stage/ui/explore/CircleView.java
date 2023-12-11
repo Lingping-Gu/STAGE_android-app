@@ -142,7 +142,7 @@ public class CircleView extends View {
 
         velocities = new float[circles.length * 2]; // x and y velocities for each circle
         // Update circle positions based on velocities
-//        updateCirclePositions(canvas);
+        updateCirclePositions(canvas);
 
         canvas.save();
         canvas.concat(matrix);
@@ -407,7 +407,6 @@ public class CircleView extends View {
                 // Check if the touch point is within the bounds of the circle
                 if (isPointInsideCircle(touchX, touchY, c)) {
                     // Handle the circle click, for example, display a message or perform an action
-                    toastmsg("" + c + " text value is " + circleTextMap.get(c));
                     Log.d("CircleView", "Current selected track :  -> " + c.getTrackObject());
                     Log.d("CircleView", "Listener   -> " + listener);
 
