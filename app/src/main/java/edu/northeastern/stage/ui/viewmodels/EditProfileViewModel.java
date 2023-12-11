@@ -4,12 +4,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -18,20 +15,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.northeastern.stage.model.Post;
-
 public class EditProfileViewModel extends ViewModel {
     private MutableLiveData<Boolean> dataRetrieved = new MutableLiveData<>();
     private MutableLiveData<String> currentUserID = new MutableLiveData<>();
-    private Integer profilePictureResource;
+    private String profilePictureResource;
     private String description;
     private List<String> selectedTags = new ArrayList<>();
+
+    public void reset() {
+        setSelectedTags(new ArrayList<>());
+        dataRetrieved.setValue(false);
+    }
 
     public MutableLiveData<Boolean> getDataRetrievedStatus() {
         return dataRetrieved;
@@ -52,7 +50,7 @@ public class EditProfileViewModel extends ViewModel {
 
             Map<String, Object> updates = new HashMap<>();
 
-            updates.put("profilePicResource", profilePictureResource);
+            updates.put("profilePicResourceName", profilePictureResource);
             updates.put("description", description);
 
             reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
@@ -72,17 +70,34 @@ public class EditProfileViewModel extends ViewModel {
                 tagsToUpdate.put(tag,true);
             }
 
-            reference.child("tags").updateChildren(tagsToUpdate);
+            reference.child("tags").updateChildren(tagsToUpdate, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                    if (error == null) {
+                        Log.d("UpdateTags", "Tags update successful");
+                    } else {
+                        Log.e("UpdateTags", "Update tags failed: " + error.getMessage());
+                    }
+                }
+            });
 
             DatabaseReference existingTagsReference = reference.child("tags");
-
             existingTagsReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for(DataSnapshot tagSnapshot : snapshot.getChildren()) {
                         String tag = tagSnapshot.getKey();
-                        if(!selectedTags.contains(tag)) {
-                            tagSnapshot.getRef().removeValue();
+                        if (!selectedTags.contains(tag)) {
+                            tagSnapshot.getRef().removeValue(new DatabaseReference.CompletionListener() {
+                                @Override
+                                public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                                    if (error == null) {
+                                        Log.d("RemoveTag", "Tag removal successful");
+                                    } else {
+                                        Log.e("RemoveTag", "Remove tag failed: " + error.getMessage());
+                                    }
+                                }
+                            });
                         }
                     }
                 }
@@ -104,10 +119,10 @@ public class EditProfileViewModel extends ViewModel {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
-                    if(snapshot.hasChild("profilePicResource")) {
-                        profilePictureResource = snapshot.child("profilePicResource").getValue(Integer.class);
+                    if(snapshot.hasChild("profilePicResourceName")) {
+                        profilePictureResource = snapshot.child("profilePicResourceName").getValue(String.class);
                     } else {
-
+                        profilePictureResource = "user";
                     }
                     if(snapshot.hasChild("description")) {
                         description = snapshot.child("description").getValue(String.class);
@@ -131,11 +146,11 @@ public class EditProfileViewModel extends ViewModel {
         });
     }
 
-    public Integer getProfilePictureResource() {
+    public String getProfilePictureResource() {
         return profilePictureResource;
     }
 
-    public void setProfilePictureResource(Integer profilePictureResource) {
+    public void setProfilePictureResource(String profilePictureResource) {
         this.profilePictureResource = profilePictureResource;
     }
 

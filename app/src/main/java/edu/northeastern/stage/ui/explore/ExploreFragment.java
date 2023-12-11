@@ -76,10 +76,18 @@ public class ExploreFragment extends Fragment {
         //setup search
         setupSearch();
 
+        // button to music review page
         buttonToMusicReview.setOnClickListener(v -> {
             if(!actv.getText().toString().isEmpty()) {
                 actv.setText("");
                 ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true, null);
+            }
+        });
+
+        // if trackReview is not empty, enable button
+        sharedDataViewModel.getTrackReview().observe(getViewLifecycleOwner(), track -> {
+            if (track != null) {
+                buttonToMusicReview.setEnabled(true);
             }
         });
 
@@ -174,8 +182,8 @@ public class ExploreFragment extends Fragment {
                                     searchAdapter = new TrackSearchAdapter(getContext(),results);
                                     actv.setAdapter(searchAdapter);
                                     searchAdapter.notifyDataSetChanged();
+                                    actv.showDropDown();
                                 });
-                        actv.showDropDown();
                     }
                 } catch (Exception e) {
                     Log.e("ExploreFragment", "afterTextChanged - Error performing search", e);

@@ -9,11 +9,11 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import edu.northeastern.stage.ui.adapters.NavigationCallback;
 import edu.northeastern.stage.ui.adapters.PostAdapter;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Post;
@@ -35,7 +35,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileFragment extends Fragment implements PostAdapter.NavigationCallback {
+public class ProfileFragment extends Fragment implements NavigationCallback {
 
     private FragmentProfileBinding binding;
     private ProfileViewModel viewModel;
@@ -77,7 +77,7 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
                     profileOwnerId = userID;
                 }
 
-                // set profile owner ID and current ID in the viewmodel
+                // set profile owner ID and current ID in the view model
                 viewModel.setProfileOwnerID(profileOwnerId);
                 viewModel.setCurrentID(userID);
 
@@ -93,9 +93,6 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
                         posts = viewModel.getPosts();
                         setUIValues();
 
-                        // initiate follow status
-                        viewModel.followStatus();
-
                         // update adapters
                         tagsAdapter.setTags(viewModel.getTags());
                         tagsAdapter.notifyDataSetChanged();
@@ -103,43 +100,44 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
                         postsAdapter.notifyDataSetChanged();
                         recentListenedAdapter.setImageUrls(viewModel.getRecentlyListenedToImageURLs());
                         recentListenedAdapter.notifyDataSetChanged();
+                        viewModel.reset();
                     }
                 });
-
                 // get followed status
                 viewModel.getFollowedStatus().observe(getViewLifecycleOwner(), followedStatus -> {
                     // true = following this profile owner
                     // false = not following this profile owner
-                    binding.unfollowButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            viewModel.unfollow();
-                            binding.followButton.setVisibility(View.VISIBLE);
-                            binding.unfollowButton.setVisibility(View.GONE);
-                        }
-                    });
-                    binding.followButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            viewModel.follow();
-                            binding.followButton.setVisibility(View.GONE);
-                            binding.unfollowButton.setVisibility(View.VISIBLE);
-                        }
-                    });
                     showEditProfileButtonOrFollowButton(followedStatus);
                 });
+            }
+        });
 
-                //set up logout button
-                binding.LogOutButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(requireContext(), Login.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                        mAuth.signOut(); // use this to sign out
-                        startActivity(intent);
-                    }
-                });
+        binding.unfollowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewModel.unfollow();
+                binding.followButton.setVisibility(View.VISIBLE);
+                binding.unfollowButton.setVisibility(View.GONE);
+            }
+        });
+        binding.followButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewModel.follow();
+                binding.followButton.setVisibility(View.GONE);
+                binding.unfollowButton.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //set up logout button
+        binding.LogOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(requireContext(), Login.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                mAuth.signOut(); // use this to sign out
+                startActivity(intent);
             }
         });
 
@@ -148,7 +146,11 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
 
     private void setUIValues() {
         binding.description.setText(viewModel.getDescription());
-        binding.profileImage.setImageResource(viewModel.getProfilePicResource());
+        if(getResources().getIdentifier(viewModel.getProfilePicResource(), "drawable", requireContext().getPackageName()) == 0) {
+            binding.profileImage.setImageResource(getResources().getIdentifier("user", "drawable", requireContext().getPackageName()));
+        } else {
+            binding.profileImage.setImageResource(getResources().getIdentifier(viewModel.getProfilePicResource(), "drawable", requireContext().getPackageName()));
+        }
         binding.userName.setText(viewModel.getUserName());
         for(Post post : posts) {
             recentlyListenedToImageURLs.add(post.getImageURL());

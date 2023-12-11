@@ -67,7 +67,6 @@ public class NewPostFragment extends Fragment {
             }
         });
 
-        // todo - add empty entry error messages
         // Set up the interactions for the new post elements
         binding.btnSubmitPost.setOnClickListener(v -> {
             String postContent = binding.etPostContent.getText().toString();
@@ -77,7 +76,7 @@ public class NewPostFragment extends Fragment {
             if (selectedId != -1) {
                 RadioButton selectedRadioButton = getView().findViewById(selectedId);
                 visibilityState = selectedRadioButton.getText().toString();
-                if(visibilityState.equals("Private")) {
+                if (visibilityState.equals("Private")) {
                     visibilityState = "private";
                 } else if (visibilityState.equals("Only Friends")) {
                     visibilityState = "friends";
@@ -94,8 +93,8 @@ public class NewPostFragment extends Fragment {
                 viewModel.createPost(postContent, visibilityState);
                 Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
 
-                ((MainActivity)requireActivity()).removeFragmentFromBackStack("NEW_POST_FRAGMENT");
-                ((MainActivity)requireActivity()).navigateToFragment("HOME_FRAGMENT", true, null);
+                ((MainActivity) requireActivity()).removeFragmentFromBackStack("NEW_POST_FRAGMENT");
+                ((MainActivity) requireActivity()).navigateToFragment("HOME_FRAGMENT", true, null);
             }
         });
 
@@ -111,66 +110,66 @@ public class NewPostFragment extends Fragment {
     }
 
     private void setupSearch() {
-            binding.actvSongSearch.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        binding.actvSongSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    if (s.length() != 0) {
+                        viewModel.performSearch(s.toString())
+                                .observe(getViewLifecycleOwner(), searchResults -> {
+                                    ArrayList<JsonObject> results = new ArrayList<>();
+
+                                    for (int i = 0; i < searchResults.size(); i++) {
+                                        results.add(searchResults.get(i).getAsJsonObject());
+                                    }
+                                    searchAdapter = new TrackSearchAdapter(getContext(), results);
+                                    binding.actvSongSearch.setAdapter(searchAdapter);
+                                    searchAdapter.notifyDataSetChanged();
+                                    binding.actvSongSearch.showDropDown();
+                                });
+                    }
+                } catch (Exception e) {
+                    Log.e("NewPostFragment", "afterTextChanged - Error performing search", e);
                 }
+            }
+        });
 
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    try {
-                        if(s.length() != 0) {
-                            viewModel.performSearch(s.toString())
-                                    .observe(getViewLifecycleOwner(), searchResults -> {
-                                        ArrayList<JsonObject> results = new ArrayList<>();
-
-                                        for (int i = 0; i < searchResults.size(); i++) {
-                                            results.add(searchResults.get(i).getAsJsonObject());
-                                        }
-                                        searchAdapter = new TrackSearchAdapter(getContext(),results);
-                                        binding.actvSongSearch.setAdapter(searchAdapter);
-                                        searchAdapter.notifyDataSetChanged();
-                                    });
-                            binding.actvSongSearch.showDropDown();
-                        }
-                    } catch (Exception e) {
-                        Log.e("NewPostFragment", "afterTextChanged - Error performing search", e);
+        binding.actvSongSearch.setOnItemClickListener((parent, view, position, id) -> {
+            selectedTrack = searchAdapter.getItem(position);
+            if (selectedTrack != null) {
+                String artists = "";
+                JsonArray artistsArray = selectedTrack.getAsJsonArray("artists");
+                if (artistsArray != null && artistsArray.size() > 0) {
+                    for (JsonElement artist : artistsArray) {
+                        artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
                     }
                 }
-            });
+                artists = artists.trim();
+                Track trackToStore = viewModel.createTrack(selectedTrack);
+                sharedDataViewModel.setTrackPost(trackToStore);
+                binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
 
-            binding.actvSongSearch.setOnItemClickListener((parent, view, position, id) -> {
-                selectedTrack = searchAdapter.getItem(position);
-                if (selectedTrack != null) {
-                    String artists = "";
-                    JsonArray artistsArray = selectedTrack.getAsJsonArray("artists");
-                    if (artistsArray != null && artistsArray.size() > 0) {
-                        for (JsonElement artist : artistsArray) {
-                            artists = artists + artist.getAsJsonObject().get("name").getAsString() + " ";
-                        }
-                    }
-                    artists = artists.trim();
-                    Track trackToStore = viewModel.createTrack(selectedTrack);
-                    sharedDataViewModel.setTrackPost(trackToStore);
-                    binding.actvSongSearch.setText(selectedTrack.get("name").getAsString() + " by " + artists);
-
-                    JsonObject albumObject = selectedTrack.getAsJsonObject("album");
-                    if (albumObject != null) {
-                        JsonArray imagesArray = albumObject.getAsJsonArray("images");
-                        if (imagesArray != null && imagesArray.size() > 0) {
-                            String imageURL = imagesArray.get(0).getAsJsonObject().get("url").getAsString();
-                            Glide.with(this)
-                                    .load(imageURL)
-                                    .into(binding.ivAlbumCover);
-                        }
+                JsonObject albumObject = selectedTrack.getAsJsonObject("album");
+                if (albumObject != null) {
+                    JsonArray imagesArray = albumObject.getAsJsonArray("images");
+                    if (imagesArray != null && imagesArray.size() > 0) {
+                        String imageURL = imagesArray.get(0).getAsJsonObject().get("url").getAsString();
+                        Glide.with(this)
+                                .load(imageURL)
+                                .into(binding.ivAlbumCover);
                     }
                 }
-            });
+            }
+        });
     }
 
     @Override

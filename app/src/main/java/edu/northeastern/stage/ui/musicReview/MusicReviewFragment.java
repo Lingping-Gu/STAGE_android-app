@@ -28,6 +28,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import edu.northeastern.stage.databinding.FragmentMusicReviewBinding;
 import edu.northeastern.stage.model.music.Artist;
+import edu.northeastern.stage.ui.adapters.NavigationCallback;
 import edu.northeastern.stage.ui.adapters.ReviewAdapter;
 import edu.northeastern.stage.ui.viewmodels.MusicReviewViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
@@ -45,7 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class MusicReviewFragment extends Fragment {
+public class MusicReviewFragment extends Fragment implements NavigationCallback {
     private FragmentMusicReviewBinding binding;
     private MusicReviewViewModel mViewModel;
     private SharedDataViewModel sharedDataViewModel;
@@ -125,7 +126,7 @@ public class MusicReviewFragment extends Fragment {
                 updateOverallScore();
             } else {
                 // Show RecyclerView and hide "No reviews yet." text
-                reviewAdapter = new ReviewAdapter(reviews);
+                reviewAdapter = new ReviewAdapter(requireActivity(), reviews, this);
                 reviewsRecyclerView.setAdapter(reviewAdapter);
                 noReviewsTextView.setVisibility(View.GONE);
                 reviewsRecyclerView.setVisibility(View.VISIBLE);
@@ -181,6 +182,16 @@ public class MusicReviewFragment extends Fragment {
         } else {
             String formattedRating = String.format(Locale.getDefault(), "Overall rating: %.1f / 5.0", overallRating);
             overallScoreTextView.setText(formattedRating);
+        }
+    }
+
+    @Override
+    public void onNavigateToProfile(String profileOwnerId) {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null) {
+            Bundle bundle = new Bundle();
+            bundle.putString("PROFILE_OWNER_ID", profileOwnerId);
+            mainActivity.navigateToFragment("OTHER_PROFILE_FRAGMENT", true, bundle);
         }
     }
 }
