@@ -98,7 +98,7 @@ public class CircleView extends View {
                 float textSize = c.getRadius() / 3;
                 paint.setTextSize(textSize);
                 String fullText  = circleTextMap.get(c);
-                String[] lines = fullText.split("/");
+                String[] lines = fullText.split("//");
                 float textWidth = maxTextWidth(lines);
                 // adjust the width to fit inside the circle
                 while (textWidth > c.getRadius() * 2 && textSize > 0) {
