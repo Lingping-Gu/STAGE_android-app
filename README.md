@@ -4,7 +4,7 @@ Discover new music and connect with friends who share your taste through STAGE.
 STAGE is an android application built using Java, Android Studio and Firebase real-time Database, connected with Spotify. Post about the tunes you love and why they resonate with you. Learn about friends old and new through the music that defines them. This app allows you to build a community around musical passion. Follow friends and interesting profiles to explore new artists, genres, and songs. Share your discoveries and daily moods through music. STAGE uses your personal soundtrack to foster meaningful connections. Meet fellow music
 enthusiasts, discuss favorite artists, and exchange recommendations. Let curiosity guide you through this social music ecosystem. Discover, connect, and bond over your love of music.
 
-# Features:
+# Features
 **Friend Circle:** Cultivate your musical tribe with likes, follows, and exclusive posts. Shape a sanctuary where private anthems and personal notes resonate.
 
 **Home:** Express your current vibe with a post, or surf through a stream of the latest musical tales.
