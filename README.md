@@ -16,7 +16,7 @@ enthusiasts, discuss favorite artists, and exchange recommendations. Let curiosi
 **Profile:** Craft your musical identity with tags, a bio, and a profile picture that speaks volumes.
 
 # Getting Started
-Follow these simple steps to run WalletWatch on an Android emulator:
+Follow these simple steps to run SATGE on an Android emulator:
 
 1. Clone the Repository:
 ```bash
