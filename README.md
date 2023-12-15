@@ -5,7 +5,6 @@ STAGE is an android application built using Java, Android Studio and Firebase re
 enthusiasts, discuss favorite artists, and exchange recommendations. Let curiosity guide you through this social music ecosystem. Discover, connect, and bond over your love of music.
 
 # Features:
-
 **Friend Circle:** Cultivate your musical tribe with likes, follows, and exclusive posts. Shape a sanctuary where private anthems and personal notes resonate.
 
 **Home:** Express your current vibe with a post, or surf through a stream of the latest musical tales.
