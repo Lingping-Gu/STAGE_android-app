@@ -19,9 +19,8 @@ enthusiasts, discuss favorite artists, and exchange recommendations. Let curiosi
 Follow these simple steps to run WalletWatch on an Android emulator:
 
 1. Clone the Repository:
- [```bash
+```bash
    git clone https://github.com/Lingping-Gu/STAGE_android-app.git
-   ```](https://github.com/Lingping-Gu/STAGE_android-app.git)
 
 2. Open in Android Studio:
 Open Android Studio.
